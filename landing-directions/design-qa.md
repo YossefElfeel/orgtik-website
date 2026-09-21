@@ -4,6 +4,8 @@ Status: passed after the approach hover interaction refinement.
 
 ## Scope
 
+Latest follow-up (2026-09-21): testimonials now have six explicitly labeled placeholders on a native scroll-snap track with three visible at desktop/tablet and one on mobile. Previous/next buttons, keyboard Home/End, range updates, and boundary disabled states verified. FAQ uses a full-width dark panel with off-white/white question states, violet active toggle, readable muted-lavender answers, and an aligned compact contact band. Footer links are 16px desktop / 15px mobile; a separate logo row and top-aligned navigation replace the bottom-aligned tiny-link layout. `overflow: clip` fixes the decorative glow causing internal footer scrolling; confirmed footer scrollTop is zero and mobile bottom padding is 28px. Desktop 1440 × 1000, tablet 768 × 1024, and mobile 390 × 844 checks showed no horizontal page overflow. Contact dialog and FAQ keyboard behavior remain functional. Earlier entries below describe previous iterations.
+
 The selected Cinematic landing page is the only public experience. The comparison gallery, selection controls, Editorial direction, and Connected direction have been removed.
 
 ## Visual source

@@ -19,7 +19,7 @@
 - Do not implement backend services, real authentication, transactions, or message delivery. All contact/account/plan behavior is labelled as a local preview.
 - Build static client output only for this task. The starter's optional hosting files are untouched and not used or included in preview delivery.
 - Continue future design work in the cinematic visual language unless the user explicitly changes direction.
-- Keep all current work on this single page and frontend only; use on-page overlays for project and plan previews.
+- The website now uses real client-side routes for the plan's P01–P18 public templates. Keep the homepage and routed templates in one shared cinematic design system; preserve local-only preview behavior for forms, plans, roadmap participation, and account states.
 - Keep the navbar fixed and visible while scrolling, with an opaque plum surface after leaving the top. Account for its height in anchor offsets.
 - The scrolled navbar uses a compact floating rounded rail with subtly translucent plum glass, 16px backdrop blur, a fine highlight/shadow, and active-section indication. Retain the full-width top state, compact mobile rail, and opaque fallback for unsupported/reduced-transparency environments.
 - Include a shared “View all projects” CTA after the selected work imagery, opening the existing projects in an on-page gallery without adding routes or invented work.
@@ -42,6 +42,11 @@
 - The approach section uses a hover stage selector for Understand, Design, Deliver, and Evolve, paired with large supplied OrgTik imagery and the original stage narrative. Preserve mobile tap and keyboard navigation, including arrows, Home, and End, with a stacked mobile layout.
 - The “View all projects” CTA belongs in the “Our identity, in the world” section introduction, aligned to the right of the heading copy on larger screens and stacked with the introduction on mobile.
 - Services include a fifth “OrgTik hosting” offer in the existing cinematic accordion, covering managed hosting, monitoring/backups, and performance care without unverified uptime claims.
+- Treat “OrgTik hosting” as the fifth service family throughout `/services`, its managed-hosting detail route, and the generated sitemap so the routed architecture matches the approved homepage.
+- Closing CTAs across all routed marketing/content pages use the homepage contact-band treatment: a contained rounded violet panel on warm paper with the official mark. Do not restore full-bleed violet closing sections without a new request.
+- Keep the `/pricing` plan builder compact and aligned: five short plan selectors, a three-by-two desktop module grid, two columns on tablet, one column on mobile, and a top-aligned review card. Module cards should hug their content rather than stretch to the review panel's height. Preserve `mode` and plural `modules` URL state for shareable local previews.
+- “Discuss this plan” in the pricing builder opens `/pricing/plans`, carrying the selected mode and module IDs into a dedicated three-plan comparison. Keep Launch, Connected (recommended), and Partnership as contact-led service-scope options; preserve the selected systems, clear frontend-preview boundary, responsive three-column/stacked layout, and the final handoff into the contact preview.
+- The shared header navigation includes an explicit Home link in both desktop and mobile menus. Keep the official logo linked to Home as an additional route, not the sole way back.
 
 Run the local server yourself and open the preview in the browser available to this environment. Do not give the user server-start instructions when you can run it.
 

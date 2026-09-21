@@ -1,5 +1,75 @@
 # OrgTik cinematic website design QA
 
+## Explicit Home navigation — 2026-09-21
+
+The shared header now exposes Home as the first text link on desktop and as item 01 in the mobile menu, while retaining the official logo link. Browser checks from the plan-recommendation screen verified that both versions navigate to `/`, the mobile dialog closes after selection, and Home receives the active-page state on arrival. The additional link fits the existing 1440 px header and the 390 px mobile menu without horizontal overflow or browser warning/error logs.
+
+final result: passed
+
+## Three-plan recommendation screen — 2026-09-21
+
+Source visual truth: the approved cinematic routed design system, the refined compact pricing builder, and the user-requested next step after “Discuss this plan.” Commercial prices and terms were not supplied, so the screen compares service scope while retaining explicit contact-led language.
+
+Implementation evidence: browser-rendered flow from `/pricing?mode=custom&modules=hr` to `/pricing/plans?mode=custom&modules=hr`, inspected at 1440 × 900 and 390 × 844 CSS viewports at density 1. The Connected CTA was followed into the contact preview, and the recommendation route was also loaded without module parameters to verify its recovery state.
+
+State: the new screen carries the selected systems into Launch, Connected, and Partnership cards. Connected receives the premium dark recommended treatment. All three cards show their distinct scope, inclusions, contact-led pricing status, selected-system count, and a direct plan-specific action. The compact hero uses the required animated brand-video treatment. An edit-selection path returns to the exact builder configuration.
+
+Findings: no actionable P0/P1/P2 issues remain. Desktop presents three equal-width cards at approximately 427 px each. Mobile stacks approximately 335 px cards inside the standard 20 px gutter and removes the desktop card offset. The HR selection, mode, and chosen recommendation persist in the URL; choosing Connected opens `/contact?intent=platform&plan=connected&mode=custom&modules=hr` with Platform selected. A direct empty-state visit renders no recommendation cards and provides a clear return to the builder. No horizontal overflow or browser warning/error logs were found.
+
+final result: passed
+
+## Pricing plan-builder density and alignment — 2026-09-21
+
+Source visual truth: the approved cinematic routed design system and the user-supplied state `/pricing?mode=custom&modules=hr`. No separate pricing mock was supplied; the existing page content, type system, palette, and interaction model were retained.
+
+Implementation evidence: browser-rendered pricing builder at 1440 × 900 and 390 × 844 CSS viewports at density 1. The supplied plural `modules=hr` deep link was loaded directly, then CRM was added through the interface to verify selection state, the count, review content, and URL synchronization.
+
+State: the five plan choices now render as compact 90 px selectors. The six module choices use a balanced three-by-two desktop grid with 108 px content-hugging cards, two columns on tablet, and one column on mobile. A numbered module heading and live selection-count pill clarify the builder sequence. The review card is top-aligned, reduced from approximately 542 px to 381 px, and no longer stretches the module rows.
+
+Findings: no actionable P0/P1/P2 issues remain. At desktop the selection area is approximately 965 px wide and 300 px high, with a 328 px review panel beside it. At mobile the content uses the established 20 px gutter and approximately 335 px cards. The page has no horizontal overflow. Loading the supplied URL restores HR; selecting CRM changes the pill to “2 modules,” updates the review to “HR · CRM,” and writes `modules=hr%2Ccrm` to the URL.
+
+final result: passed
+
+## Contained closing CTAs across routed pages — 2026-09-21
+
+Source visual truth: the approved homepage `.faq-contact-band` treatment and the Services refinement documented immediately below.
+
+Implementation evidence: browser-rendered closing states at `/services`, service family/detail, `/insights` and article detail, `/about`, `/platform` and module detail, `/pricing`, `/work` and case-study detail, and `/roadmap`. Desktop checks used 1440 × 900 CSS pixels; responsive checks used 390 × 844 at density 1.
+
+State: the shared `PageCTA` component now defaults to its contained treatment. Every route that renders this closing action uses the same warm-paper surround, 16 px violet panel, official OrgTik mark, two-column desktop composition, and stacked mobile composition. Utility and task-focused routes without a marketing closing action remain unchanged.
+
+Findings: no actionable P0/P1/P2 issues remain. At desktop, all twelve checked template states render one contained CTA approximately 1313 px wide with a 56 px page margin. At mobile, representative routes render a single-column CTA approximately 335 px wide with a 20 px margin. All checked routes retain their page-specific copy and destination, show no horizontal overflow, and produce no browser warning/error logs.
+
+final result: passed
+
+## Services closing CTA containment — 2026-09-21
+
+Source visual truth: `C:/Users/USER/AppData/Local/Temp/codex-clipboard-9b078f29-4145-4c92-8007-2d7aa1d00889.png` (1892 × 472), showing the earlier full-bleed Services CTA, plus the approved homepage `.faq-contact-band` as the requested contained treatment.
+
+Implementation evidence: browser-rendered `/services#page-cta`, inspected at 1440 × 900 and 390 × 844 CSS viewports at density 1. The desktop panel measures approximately 1313 px wide with a 56 px left margin and 16 px radius; the mobile panel measures approximately 335 px wide with a 20 px left margin. The browser provider displayed the rendered captures inline; no persistent screenshot file was produced.
+
+State: Services overview closing action immediately before the footer. Full-view comparison verified that the warm-paper surround separates the CTA from the dark process section and footer. Focused comparison verified the contained frame, two-column desktop composition, stacked mobile composition, official OrgTik mark, preserved heading/body/action copy, and functioning `/contact?intent=services` link.
+
+Findings: no actionable P0/P1/P2 issues remain. The earlier full-width violet fill was replaced by a homepage-aligned contained card. Typography remains Montserrat with the established display hierarchy; spacing uses the shared 56/20 px responsive gutters; the gradient reuses the homepage contact-band colors; the decorative mark is the official SVG asset rather than a recreation; and all app-specific copy remains unchanged.
+
+Comparison history: the source capture showed a full-viewport violet region with no outer paper margin. The implementation adds the requested warm-paper frame, 16 px radius, restrained homepage gradient, and responsive internal padding. Post-fix desktop/mobile browser captures show no horizontal overflow. Browser warning/error logs are empty.
+
+final result: passed
+
+## Routed website templates — 2026-09-21
+
+Extended the approved cinematic homepage system across the plan's remaining P02–P18 template families: Services overview, five service families including OrgTik hosting, reusable service detail, Insights/category/article, About, Contact, Legal, Sitemap, not found, Roadmap, Platform, six module pages, Plans, sign in/recovery, Work, and case study.
+
+The route shell preserves the official logo, Montserrat hierarchy, deep-plum and violet palette, warm-paper reading sections, 54px CTA anatomy, responsive media treatment, and restrained motion. Major marketing heroes use the existing branded motion or approved PDF-derived assets. Article, legal, sitemap, sign-in, work, and error templates use quieter static treatments where the plan prioritizes reading or task clarity.
+
+Functional verification covered route titles and headings, the fifth hosting family and managed-hosting detail, category/project filters, module selection and URL summary state, contact validation and explicit local success state, roadmap detail dialog and scroll unlock, sign-in preview, recovery route, and unknown-route recovery. Contact, account, pricing, roadmap, legal, case-study proof, and product imagery clearly state their preview or owner-review status.
+
+Browser checks covered all 18 template families at 1440 × 900 and representative commercial/content/utility routes at 390 × 844. The tested pages had no horizontal overflow and browser warning/error logs were empty. `npm run format:check` passes. The latest `npm run build` passes with 85.26 kB CSS (18.59 kB gzip) and 416.05 kB JavaScript (119.64 kB gzip), within the plan's gzip budgets.
+
+Remaining release dependencies are content and ownership decisions: approved client evidence, quotations and metrics; final legal wording; commercial plan names and prices; confirmed product availability and captures; verified contact details; and approved historical/roadmap claims.
+
+final result: passed for frontend template implementation; content approval pending
+
 ## Review comments verification — 2026-09-21
 
 Source visual truth: `qa/cinematic-full-wide.png` (1424 × 6196) for the existing cinematic composition, plus the user’s requested CTA placement and fifth-service requirements. Brand imagery and palette remain grounded in `../ORGTIK.pdf` and `../assits/LOGO`.

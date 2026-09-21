@@ -169,7 +169,13 @@ export function VideoScene({
   );
 }
 
-export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
+export function Header({
+  theme = "dark",
+  onContact,
+  onAccount,
+  onPlan,
+  currentPath = window.location.pathname,
+}) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(() => window.scrollY > 24);
   const [activeSection, setActiveSection] = useState("");
@@ -213,13 +219,16 @@ export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
     requestAnimationFrame(() => trigger.current?.focus());
   };
   const links = [
-    ["Platform", "#platform"],
-    ["Services", "#services"],
-    ["Our approach", "#approach"],
+    ["Home", "/"],
+    ["Platform", "/platform"],
+    ["Services", "/services"],
+    ["Work", "/work"],
+    ["Insights", "/insights"],
+    ["About", "/about"],
   ];
   return (
     <header className={`site-header ${theme}`} data-scrolled={scrolled}>
-      <a className="logo-link" href="#top" aria-label="OrgTik home">
+      <a className="logo-link" href="/" aria-label="OrgTik home">
         <Logo light={theme === "dark"} />
       </a>
       <nav className="desktop-nav" aria-label="Main navigation">
@@ -227,7 +236,13 @@ export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
           <a
             key={name}
             href={url}
-            aria-current={url === `#${activeSection}` ? "location" : undefined}
+            aria-current={
+              currentPath === url ||
+              (url !== "/" && currentPath.startsWith(`${url}/`)) ||
+              (currentPath === "/" && url === `/#${activeSection}`)
+                ? "page"
+                : undefined
+            }
           >
             {name}
           </a>
@@ -271,7 +286,17 @@ export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
         </div>
         <nav aria-label="Mobile navigation">
           {links.map(([name, url], i) => (
-            <a key={url} href={url} onClick={close}>
+            <a
+              key={url}
+              href={url}
+              onClick={close}
+              aria-current={
+                currentPath === url ||
+                (url !== "/" && currentPath.startsWith(`${url}/`))
+                  ? "page"
+                  : undefined
+              }
+            >
               <small>0{i + 1}</small>
               {name}
               <ArrowUpRight size={24} />
@@ -602,7 +627,7 @@ export function Footer({ theme = "dark", onContact, onPlan }) {
     <footer className={`site-footer ${theme}`}>
       <div className="footer-aurora" aria-hidden="true" />
       <div className="footer-top">
-        <a href="#top" aria-label="OrgTik — back to top">
+        <a href="/" aria-label="OrgTik home">
           <Logo light={theme === "dark"} />
         </a>
         <a href="#top" className="back-top" aria-label="Back to top">
@@ -626,17 +651,18 @@ export function Footer({ theme = "dark", onContact, onPlan }) {
         <nav className="footer-links" aria-label="Footer navigation">
           <div>
             <h3>Explore</h3>
-            <a href="#platform">Platform</a>
-            <a href="#services">Services</a>
-            <a href="#work">Selected work</a>
-            <a href="#approach">Our approach</a>
-            <a href="#testimonials">Testimonials</a>
+            <a href="/platform">Platform</a>
+            <a href="/services">Services</a>
+            <a href="/work">Selected work</a>
+            <a href="/insights">Insights</a>
+            <a href="/about">About OrgTik</a>
           </div>
           <div>
             <h3>Start here</h3>
             <button onClick={onPlan}>Explore plans</button>
             <button onClick={onContact}>Tell us about your project</button>
-            <a href="#faq">Common questions</a>
+            <a href="/roadmap">Roadmap</a>
+            <a href="/sitemap">Sitemap</a>
           </div>
         </nav>
       </div>

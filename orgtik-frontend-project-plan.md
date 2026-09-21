@@ -1,11 +1,13 @@
 # OrgTik frontend project plan
 
 Prepared: 20 September 2026  
-Status: ready for user review; website development has not started.  
+Status: frontend implementation in progress; P01–P18 public template families are available as a routed local preview, with final content approval and release polish still pending.
 Scope: UI/UX, customer experience, product design, and frontend only.  
 Source brief: [Enhanced website IA](orgtik-website-ia.md).  
 Brand source: [ORGTIK.pdf](ORGTIK.pdf), all 21 pages reviewed.  
 Confirmed media decision: **use an animated video placeholder in the hero**.
+
+Implementation update — 21 September 2026: the selected cinematic direction now extends across the planned frontend route inventory. Services include the later-approved fifth **OrgTik hosting** family. Forms, plan configuration, account/recovery, filters, and roadmap participation remain deterministic local previews with no backend behavior. Owner-approved client proof, legal text, pricing, roadmap commitments, and final product captures are still required before public release.
 
 ## 1. Recommended direction
 

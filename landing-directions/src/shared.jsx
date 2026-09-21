@@ -1,42 +1,65 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  ArrowRight,
   ArrowUpRight,
-  ArrowLeft,
-  ArrowDown,
-  Pause,
-  Play,
   List,
   X,
   Check,
   CheckCircle,
-  Copy,
-  GridFour,
   Plus,
-  Minus,
   Stack,
+  FacebookLogo,
+  InstagramLogo,
+  LinkedinLogo,
+  XLogo,
+  TiktokLogo,
+  PinterestLogo,
+  SnapchatLogo,
+  YoutubeLogo,
 } from "@phosphor-icons/react";
-import { directions, modules, steps } from "./content";
+import { modules, steps } from "./content";
+import { Disclosure } from "./Experience";
+import { Action } from "./Action";
+export { Action } from "./Action";
 
 export const asset = (name) => `/assets/${name}`;
-export const Arrow = ({ diagonal = false, ...props }) =>
-  diagonal ? (
-    <ArrowUpRight size={20} {...props} />
-  ) : (
-    <ArrowRight size={20} {...props} />
-  );
 export function Logo({ light = false, emblem = false, ...props }) {
+  const variant = light ? "white" : "black";
+  if (emblem) {
+    return (
+      <img
+        {...props}
+        className={`brand-logo emblem ${props.className || ""}`}
+        src={asset(`logo/orgtik-mark-${variant}.svg`)}
+        alt="OrgTik"
+        width="247"
+        height="250"
+      />
+    );
+  }
   return (
-    <img
+    <span
       {...props}
-      className={`brand-logo ${emblem ? "emblem" : ""} ${props.className || ""}`}
-      src={asset(
-        `${emblem ? "emblem" : "wordmark"}-${light ? "white" : "plum"}.svg`,
-      )}
-      alt="OrgTik"
-      width={emblem ? 42 : 112}
-      height={emblem ? 42 : 30}
-    />
+      className={`brand-logo ${props.className || ""}`}
+      role="img"
+      aria-label="OrgTik"
+    >
+      <img
+        className="brand-logo-mark"
+        src={asset(`logo/orgtik-mark-${variant}.svg`)}
+        alt=""
+        width="247"
+        height="250"
+        aria-hidden="true"
+      />
+      <img
+        className="brand-logo-wordmark"
+        src={asset(`logo/orgtik-wordmark-${variant}.svg`)}
+        alt=""
+        width="673"
+        height="197"
+        aria-hidden="true"
+      />
+    </span>
   );
 }
 export function Eyebrow({ children, number, className = "" }) {
@@ -47,28 +70,6 @@ export function Eyebrow({ children, number, className = "" }) {
     </p>
   );
 }
-export function Action({
-  children,
-  href,
-  onClick,
-  secondary = false,
-  className = "",
-  ...rest
-}) {
-  const cls = `action ${secondary ? "action-secondary" : ""} ${className}`;
-  return href ? (
-    <a className={cls} href={href} {...rest}>
-      {children}
-      <Arrow />
-    </a>
-  ) : (
-    <button className={cls} onClick={onClick} {...rest}>
-      {children}
-      <Arrow />
-    </button>
-  );
-}
-
 export function useReducedMotion() {
   const [reduced, setReduced] = useState(
     () =>
@@ -94,12 +95,9 @@ export function VideoScene({
   const reduced = useReducedMotion();
   const [mobile, setMobile] = useState(() => window.innerWidth < 700);
   const [playing, setPlaying] = useState(false);
-  const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
-  const pausedByUser = useRef(false);
-  const [manual, setManual] = useState(false);
   const saveData = !!navigator.connection?.saveData;
-  const canLoad = (!reduced && !saveData) || manual;
+  const canLoad = !reduced && !saveData;
   const stem = `${kind}-${mobile ? "mobile" : "desktop"}`;
   useEffect(() => {
     const m = matchMedia("(max-width:699px)");
@@ -112,8 +110,7 @@ export function VideoScene({
     if (!el) return;
     let inside = true;
     const sync = () => {
-      if (document.hidden || !inside || pausedByUser.current || !canLoad)
-        el.pause();
+      if (document.hidden || !inside || !canLoad) el.pause();
       else el.play().catch(() => setPlaying(false));
     };
     const observer = new IntersectionObserver(
@@ -131,18 +128,6 @@ export function VideoScene({
       document.removeEventListener("visibilitychange", sync);
     };
   }, [canLoad, stem]);
-  function toggle() {
-    const el = ref.current;
-    if (!el) return;
-    if (playing) {
-      pausedByUser.current = true;
-      el.pause();
-    } else {
-      pausedByUser.current = false;
-      setManual(true);
-      el.play().catch(() => setPlaying(false));
-    }
-  }
   return (
     <div className={`video-scene ${className} ${ready ? "video-ready" : ""}`}>
       <picture>
@@ -176,27 +161,10 @@ export function VideoScene({
         }}
         onPause={() => setPlaying(false)}
         onError={() => {
-          setFailed(true);
           setPlaying(false);
         }}
       />
       {showLabel && <span className="scene-label">{label}</span>}
-      {!failed && (
-        <button
-          className="video-control"
-          onClick={toggle}
-          aria-label={
-            playing ? "Pause background video" : "Play background video"
-          }
-        >
-          {playing ? (
-            <Pause weight="fill" size={14} />
-          ) : (
-            <Play weight="fill" size={14} />
-          )}
-          <span>{playing ? "Pause motion" : "Play motion"}</span>
-        </button>
-      )}
     </div>
   );
 }
@@ -243,9 +211,9 @@ export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
         <button className="account-link" onClick={onAccount}>
           Sign in <ArrowUpRight size={13} />
         </button>
-        <button className="header-cta" onClick={onContact}>
-          Start a project <ArrowUpRight size={16} />
-        </button>
+        <Action className="header-cta" compact onClick={onContact}>
+          Start a project
+        </Action>
       </div>
       <button
         ref={trigger}
@@ -307,9 +275,6 @@ export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
         >
           Start a project
         </Action>
-        <a href="/" className="mobile-compare">
-          Compare all three directions
-        </a>
       </dialog>
     </header>
   );
@@ -317,8 +282,29 @@ export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
 
 export function ModuleExplorer({ variant = "cinematic", onPlan }) {
   const [selected, setSelected] = useState("hr");
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [pageVisible, setPageVisible] = useState(!document.hidden);
+  const root = useRef(null);
+  const reduced = useReducedMotion();
+  const running = !hovered && !focused && visible && pageVisible && !reduced;
   const active = modules.find((m) => m.id === selected);
+  const activeIndex = modules.indexOf(active);
   const Icon = active.icon;
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0.25 },
+    );
+    observer.observe(root.current);
+    const visibility = () => setPageVisible(!document.hidden);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, []);
   function keyboard(e, index) {
     if (["ArrowRight", "ArrowLeft", "Home", "End"].includes(e.key)) {
       e.preventDefault();
@@ -333,7 +319,19 @@ export function ModuleExplorer({ variant = "cinematic", onPlan }) {
     }
   }
   return (
-    <div className={`module-explorer explorer-${variant}`}>
+    <div
+      ref={root}
+      className={`module-explorer explorer-${variant}`}
+      data-running={running}
+      onPointerEnter={(e) => {
+        if (e.pointerType === "mouse") setHovered(true);
+      }}
+      onPointerLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
+      }}
+    >
       <div
         className="module-tabs"
         role="tablist"
@@ -353,6 +351,17 @@ export function ModuleExplorer({ variant = "cinematic", onPlan }) {
             <m.icon size={20} />
             <span>{m.formal}</span>
             <span className="module-tab-number">{m.number}</span>
+            {selected === m.id && (
+              <span
+                key={selected}
+                className="module-timer"
+                aria-hidden="true"
+                onAnimationEnd={() => {
+                  if (running)
+                    setSelected(modules[(activeIndex + 1) % modules.length].id);
+                }}
+              />
+            )}
           </button>
         ))}
       </div>
@@ -364,31 +373,41 @@ export function ModuleExplorer({ variant = "cinematic", onPlan }) {
         tabIndex="0"
       >
         <div key={selected} className="module-copy">
-          <div className="module-category">
-            <Icon size={28} />
-            <span>
-              {active.category} / {active.number}
-            </span>
-          </div>
-          <h3>{active.title}</h3>
-          <p>{active.description}</p>
-          <ul>
-            {active.tasks.map((t) => (
-              <li key={t}>
-                <Check size={16} />
-                {t}
-              </li>
+          <h3>
+            {active.title.split(/(?<=\.) /).map((sentence, index) => (
+              <span
+                key={sentence}
+                className={index > 0 ? "module-title-accent" : undefined}
+              >
+                {index > 0 ? " " : ""}
+                {sentence}
+              </span>
             ))}
-          </ul>
-          <button className="text-link" onClick={() => onPlan(active.id)}>
-            Explore your combination <Arrow />
-          </button>
+          </h3>
+          <p>{active.description}</p>
+          <div className="module-capabilities">
+            <span className="module-capability-mark" aria-hidden="true">
+              <Icon size={32} weight="light" />
+            </span>
+            <ul>
+              {active.tasks.map((t) => (
+                <li key={t}>
+                  <Check size={15} aria-hidden="true" />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <Action
+            className="module-plan-action"
+            onClick={() => onPlan(active.id)}
+          >
+            Explore your combination
+          </Action>
         </div>
         <div className="module-art">
           <img
-            src={asset(
-              variant === "editorial" ? "brand-glass.webp" : "brand-phone.webp",
-            )}
+            src={asset("brand-phone.webp")}
             alt="OrgTik brand application on a device"
             loading="lazy"
             width="1920"
@@ -397,7 +416,7 @@ export function ModuleExplorer({ variant = "cinematic", onPlan }) {
           <span className="art-caption">
             Brand application · Platform concept
           </span>
-          <div className="module-art-label">
+          <div key={selected} className="module-art-label">
             <Icon size={24} />
             <div>
               <small>One part of your workspace</small>
@@ -410,25 +429,106 @@ export function ModuleExplorer({ variant = "cinematic", onPlan }) {
   );
 }
 
-export function Process({ variant = "cinematic" }) {
+const processArt = [
+  ["brand-glass.webp", "The OrgTik mark held on a transparent glass surface"],
+  [
+    "brand-tablet.webp",
+    "OrgTik's visual identity applied to a digital surface",
+  ],
+  [
+    "brand-cards.webp",
+    "The OrgTik identity brought together in a printed card system",
+  ],
+  ["brand-phone.webp", "OrgTik's identity carried into a mobile experience"],
+];
+
+export function Process() {
+  const [selected, setSelected] = useState(0);
+  const tabRefs = useRef([]);
+  function navigate(event, index) {
+    const directions = {
+      ArrowDown: 1,
+      ArrowRight: 1,
+      ArrowUp: -1,
+      ArrowLeft: -1,
+    };
+    let next;
+    if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = steps.length - 1;
+    else if (event.key in directions)
+      next = (index + directions[event.key] + steps.length) % steps.length;
+    else return;
+    event.preventDefault();
+    setSelected(next);
+    tabRefs.current[next]?.focus();
+  }
   return (
-    <div className={`process-grid process-${variant}`}>
-      {steps.map(([name, title, text], i) => (
-        <article key={name} className="process-step">
-          <div className="process-top">
-            <span>0{i + 1}</span>
-            <ArrowRight size={18} />
-          </div>
-          <h3>{name}</h3>
-          <h4>{title}</h4>
-          <p>{text}</p>
-        </article>
-      ))}
+    <div className="process-studio">
+      <div
+        className="process-selector"
+        role="tablist"
+        aria-label="Our process stages"
+        aria-orientation="vertical"
+      >
+        {steps.map(([name], index) => (
+          <button
+            key={name}
+            ref={(node) => {
+              tabRefs.current[index] = node;
+            }}
+            role="tab"
+            id={`process-tab-${index}`}
+            aria-controls="process-detail"
+            aria-selected={selected === index}
+            tabIndex={selected === index ? 0 : -1}
+            onPointerEnter={(event) => {
+              if (event.pointerType === "mouse") setSelected(index);
+            }}
+            onClick={() => setSelected(index)}
+            onKeyDown={(event) => navigate(event, index)}
+          >
+            <span className="process-index" aria-hidden="true">
+              0{index + 1}
+            </span>
+            <span className="process-name">{name}</span>
+            <span className="process-select-arrow" aria-hidden="true">
+              <ArrowUpRight size={22} />
+            </span>
+          </button>
+        ))}
+      </div>
+      <div
+        className="process-detail"
+        id="process-detail"
+        role="tabpanel"
+        aria-labelledby={`process-tab-${selected}`}
+        tabIndex={0}
+      >
+        <div className="process-image-stage">
+          {processArt.map(([filename, alt], index) => (
+            <img
+              key={filename}
+              src={asset(filename)}
+              alt={selected === index ? alt : ""}
+              aria-hidden={selected !== index}
+              className={selected === index ? "is-active" : ""}
+              loading="lazy"
+              width="1920"
+              height="1072"
+            />
+          ))}
+        </div>
+        <div className="process-narrative" key={selected}>
+          <h3>{steps[selected][1]}</h3>
+          <p>{steps[selected][2]}</p>
+        </div>
+      </div>
     </div>
   );
 }
 
-export function FAQ({ onContact }) {
+export function FAQ() {
+  const [selected, setSelected] = useState(0);
   const questions = [
     [
       "Can we start with a single project?",
@@ -445,100 +545,131 @@ export function FAQ({ onContact }) {
   ];
   return (
     <div className="faq-list">
-      {questions.map(([q, a]) => (
-        <details key={q}>
-          <summary>
-            {q}
-            <Plus size={20} className="faq-plus" />
-            <Minus size={20} className="faq-minus" />
-          </summary>
-          <p>{a}</p>
-        </details>
+      {questions.map(([q, a], index) => (
+        <Disclosure
+          key={q}
+          className="faq-item"
+          open={selected === index}
+          onToggle={() => setSelected(selected === index ? null : index)}
+          header={<span className="faq-question">{q}</span>}
+        >
+          <p className="faq-answer">{a}</p>
+        </Disclosure>
       ))}
-      <button onClick={onContact} className="text-link">
-        Have something else in mind? Let's talk <Arrow />
-      </button>
     </div>
   );
 }
 
+// Add the confirmed OrgTik profile URLs here when supplied.
+const socialProfiles = [
+  { name: "Facebook", icon: FacebookLogo, href: null },
+  { name: "Instagram", icon: InstagramLogo, href: null },
+  { name: "LinkedIn", icon: LinkedinLogo, href: null },
+  { name: "X", icon: XLogo, href: null },
+  { name: "TikTok", icon: TiktokLogo, href: null },
+  { name: "Pinterest", icon: PinterestLogo, href: null },
+  { name: "Snapchat", icon: SnapchatLogo, href: null },
+  { name: "YouTube", icon: YoutubeLogo, href: null },
+];
+
 export function Footer({ theme = "dark", onContact, onPlan }) {
   return (
     <footer className={`site-footer ${theme}`}>
+      <div className="footer-aurora" aria-hidden="true" />
       <div className="footer-main">
-        <div>
+        <div className="footer-intro">
           <a href="#top" aria-label="Back to top">
             <Logo light={theme === "dark"} />
           </a>
+          <h2>
+            Make the next move <em>matter.</em>
+          </h2>
           <p>
-            We don’t chase attention.
-            <br />
-            We attract it.
+            Strategy, design, and technology brought together around one clear
+            ambition: moving your business forward.
           </p>
+          <Action onClick={onContact} secondary className="footer-contact">
+            Start a conversation
+          </Action>
         </div>
-        <div className="footer-links">
-          <a href="#platform">Platform</a>
-          <a href="#services">Services</a>
-          <a href="#approach">Our approach</a>
-          <button onClick={onPlan}>Explore plans</button>
-          <button onClick={onContact}>Contact</button>
-        </div>
+        <nav className="footer-links" aria-label="Footer navigation">
+          <div>
+            <span>Explore</span>
+            <a href="#platform">Platform</a>
+            <a href="#services">Services</a>
+            <a href="#work">Selected work</a>
+            <a href="#approach">Our approach</a>
+            <a href="#testimonials">Testimonials</a>
+          </div>
+          <div>
+            <span>Start here</span>
+            <button onClick={onPlan}>Explore plans</button>
+            <button onClick={onContact}>Tell us about your project</button>
+          </div>
+        </nav>
         <a href="#top" className="back-top" aria-label="Back to top">
           <ArrowUpRight size={24} />
         </a>
       </div>
+      <div className="footer-connect">
+        <div
+          className="footer-socials"
+          role="group"
+          aria-label="OrgTik social media"
+        >
+          {socialProfiles.map(({ name, icon: Icon, href }) =>
+            href ? (
+              <a
+                key={name}
+                className="footer-social"
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`OrgTik on ${name} (opens in a new tab)`}
+                title={name}
+              >
+                <Icon
+                  size={25}
+                  weight={name === "X" ? "regular" : "fill"}
+                  aria-hidden="true"
+                />
+              </a>
+            ) : (
+              <span
+                key={name}
+                className="footer-social"
+                role="img"
+                aria-label={`${name}: profile link not yet configured`}
+                title={`${name} · Profile link coming soon`}
+              >
+                <Icon
+                  size={25}
+                  weight={name === "X" ? "regular" : "fill"}
+                  aria-hidden="true"
+                />
+              </span>
+            ),
+          )}
+        </div>
+        <span className="footer-origin">
+          <span className="swiss-flag" role="img" aria-label="Swiss flag" />
+          Made in Switzerland
+        </span>
+      </div>
       <div className="footer-bottom">
         <span>© 2026 OrgTik.</span>
+        <span className="footer-status">
+          <i aria-hidden="true" /> Independent digital partner
+        </span>
         <span>Strategy. Design. Technology.</span>
-        <a href="/">
-          View design directions <ArrowUpRight size={13} />
-        </a>
       </div>
     </footer>
   );
 }
 
-export function DirectionDock({ current, onChoose }) {
-  return (
-    <aside className="direction-dock" aria-label="Compare design directions">
-      <a href="/" className="dock-home" aria-label="All directions">
-        <GridFour size={19} />
-      </a>
-      <div className="dock-options">
-        {directions.map((d) => (
-          <a
-            key={d.id}
-            href={`/${d.id}`}
-            className={d.id === current ? "current" : ""}
-            aria-current={d.id === current ? "page" : undefined}
-          >
-            <span>{d.number}</span>
-            <b>
-              {d.id === "cinematic"
-                ? "Cinematic"
-                : d.id === "editorial"
-                  ? "Editorial"
-                  : "Connected"}
-            </b>
-          </a>
-        ))}
-      </div>
-      <button
-        className="dock-choose"
-        aria-label="Choose this direction"
-        onClick={onChoose}
-      >
-        <Check size={16} />
-        <span>Choose this direction</span>
-      </button>
-    </aside>
-  );
-}
-
-export function Modal({ type, onClose, direction, initialModule }) {
+export function Modal({ type, onClose, initialModule }) {
   const ref = useRef(null);
   const [sent, setSent] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState(
     initialModule ? [initialModule] : [],
@@ -557,9 +688,7 @@ export function Modal({ type, onClose, direction, initialModule }) {
       ? "What would you like to build?"
       : type === "plan"
         ? "Make room for what matters."
-        : type === "choice"
-          ? `${direction.name}, selected.`
-          : "Your OrgTik workspace.";
+        : "Your OrgTik workspace.";
   function chooseModule(id) {
     setSelected((s) =>
       s.includes(id) ? s.filter((x) => x !== id) : [...s, id],
@@ -602,9 +731,7 @@ export function Modal({ type, onClose, direction, initialModule }) {
           <X size={23} />
         </button>
       </div>
-      <Eyebrow>
-        {type === "choice" ? "Your next chapter" : "Let’s connect"}
-      </Eyebrow>
+      <Eyebrow>Let’s connect</Eyebrow>
       <h2 id="modal-title">{title}</h2>
       {type === "contact" &&
         (sent ? (
@@ -672,9 +799,7 @@ export function Modal({ type, onClose, direction, initialModule }) {
                 {error}
               </p>
             )}
-            <button type="submit" className="action">
-              Preview enquiry <Arrow />
-            </button>
+            <Action type="submit">Preview enquiry</Action>
           </form>
         ))}
       {type === "plan" && (
@@ -710,13 +835,9 @@ export function Modal({ type, onClose, direction, initialModule }) {
             Local concept preview. No subscription or payment is created.
             Features and availability are subject to confirmation.
           </p>
-          <button
-            className="action"
-            disabled={!selected.length}
-            onClick={() => setSent(true)}
-          >
-            Review this combination <Arrow />
-          </button>
+          <Action disabled={!selected.length} onClick={() => setSent(true)}>
+            Review this combination
+          </Action>
           {sent && (
             <p className="plan-result" role="status">
               Your combination:{" "}
@@ -743,44 +864,6 @@ export function Modal({ type, onClose, direction, initialModule }) {
           <Action onClick={onClose}>Keep exploring</Action>
         </>
       )}
-      {type === "choice" && (
-        <>
-          <p>
-            Your preference is saved in this browser. Tell Codex which direction
-            you chose to continue building the website.
-          </p>
-          <div className="choice-image">
-            <img
-              src={asset(`${direction.image}.webp`)}
-              alt={`${direction.name} brand direction`}
-            />
-            <span>
-              {direction.number} / {direction.name}
-            </span>
-          </div>
-          <button
-            className="action"
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(
-                  `Continue the OrgTik website with the ${direction.name} direction.`,
-                );
-                setCopied(true);
-              } catch {
-                setError(
-                  `Continue the OrgTik website with the ${direction.name} direction.`,
-                );
-              }
-            }}
-          >
-            {copied
-              ? "Copied — paste it in the conversation"
-              : "Copy my choice"}
-            {copied ? <Check size={20} /> : <Copy size={20} />}
-          </button>
-          {error && <p role="status">{error}</p>}
-        </>
-      )}
     </dialog>
   );
 }
@@ -805,6 +888,9 @@ export function useReveals() {
       el.classList.add("will-reveal");
       observer.observe(el);
     });
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      els.forEach((el) => el.classList.remove("will-reveal"));
+    };
   }, [reduced]);
 }

@@ -1,9 +1,6 @@
 import {
   ArrowDown,
   ArrowUpRight,
-  ArrowRight,
-  Plus,
-  Minus,
   Stack,
   CursorClick,
 } from "@phosphor-icons/react";
@@ -16,9 +13,14 @@ import {
   ModuleExplorer,
   Process,
   FAQ,
-  asset,
 } from "./shared";
-import { services } from "./content";
+import {
+  Services,
+  Projects,
+  Testimonials,
+  Closing,
+  CursorTarget,
+} from "./Experience";
 
 export default function Cinematic({ onContact, onAccount, onPlan }) {
   return (
@@ -43,9 +45,9 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
             </p>
             <div className="hero-actions">
               <Action href="#platform">Explore the platform</Action>
-              <button className="quiet-link" onClick={onContact}>
-                Start a project <ArrowUpRight size={18} />
-              </button>
+              <Action secondary onClick={onContact}>
+                Start a project
+              </Action>
             </div>
           </div>
           <div className="hero-bottom wrap">
@@ -68,7 +70,12 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
               </h2>
             </div>
             <div className="gateway-pair" data-reveal>
-              <a href="#services" className="gateway-item">
+              <CursorTarget
+                as="a"
+                href="#services"
+                label="Let’s build"
+                className="gateway-item"
+              >
                 <span className="gateway-icon">
                   <CursorClick size={25} />
                 </span>
@@ -81,8 +88,12 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
                   </p>
                 </div>
                 <ArrowUpRight size={29} />
-              </a>
-              <a href="#platform" className="gateway-item">
+              </CursorTarget>
+              <CursorTarget
+                label="Explore plans"
+                className="gateway-item"
+                onClick={() => onPlan()}
+              >
                 <span className="gateway-icon">
                   <Stack size={25} />
                 </span>
@@ -95,7 +106,7 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
                   </p>
                 </div>
                 <ArrowUpRight size={29} />
-              </a>
+              </CursorTarget>
             </div>
           </div>
         </section>
@@ -124,41 +135,21 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
           className="cinematic-services section-pad light-section"
           id="services"
         >
-          <div className="wrap services-layout">
-            <div className="services-intro" data-reveal>
+          <div className="wrap">
+            <div className="services-heading" data-reveal>
               <Eyebrow number="03">Built around your business</Eyebrow>
               <h2>
-                Good ideas <br />
-                deserve <br />
-                <span className="muted-ink">great execution.</span>
+                Good ideas deserve <span>great execution.</span>
               </h2>
               <p>
-                From the first sketch to what comes next. <br />
-                The right expertise, connected.
+                From the first sketch to what comes next. The right expertise,
+                connected around one clear ambition.
               </p>
-              <button className="text-link" onClick={onContact}>
-                Tell us about your project <ArrowRight size={18} />
-              </button>
+              <Action className="services-heading-action" onClick={onContact}>
+                Tell us about your project
+              </Action>
             </div>
-            <div className="service-accordions" data-reveal>
-              {services.map((s, i) => (
-                <details key={s.title} open={i === 0}>
-                  <summary>
-                    <span className="service-number">{s.index}</span>
-                    <h3>{s.title}</h3>
-                    <Plus className="faq-plus" size={22} />
-                    <Minus className="faq-minus" size={22} />
-                  </summary>
-                  <div className="service-detail">
-                    <p>{s.text}</p>
-                    <small>{s.details}</small>
-                    <button onClick={onContact} className="text-link">
-                      Let's make it happen <ArrowUpRight size={18} />
-                    </button>
-                  </div>
-                </details>
-              ))}
-            </div>
+            <Services onContact={onContact} />
           </div>
         </section>
         <section className="cinematic-brand" id="work">
@@ -170,47 +161,19 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
             </h2>
             <p>The OrgTik identity. From a clear idea to every touchpoint.</p>
           </div>
-          <div className="brand-story-images">
-            <figure className="brand-story-primary" data-reveal>
-              <img
-                src={asset("brand-cards.webp")}
-                alt="OrgTik business cards with a metallic violet identity"
-                loading="lazy"
-                width="1920"
-                height="1072"
-              />
-              <figcaption>
-                <span>Identity, made tangible.</span>
-                <small>OrgTik brand application</small>
-              </figcaption>
-            </figure>
-            <figure className="brand-story-secondary" data-reveal>
-              <img
-                src={asset("brand-tablet.webp")}
-                alt="The OrgTik identity displayed on a tablet"
-                loading="lazy"
-                width="1920"
-                height="1072"
-              />
-              <figcaption>
-                <span>A presence that carries through.</span>
-                <small>OrgTik brand application</small>
-              </figcaption>
-            </figure>
-          </div>
+          <Projects />
         </section>
         <section className="cinematic-process section-pad" id="approach">
           <div className="wrap">
-            <div className="section-heading heading-split" data-reveal>
-              <div>
-                <Eyebrow number="04">From possibility to progress</Eyebrow>
-                <h2>
-                  A shared direction. <br />
-                  At every step.
-                </h2>
-              </div>
+            <div className="process-heading" data-reveal>
+              <h2>
+                A shared direction.
+                <br />
+                <span>At every step.</span>
+              </h2>
               <p>
-                A considered process. <br />A connected team. <br />
+                A considered process. A connected team.
+                <br />
                 Something worth building.
               </p>
             </div>
@@ -219,30 +182,48 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
             </div>
           </div>
         </section>
-        <section className="faq-section section-pad light-section">
+        <Testimonials />
+        <section
+          className="faq-section section-pad light-section"
+          id="faq"
+          aria-labelledby="faq-title"
+        >
           <div className="wrap faq-layout">
-            <div data-reveal>
-              <Eyebrow>A little more clarity</Eyebrow>
-              <h2>
+            <div className="faq-intro" data-reveal>
+              <h2 id="faq-title">
                 Before we <br />
-                begin.
+                <span>begin.</span>
               </h2>
+              <p>A few answers to help you take the first step.</p>
             </div>
             <div data-reveal>
-              <FAQ onContact={onContact} />
+              <FAQ />
+            </div>
+            <div className="faq-contact-band" data-reveal>
+              <img
+                src="/assets/logo/orgtik-mark-white.svg"
+                alt=""
+                aria-hidden="true"
+                className="faq-contact-mark"
+                loading="lazy"
+                width="247"
+                height="250"
+              />
+              <div>
+                <h3>Still have a question?</h3>
+                <p>
+                  Bring us the part that is still unclear.
+                  <br />
+                  We’ll find a way forward.
+                </p>
+              </div>
+              <Action onClick={onContact} tone="light">
+                Talk to us
+              </Action>
             </div>
           </div>
         </section>
-        <section className="cinematic-closing section-pad">
-          <div className="wrap" data-reveal>
-            <Eyebrow>The next connection starts here</Eyebrow>
-            <h2>
-              What could we <br />
-              build <em>together?</em>
-            </h2>
-            <Action onClick={onContact}>Start a conversation</Action>
-          </div>
-        </section>
+        <Closing onContact={onContact} />
       </main>
       <Footer onContact={onContact} onPlan={onPlan} />
     </div>

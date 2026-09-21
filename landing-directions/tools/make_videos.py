@@ -7,7 +7,7 @@ import imageio_ffmpeg
 ffmpeg=imageio_ffmpeg.get_ffmpeg_exe()
 assets=ROOT/'public/assets'
 outputs=[]
-for name,source in [('cinematic','brand-glass'),('editorial','brand-cards'),('connected','brand-phone')]:
+for name,source in [('cinematic','brand-glass')]:
     for kind,w,h in [('desktop',1280,720),('mobile',540,720)]:
         stem=f'{name}-{kind}'
         # Periodic cosine zoom returns to its opening position for a seamless 12s loop.

@@ -219,6 +219,7 @@ export function Header({
     requestAnimationFrame(() => trigger.current?.focus());
   };
   const links = [
+    ["Home", "/"],
     ["Platform", "/platform"],
     ["Services", "/services"],
     ["Work", "/work"],
@@ -285,7 +286,17 @@ export function Header({
         </div>
         <nav aria-label="Mobile navigation">
           {links.map(([name, url], i) => (
-            <a key={url} href={url} onClick={close}>
+            <a
+              key={url}
+              href={url}
+              onClick={close}
+              aria-current={
+                currentPath === url ||
+                (url !== "/" && currentPath.startsWith(`${url}/`))
+                  ? "page"
+                  : undefined
+              }
+            >
               <small>0{i + 1}</small>
               {name}
               <ArrowUpRight size={24} />

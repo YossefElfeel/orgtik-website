@@ -54,6 +54,52 @@ const processSteps = [
   },
 ];
 
+const recommendationPlans = [
+  {
+    id: "launch",
+    number: "01",
+    eyebrow: "Start focused",
+    title: "Launch plan",
+    body: "Shape the selected systems into a clear first release your team can understand and adopt.",
+    scope: "Selected systems",
+    features: [
+      "Configuration workshop",
+      "Core workspace setup",
+      "Guided launch plan",
+      "Team handover session",
+    ],
+  },
+  {
+    id: "connected",
+    number: "02",
+    eyebrow: "Build the flow",
+    title: "Connected plan",
+    body: "Connect the selected systems around the work, decisions, and handoffs that matter most.",
+    scope: "Systems + connected workflows",
+    featured: true,
+    features: [
+      "Everything in Launch",
+      "Workflow and role mapping",
+      "Cross-system coordination",
+      "Adoption support",
+    ],
+  },
+  {
+    id: "partnership",
+    number: "03",
+    eyebrow: "Keep evolving",
+    title: "Partnership plan",
+    body: "Launch the selected workspace with an ongoing rhythm for support, learning, and improvement.",
+    scope: "Systems + ongoing evolution",
+    features: [
+      "Everything in Connected",
+      "Improvement roadmap",
+      "Ongoing support rhythm",
+      "Evolution planning",
+    ],
+  },
+];
+
 const matchFamily = (slug) =>
   serviceFamilies.find((family) => family.slug === slug);
 const matchService = (family, slug) =>
@@ -1161,7 +1207,7 @@ function PlansPage({ navigate, path, search }) {
                 No payment, subscription, or account is created.
               </PreviewNote>
               <Action
-                href={`/contact?intent=platform&plan=${mode}&modules=${selected.join(",")}`}
+                href={`/pricing/plans?mode=${mode}&modules=${selected.join(",")}`}
                 aria-disabled={!selected.length}
                 onClick={(event) => {
                   if (!selected.length) event.preventDefault();
@@ -1193,7 +1239,7 @@ function PlansPage({ navigate, path, search }) {
               },
               {
                 title: "Discuss",
-                body: "Carry only the configuration IDs into the contact preview for a focused conversation.",
+                body: "Compare three service plans around the selected systems, then carry the preferred direction into the contact preview.",
               },
             ]}
           />
@@ -1203,6 +1249,143 @@ function PlansPage({ navigate, path, search }) {
         title="Need help shaping the workspace?"
         body="Bring the team’s priorities and current tools. We’ll help identify a focused starting point."
         href="/contact?intent=platform"
+        label="Talk through the options"
+      />
+    </SiteLayout>
+  );
+}
+
+function PlanOptionsPage({ navigate, path, search }) {
+  const params = new URLSearchParams(search);
+  const selectedIds = (params.get("modules") || "")
+    .split(",")
+    .filter((id) => modules.some((module) => module.id === id));
+  const selectedModules = modules.filter((module) =>
+    selectedIds.includes(module.id),
+  );
+  const requestedMode = params.get("mode") || "custom";
+  const mode = planOptions.some((option) => option.id === requestedMode)
+    ? requestedMode
+    : "custom";
+  const modeName = planOptions.find((option) => option.id === mode)?.name;
+  const modulesValue = selectedIds.join(",");
+  const editHref = `/pricing?mode=${mode}${modulesValue ? `&modules=${modulesValue}` : ""}`;
+
+  return (
+    <SiteLayout navigate={navigate} path={path}>
+      <PageHero
+        eyebrow="Plan recommendations / Frontend preview"
+        title="Three ways to launch"
+        accent="your selected workspace."
+        body="Compare the level of guidance and continuity around the systems you chose. Final scope, availability, and commercial terms remain contact-led."
+        primary={{ label: "Compare the plans", href: "#plan-options" }}
+        secondary={{ label: "Edit your systems", href: editHref }}
+        video
+        compact
+      >
+        <Breadcrumbs
+          items={[
+            { label: "Plans", href: editHref },
+            { label: "Recommendations" },
+          ]}
+        />
+      </PageHero>
+      <section className="page-section paper-section" id="plan-options">
+        <div className="wrap plan-recommendations">
+          <div className="plan-review-context">
+            <div>
+              <Eyebrow number="01">Your selected workspace</Eyebrow>
+              <h2>
+                {selectedModules.length
+                  ? `${selectedModules.length} system${selectedModules.length === 1 ? "" : "s"}, three ways forward.`
+                  : "Choose your systems first."}
+              </h2>
+              <p>
+                {selectedModules.length
+                  ? `${modeName} · Your systems stay consistent while the level of planning, connection, and ongoing support changes.`
+                  : "Return to the plan builder and select at least one system before comparing these recommendations."}
+              </p>
+            </div>
+            <a className="text-link" href={editHref}>
+              Edit selection <ArrowRight size={17} />
+            </a>
+          </div>
+
+          {selectedModules.length ? (
+            <>
+              <div
+                className="selected-system-list"
+                aria-label="Selected systems"
+              >
+                {selectedModules.map((module) => {
+                  const Icon = module.icon;
+                  return (
+                    <span key={module.id}>
+                      <Icon size={17} aria-hidden="true" />
+                      {module.formal}
+                    </span>
+                  );
+                })}
+              </div>
+              <PreviewNote>
+                These plans compare service scope only. Prices, limits, timing,
+                and contractual terms require commercial approval.
+              </PreviewNote>
+              <div className="recommendation-grid">
+                {recommendationPlans.map((plan) => {
+                  const contactHref = `/contact?intent=platform&plan=${plan.id}&mode=${mode}&modules=${modulesValue}`;
+                  return (
+                    <article
+                      className={`recommendation-card ${plan.featured ? "featured" : ""}`}
+                      key={plan.id}
+                    >
+                      <div className="recommendation-card-top">
+                        <small>{plan.number}</small>
+                        {plan.featured && <span>Recommended</span>}
+                      </div>
+                      <p className="recommendation-eyebrow">{plan.eyebrow}</p>
+                      <h3>{plan.title}</h3>
+                      <p className="recommendation-body">{plan.body}</p>
+                      <div className="recommendation-scope">
+                        <small>Workspace scope</small>
+                        <strong>{plan.scope}</strong>
+                      </div>
+                      <FeatureList items={plan.features} />
+                      <div className="recommendation-commercial">
+                        <span>
+                          <small>Pricing</small>
+                          <strong>Contact-led</strong>
+                        </span>
+                        <span>
+                          <small>Selected</small>
+                          <strong>{selectedModules.length} systems</strong>
+                        </span>
+                      </div>
+                      <Action
+                        href={contactHref}
+                        tone={plan.featured ? "light" : undefined}
+                      >
+                        Choose {plan.title.replace(" plan", "")}
+                      </Action>
+                    </article>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <EmptyState
+              title="No systems selected"
+              body="Build a workspace first, then return here to compare the three launch plans."
+              action={<Action href="/pricing">Build your workspace</Action>}
+            />
+          )}
+        </div>
+      </section>
+      <PageCTA
+        eyebrow="A plan shaped around the work"
+        title="Bring the selected systems into one useful conversation."
+        body="We’ll clarify the fit, final scope, and commercial details before anything is agreed."
+        href={`/contact?intent=platform&mode=${mode}&modules=${modulesValue}`}
         label="Talk through the options"
       />
     </SiteLayout>
@@ -1953,6 +2136,9 @@ export function RoutePage({ path, search, navigate }) {
       page = <ModulePage {...{ module, navigate, path }} />;
       title = module.formal;
     }
+  } else if (path === "/pricing/plans") {
+    page = <PlanOptionsPage {...{ navigate, path, search }} />;
+    title = "Plan recommendations";
   } else if (path === "/pricing") {
     page = <PlansPage {...{ navigate, path, search }} />;
     title = "Plans";

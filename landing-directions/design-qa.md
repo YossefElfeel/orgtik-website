@@ -1,5 +1,23 @@
 # OrgTik cinematic website design QA
 
+## Explicit Home navigation — 2026-09-21
+
+The shared header now exposes Home as the first text link on desktop and as item 01 in the mobile menu, while retaining the official logo link. Browser checks from the plan-recommendation screen verified that both versions navigate to `/`, the mobile dialog closes after selection, and Home receives the active-page state on arrival. The additional link fits the existing 1440 px header and the 390 px mobile menu without horizontal overflow or browser warning/error logs.
+
+final result: passed
+
+## Three-plan recommendation screen — 2026-09-21
+
+Source visual truth: the approved cinematic routed design system, the refined compact pricing builder, and the user-requested next step after “Discuss this plan.” Commercial prices and terms were not supplied, so the screen compares service scope while retaining explicit contact-led language.
+
+Implementation evidence: browser-rendered flow from `/pricing?mode=custom&modules=hr` to `/pricing/plans?mode=custom&modules=hr`, inspected at 1440 × 900 and 390 × 844 CSS viewports at density 1. The Connected CTA was followed into the contact preview, and the recommendation route was also loaded without module parameters to verify its recovery state.
+
+State: the new screen carries the selected systems into Launch, Connected, and Partnership cards. Connected receives the premium dark recommended treatment. All three cards show their distinct scope, inclusions, contact-led pricing status, selected-system count, and a direct plan-specific action. The compact hero uses the required animated brand-video treatment. An edit-selection path returns to the exact builder configuration.
+
+Findings: no actionable P0/P1/P2 issues remain. Desktop presents three equal-width cards at approximately 427 px each. Mobile stacks approximately 335 px cards inside the standard 20 px gutter and removes the desktop card offset. The HR selection, mode, and chosen recommendation persist in the URL; choosing Connected opens `/contact?intent=platform&plan=connected&mode=custom&modules=hr` with Platform selected. A direct empty-state visit renders no recommendation cards and provides a clear return to the builder. No horizontal overflow or browser warning/error logs were found.
+
+final result: passed
+
 ## Pricing plan-builder density and alignment — 2026-09-21
 
 Source visual truth: the approved cinematic routed design system and the user-supplied state `/pricing?mode=custom&modules=hr`. No separate pricing mock was supplied; the existing page content, type system, palette, and interaction model were retained.

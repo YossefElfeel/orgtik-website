@@ -45,6 +45,8 @@
 - Treat “OrgTik hosting” as the fifth service family throughout `/services`, its managed-hosting detail route, and the generated sitemap so the routed architecture matches the approved homepage.
 - Closing CTAs across all routed marketing/content pages use the homepage contact-band treatment: a contained rounded violet panel on warm paper with the official mark. Do not restore full-bleed violet closing sections without a new request.
 - Keep the `/pricing` plan builder compact and aligned: five short plan selectors, a three-by-two desktop module grid, two columns on tablet, one column on mobile, and a top-aligned review card. Module cards should hug their content rather than stretch to the review panel's height. Preserve `mode` and plural `modules` URL state for shareable local previews.
+- “Discuss this plan” in the pricing builder opens `/pricing/plans`, carrying the selected mode and module IDs into a dedicated three-plan comparison. Keep Launch, Connected (recommended), and Partnership as contact-led service-scope options; preserve the selected systems, clear frontend-preview boundary, responsive three-column/stacked layout, and the final handoff into the contact preview.
+- The shared header navigation includes an explicit Home link in both desktop and mobile menus. Keep the official logo linked to Home as an additional route, not the sole way back.
 
 Run the local server yourself and open the preview in the browser available to this environment. Do not give the user server-start instructions when you can run it.
 

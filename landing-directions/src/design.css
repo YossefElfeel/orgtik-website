@@ -270,10 +270,12 @@ svg {
     backdrop-filter: none;
   }
 }
-.desktop-nav a[aria-current="location"] {
+.desktop-nav a[aria-current="location"],
+.desktop-nav a[aria-current="page"] {
   color: #d4b7ec;
 }
-.desktop-nav a[aria-current="location"]:after {
+.desktop-nav a[aria-current="location"]:after,
+.desktop-nav a[aria-current="page"]:after {
   right: 0;
   height: 2px;
 }
@@ -372,6 +374,9 @@ svg {
 }
 .mobile-nav nav > a svg {
   margin-left: auto;
+}
+.mobile-nav nav > a[aria-current="page"] {
+  color: #7540bd;
 }
 .video-scene {
   position: relative;
@@ -4777,6 +4782,209 @@ svg {
   min-height: 48px;
   padding: 5px 5px 5px 18px;
 }
+.plan-review-context {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #190b2520;
+}
+.plan-review-context h2 {
+  max-width: 780px;
+  margin-top: 18px;
+  font-size: clamp(38px, 4.5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
+.plan-review-context p:not(.eyebrow) {
+  max-width: 690px;
+  margin-top: 20px;
+  color: #746a7d;
+}
+.plan-review-context .text-link {
+  margin-bottom: 5px;
+}
+.selected-system-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 22px 0 14px;
+}
+.selected-system-list > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 1px solid #9458f43d;
+  border-radius: 999px;
+  background: #eee5f7;
+  color: #542c75;
+  font-size: 11px;
+  font-weight: 650;
+}
+.selected-system-list svg {
+  color: #7540bd;
+}
+.plan-recommendations > .preview-note {
+  max-width: 720px;
+  margin-bottom: 34px;
+}
+.recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 16px;
+}
+.recommendation-card {
+  position: relative;
+  min-width: 0;
+  padding: 28px;
+  overflow: hidden;
+  border: 1px solid #190b2520;
+  border-radius: 18px;
+  background: #faf9f6;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 22px 52px #2711360b;
+  transition:
+    transform 420ms var(--ease),
+    border-color 220ms,
+    box-shadow 420ms var(--ease);
+}
+.recommendation-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, #7540bd, #ba8cff);
+  transform: scaleX(0.38);
+  transform-origin: left;
+  transition: transform 420ms var(--ease);
+}
+.recommendation-card.featured {
+  color: #fff;
+  border-color: #2b153a;
+  background:
+    radial-gradient(circle at 92% 8%, #9a61e738, transparent 28%), var(--plum);
+  box-shadow: 0 26px 70px #26113226;
+  transform: translateY(-8px);
+}
+.recommendation-card.featured::before {
+  transform: scaleX(1);
+}
+.recommendation-card-top {
+  min-height: 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.recommendation-card-top > small,
+.recommendation-eyebrow,
+.recommendation-scope small,
+.recommendation-commercial small {
+  color: #8d7b99;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.recommendation-card.featured .recommendation-card-top > small,
+.recommendation-card.featured .recommendation-eyebrow,
+.recommendation-card.featured .recommendation-scope small,
+.recommendation-card.featured .recommendation-commercial small {
+  color: #cdbbdd;
+}
+.recommendation-card-top > span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #eee3f7;
+  color: #402052;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.recommendation-eyebrow {
+  margin-top: 24px;
+  color: #7540bd;
+}
+.recommendation-card h3 {
+  margin: 9px 0 13px;
+  font-size: clamp(26px, 2.3vw, 34px);
+  line-height: 1.04;
+  letter-spacing: -0.05em;
+}
+.recommendation-body {
+  min-height: 64px;
+  color: #746a7d;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.recommendation-card.featured .recommendation-body,
+.recommendation-card.featured .feature-list {
+  color: #cbbdd4;
+}
+.recommendation-scope {
+  display: grid;
+  gap: 7px;
+  margin-top: 22px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #eee8f2;
+}
+.recommendation-card.featured .recommendation-scope {
+  background: #ffffff0c;
+  border: 1px solid #ffffff13;
+}
+.recommendation-scope strong {
+  font-size: 13px;
+}
+.recommendation-card .feature-list {
+  margin: 24px 0;
+  gap: 11px;
+}
+.recommendation-card .feature-list li {
+  align-items: flex-start;
+  font-size: 12px;
+}
+.recommendation-commercial {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid #190b2520;
+}
+.recommendation-card.featured .recommendation-commercial {
+  border-color: #ffffff1d;
+}
+.recommendation-commercial > span {
+  display: grid;
+  gap: 6px;
+}
+.recommendation-commercial strong {
+  font-size: 12px;
+}
+.recommendation-card .action {
+  width: 100%;
+  margin-top: 22px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .recommendation-card:hover {
+    border-color: #9458f466;
+    box-shadow: 0 28px 70px #27113618;
+    transform: translateY(-5px);
+  }
+  .recommendation-card.featured:hover {
+    transform: translateY(-13px);
+  }
+  .recommendation-card:hover::before {
+    transform: scaleX(1);
+  }
+}
 .work-editorial-grid {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
@@ -5400,6 +5608,17 @@ svg {
   .plan-summary {
     position: static;
   }
+  .recommendation-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .recommendation-card,
+  .recommendation-card.featured {
+    transform: none;
+  }
+  .recommendation-body {
+    min-height: 0;
+  }
   .work-editorial-grid {
     grid-template-columns: 1fr;
   }
@@ -5557,6 +5776,20 @@ svg {
   }
   .plan-modules {
     grid-template-columns: 1fr;
+  }
+  .plan-review-context {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 24px;
+  }
+  .plan-review-context h2 {
+    font-size: clamp(36px, 11vw, 52px);
+  }
+  .plan-review-context .text-link {
+    justify-self: start;
+  }
+  .recommendation-card {
+    padding: 24px 22px;
   }
   .work-card-lead .work-card-media,
   .work-card-media {

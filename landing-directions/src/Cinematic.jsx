@@ -1,9 +1,4 @@
-import {
-  ArrowDown,
-  ArrowUpRight,
-  Stack,
-  CursorClick,
-} from "@phosphor-icons/react";
+import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react";
 import {
   Header,
   Footer,
@@ -62,57 +57,84 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
           id="possibilities"
         >
           <div className="wrap">
-            <div className="section-heading" data-reveal>
+            <div className="section-heading" data-reveal="stagger">
               <Eyebrow number="01">A clearer way forward</Eyebrow>
               <h2>
                 One partner. <br />
                 <span className="muted-ink">Both sides of your business.</span>
               </h2>
             </div>
-            <div className="gateway-pair" data-reveal>
+            <div className="gateway-pair">
               <CursorTarget
                 as="a"
                 href="#services"
                 label="Let’s build"
-                className="gateway-item"
+                className="gateway-item gateway-build"
+                data-reveal="gateway"
               >
-                <span className="gateway-icon">
-                  <CursorClick size={25} />
+                <span className="gateway-media" aria-hidden="true">
+                  <img
+                    src="/assets/brand-cards.webp"
+                    alt=""
+                    width="1920"
+                    height="1072"
+                    loading="lazy"
+                  />
                 </span>
-                <div>
+                <div className="gateway-copy">
                   <small>Expert digital services</small>
                   <h3>Build & grow.</h3>
                   <p>
-                    Shape your brand. Create your digital presence. <br />
-                    Connect with the people who matter.
+                    Shape your brand. Create your digital presence. Connect with
+                    the people who matter.
                   </p>
+                  <span className="gateway-action">
+                    Explore services
+                    <span className="gateway-action-arrow">
+                      <ArrowUpRight size={20} />
+                    </span>
+                  </span>
                 </div>
-                <ArrowUpRight size={29} />
               </CursorTarget>
               <CursorTarget
                 label="Explore plans"
-                className="gateway-item"
+                className="gateway-item gateway-run"
+                data-reveal="gateway"
                 onClick={() => onPlan()}
               >
-                <span className="gateway-icon">
-                  <Stack size={25} />
+                <span className="gateway-media" aria-hidden="true">
+                  <img
+                    src="/assets/brand-phone.webp"
+                    alt=""
+                    width="1920"
+                    height="1072"
+                    loading="lazy"
+                  />
                 </span>
-                <div>
+                <div className="gateway-copy">
                   <small>Modular business software</small>
                   <h3>Run it better.</h3>
                   <p>
-                    Give your team a clearer way to organize <br />
-                    people, relationships, and everyday work.
+                    Give your team a clearer way to organize people,
+                    relationships, and everyday work.
                   </p>
+                  <span className="gateway-action">
+                    Explore plans
+                    <span className="gateway-action-arrow">
+                      <ArrowUpRight size={20} />
+                    </span>
+                  </span>
                 </div>
-                <ArrowUpRight size={29} />
               </CursorTarget>
             </div>
           </div>
         </section>
         <section className="cinematic-platform section-pad" id="platform">
           <div className="wrap">
-            <div className="section-heading heading-split" data-reveal>
+            <div
+              className="section-heading heading-split"
+              data-reveal="stagger"
+            >
               <div>
                 <Eyebrow number="02">Your business, connected</Eyebrow>
                 <h2>
@@ -126,7 +148,7 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
                 what belongs in your workspace.
               </p>
             </div>
-            <div data-reveal>
+            <div>
               <ModuleExplorer onPlan={onPlan} />
             </div>
           </div>
@@ -136,7 +158,7 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
           id="services"
         >
           <div className="wrap">
-            <div className="services-heading" data-reveal>
+            <div className="services-heading" data-reveal="stagger">
               <Eyebrow number="03">Built around your business</Eyebrow>
               <h2>
                 Good ideas deserve <span>great execution.</span>
@@ -153,7 +175,7 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
           </div>
         </section>
         <section className="cinematic-brand" id="work">
-          <div className="wrap brand-story-heading" data-reveal>
+          <div className="wrap brand-story-heading" data-reveal="stagger">
             <Eyebrow>Our identity, in the world</Eyebrow>
             <h2>
               We don’t chase attention. <br />
@@ -165,7 +187,7 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
         </section>
         <section className="cinematic-process section-pad" id="approach">
           <div className="wrap">
-            <div className="process-heading" data-reveal>
+            <div className="process-heading" data-reveal="stagger">
               <h2>
                 A shared direction.
                 <br />
@@ -177,7 +199,7 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
                 Something worth building.
               </p>
             </div>
-            <div data-reveal>
+            <div>
               <Process />
             </div>
           </div>
@@ -189,13 +211,14 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
           aria-labelledby="faq-title"
         >
           <div className="wrap faq-layout">
-            <div className="faq-intro" data-reveal>
+            <div className="faq-intro" data-reveal="stagger">
               <h2 id="faq-title">
-                Before we <span>begin.</span>
+                Before we <br />
+                <span>begin.</span>
               </h2>
               <p>A few answers to help you take the first step.</p>
             </div>
-            <div className="faq-content" data-reveal>
+            <div>
               <FAQ />
             </div>
             <div className="faq-contact-band" data-reveal>

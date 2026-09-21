@@ -1,6 +1,6 @@
 # OrgTik cinematic website
 
-The selected OrgTik landing-page direction, built with React and Vite from the original OrgTik brand PDF. Cinematic is the sole visual direction and opens directly at the site root.
+The selected OrgTik website direction, built with React and Vite from the original OrgTik brand PDF. Cinematic is the sole visual system across the homepage and the complete public frontend route set.
 
 ## Experience
 
@@ -16,8 +16,9 @@ The selected OrgTik landing-page direction, built with React and Vite from the o
 - Six labeled testimonial placeholders with previous/next navigation: three visible on desktop, one on mobile, plus horizontal scrolling and keyboard support. Replace with approved client stories when supplied.
 - Light editorial FAQ with a split introduction, accessible animated questions, and a full-width violet contact band. The footer retains readable navigation, official horizontal branding, and a clipped animated glow.
 - One shared pill-button system across CTAs, with context-aware light/dark and secondary variants.
-- On-page project viewer with keyboard dismissal and an automatically animated closing section.
-- Local plan, account, and enquiry previews. No backend, authentication, payment, or message delivery is implemented.
+- Routed Services, Platform, Plans, Work, Insights, About, Contact, Roadmap, Legal, Sitemap, account-preview, and not-found experiences using reusable template families.
+- OrgTik hosting carried through as the fifth service family, with a managed-hosting detail route and Sitemap coverage.
+- Local-only plan builder, filters, roadmap drawer, account, recovery, and enquiry previews. No backend, authentication, payment, subscription, roadmap submission, or message delivery is implemented.
 - Self-hosted Montserrat typography and the official OrgTik logo exports from `../assits/LOGO`.
 
 ## Development
@@ -39,8 +40,11 @@ The static build is written to `dist/client`. Serve the app at the domain root b
 
 ## Source map
 
-- `src/App.jsx`: single-direction app shell and local preview dialogs.
+- `src/App.jsx`: lightweight client router and homepage entry.
 - `src/Cinematic.jsx`: selected landing-page composition.
+- `src/Pages.jsx`: routed P02–P18 templates and local interaction states.
+- `src/pageComponents.jsx`: shared routed-page shell, heroes, sections, media, and CTA patterns.
+- `src/siteContent.js`: local services, insights, work, roadmap, plans, and legal preview data.
 - `src/shared.jsx`: navigation, video, modules, process, FAQ, footer, and dialogs.
 - `src/Action.jsx`: shared CTA component and arrow anatomy.
 - `src/Experience.jsx`: service disclosures, project viewer, testimonial cards, contextual cursors, and closing section.

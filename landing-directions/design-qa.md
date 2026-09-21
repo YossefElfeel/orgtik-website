@@ -1,5 +1,19 @@
 # OrgTik cinematic website design QA
 
+## Routed website templates — 2026-09-21
+
+Extended the approved cinematic homepage system across the plan's remaining P02–P18 template families: Services overview, five service families including OrgTik hosting, reusable service detail, Insights/category/article, About, Contact, Legal, Sitemap, not found, Roadmap, Platform, six module pages, Plans, sign in/recovery, Work, and case study.
+
+The route shell preserves the official logo, Montserrat hierarchy, deep-plum and violet palette, warm-paper reading sections, 54px CTA anatomy, responsive media treatment, and restrained motion. Major marketing heroes use the existing branded motion or approved PDF-derived assets. Article, legal, sitemap, sign-in, work, and error templates use quieter static treatments where the plan prioritizes reading or task clarity.
+
+Functional verification covered route titles and headings, the fifth hosting family and managed-hosting detail, category/project filters, module selection and URL summary state, contact validation and explicit local success state, roadmap detail dialog and scroll unlock, sign-in preview, recovery route, and unknown-route recovery. Contact, account, pricing, roadmap, legal, case-study proof, and product imagery clearly state their preview or owner-review status.
+
+Browser checks covered all 18 template families at 1440 × 900 and representative commercial/content/utility routes at 390 × 844. The tested pages had no horizontal overflow and browser warning/error logs were empty. `npm run format:check` passes. `npm run build` passes with 84.29 kB CSS (18.42 kB gzip) and 415.76 kB JavaScript (119.54 kB gzip), within the plan's gzip budgets.
+
+Remaining release dependencies are content and ownership decisions: approved client evidence, quotations and metrics; final legal wording; commercial plan names and prices; confirmed product availability and captures; verified contact details; and approved historical/roadmap claims.
+
+final result: passed for frontend template implementation; content approval pending
+
 ## Review comments verification — 2026-09-21
 
 Source visual truth: `qa/cinematic-full-wide.png` (1424 × 6196) for the existing cinematic composition, plus the user’s requested CTA placement and fifth-service requirements. Brand imagery and palette remain grounded in `../ORGTIK.pdf` and `../assits/LOGO`.

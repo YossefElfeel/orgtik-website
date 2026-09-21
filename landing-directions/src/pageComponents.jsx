@@ -190,22 +190,39 @@ export function PageCTA({
   body,
   href = "/contact",
   label = "Talk to us",
+  contained = false,
 }) {
   return (
-    <section className="page-cta">
-      <div className="page-cta-orbit" aria-hidden="true">
-        <Sparkle size={26} />
-      </div>
-      <div className="wrap page-cta-inner">
-        <div>
-          <Eyebrow>{eyebrow}</Eyebrow>
-          <h2>{title}</h2>
-        </div>
-        <div>
-          <p>{body}</p>
-          <Action href={href} tone="light">
-            {label}
-          </Action>
+    <section
+      id="page-cta"
+      className={`page-cta-shell ${contained ? "page-cta-shell-contained" : ""}`}
+    >
+      <div className={`page-cta ${contained ? "page-cta-contained" : ""}`}>
+        {contained ? (
+          <img
+            className="page-cta-mark"
+            src="/assets/logo/orgtik-mark-white.svg"
+            alt=""
+            aria-hidden="true"
+            width="247"
+            height="250"
+          />
+        ) : (
+          <div className="page-cta-orbit" aria-hidden="true">
+            <Sparkle size={26} />
+          </div>
+        )}
+        <div className="wrap page-cta-inner">
+          <div>
+            <Eyebrow>{eyebrow}</Eyebrow>
+            <h2>{title}</h2>
+          </div>
+          <div>
+            <p>{body}</p>
+            <Action href={href} tone="light">
+              {label}
+            </Action>
+          </div>
         </div>
       </div>
     </section>

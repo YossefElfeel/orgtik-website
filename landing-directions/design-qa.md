@@ -1,5 +1,19 @@
 # OrgTik cinematic website design QA
 
+## Services closing CTA containment — 2026-09-21
+
+Source visual truth: `C:/Users/USER/AppData/Local/Temp/codex-clipboard-9b078f29-4145-4c92-8007-2d7aa1d00889.png` (1892 × 472), showing the earlier full-bleed Services CTA, plus the approved homepage `.faq-contact-band` as the requested contained treatment.
+
+Implementation evidence: browser-rendered `/services#page-cta`, inspected at 1440 × 900 and 390 × 844 CSS viewports at density 1. The desktop panel measures approximately 1313 px wide with a 56 px left margin and 16 px radius; the mobile panel measures approximately 335 px wide with a 20 px left margin. The browser provider displayed the rendered captures inline; no persistent screenshot file was produced.
+
+State: Services overview closing action immediately before the footer. Full-view comparison verified that the warm-paper surround separates the CTA from the dark process section and footer. Focused comparison verified the contained frame, two-column desktop composition, stacked mobile composition, official OrgTik mark, preserved heading/body/action copy, and functioning `/contact?intent=services` link.
+
+Findings: no actionable P0/P1/P2 issues remain. The earlier full-width violet fill was replaced by a homepage-aligned contained card. Typography remains Montserrat with the established display hierarchy; spacing uses the shared 56/20 px responsive gutters; the gradient reuses the homepage contact-band colors; the decorative mark is the official SVG asset rather than a recreation; and all app-specific copy remains unchanged.
+
+Comparison history: the source capture showed a full-viewport violet region with no outer paper margin. The implementation adds the requested warm-paper frame, 16 px radius, restrained homepage gradient, and responsive internal padding. Post-fix desktop/mobile browser captures show no horizontal overflow. Browser warning/error logs are empty.
+
+final result: passed
+
 ## Routed website templates — 2026-09-21
 
 Extended the approved cinematic homepage system across the plan's remaining P02–P18 template families: Services overview, five service families including OrgTik hosting, reusable service detail, Insights/category/article, About, Contact, Legal, Sitemap, not found, Roadmap, Platform, six module pages, Plans, sign in/recovery, Work, and case study.
@@ -8,7 +22,7 @@ The route shell preserves the official logo, Montserrat hierarchy, deep-plum and
 
 Functional verification covered route titles and headings, the fifth hosting family and managed-hosting detail, category/project filters, module selection and URL summary state, contact validation and explicit local success state, roadmap detail dialog and scroll unlock, sign-in preview, recovery route, and unknown-route recovery. Contact, account, pricing, roadmap, legal, case-study proof, and product imagery clearly state their preview or owner-review status.
 
-Browser checks covered all 18 template families at 1440 × 900 and representative commercial/content/utility routes at 390 × 844. The tested pages had no horizontal overflow and browser warning/error logs were empty. `npm run format:check` passes. `npm run build` passes with 84.29 kB CSS (18.42 kB gzip) and 415.76 kB JavaScript (119.54 kB gzip), within the plan's gzip budgets.
+Browser checks covered all 18 template families at 1440 × 900 and representative commercial/content/utility routes at 390 × 844. The tested pages had no horizontal overflow and browser warning/error logs were empty. `npm run format:check` passes. The latest `npm run build` passes with 85.26 kB CSS (18.59 kB gzip) and 416.05 kB JavaScript (119.64 kB gzip), within the plan's gzip budgets.
 
 Remaining release dependencies are content and ownership decisions: approved client evidence, quotations and metrics; final legal wording; commercial plan names and prices; confirmed product availability and captures; verified contact details; and approved historical/roadmap claims.
 

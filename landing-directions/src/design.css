@@ -4090,6 +4090,9 @@ svg {
 .related-links {
   border-top: 1px solid #190b2524;
 }
+.page-cta-shell {
+  background: #7540bd;
+}
 .page-cta {
   position: relative;
   overflow: hidden;
@@ -4122,6 +4125,39 @@ svg {
 }
 .page-cta p {
   color: #eee4f5;
+}
+.page-cta-shell-contained {
+  padding-block: 112px;
+  background: var(--paper);
+}
+.page-cta-contained {
+  width: calc(100% - 112px);
+  max-width: 1328px;
+  margin-inline: auto;
+  padding-block: 72px;
+  border-radius: 16px;
+  background: linear-gradient(115deg, #351547, #5b2784 70%, #814ca5);
+}
+.page-cta-contained .page-cta-inner {
+  width: calc(100% - 96px);
+}
+.page-cta-contained h2 {
+  font-size: clamp(42px, 4.6vw, 66px);
+}
+.page-cta-mark {
+  position: absolute;
+  z-index: 0;
+  width: 240px;
+  height: 244px;
+  object-fit: contain;
+  right: 14%;
+  bottom: -92px;
+  opacity: 0.075;
+  transform: rotate(-15deg);
+  transition: transform 900ms var(--ease);
+}
+.page-cta-contained:hover .page-cta-mark {
+  transform: rotate(0deg) translateY(-12px);
 }
 .page-cta-orbit {
   position: absolute;
@@ -5532,6 +5568,24 @@ svg {
   .page-cta {
     padding-block: 70px;
   }
+  .page-cta-shell-contained {
+    padding-block: 70px;
+  }
+  .page-cta-contained {
+    width: calc(100% - 40px);
+    padding-block: 38px;
+  }
+  .page-cta-contained .page-cta-inner {
+    width: calc(100% - 52px);
+    gap: 30px;
+  }
+  .page-cta-contained .action {
+    width: 100%;
+  }
+  .page-cta-mark {
+    right: -62px;
+    bottom: -50px;
+  }
   .page-cta h2 {
     font-size: 46px;
   }
@@ -5542,5 +5596,8 @@ svg {
   }
   .page-cta-orbit {
     animation: none;
+  }
+  .page-cta-contained:hover .page-cta-mark {
+    transform: rotate(-15deg);
   }
 }

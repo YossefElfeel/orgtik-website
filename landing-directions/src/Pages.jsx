@@ -112,6 +112,7 @@ function ServicesOverview({ navigate, path }) {
         body="Bring us the business problem. We’ll help shape the right starting point without forcing the work into a predefined package."
         href="/contact?intent=services"
         label="Find your starting point"
+        contained
       />
     </SiteLayout>
   );

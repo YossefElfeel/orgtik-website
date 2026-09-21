@@ -43,6 +43,7 @@
 - The “View all projects” CTA belongs in the “Our identity, in the world” section introduction, aligned to the right of the heading copy on larger screens and stacked with the introduction on mobile.
 - Services include a fifth “OrgTik hosting” offer in the existing cinematic accordion, covering managed hosting, monitoring/backups, and performance care without unverified uptime claims.
 - Treat “OrgTik hosting” as the fifth service family throughout `/services`, its managed-hosting detail route, and the generated sitemap so the routed architecture matches the approved homepage.
+- The Services overview closing CTA (“Not sure which service fits?”) uses the homepage contact-band treatment: a contained rounded violet panel on warm paper with the official mark. Do not restore the full-bleed violet section without a new request.
 
 Run the local server yourself and open the preview in the browser available to this environment. Do not give the user server-start instructions when you can run it.
 

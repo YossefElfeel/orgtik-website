@@ -36,33 +36,43 @@
     "role": "Brand application, not a SaaS product capture"
   },
   {
-    "file": "wordmark-white.svg",
-    "source": "ORGTIK.pdf page 14; exact original vector path coordinates",
-    "role": "Supplied brand artwork, mechanically converted to SVG"
+    "file": "logo/orgtik-lockup-color.svg",
+    "source": "../assits/LOGO/ORGTIK-01.svg",
+    "role": "Official full-color OrgTik lockup"
   },
   {
-    "file": "emblem-white.svg",
-    "source": "ORGTIK.pdf page 14; exact original vector path coordinates",
-    "role": "Supplied brand artwork, mechanically converted to SVG"
+    "file": "logo/orgtik-lockup-black.svg",
+    "source": "../assits/LOGO/ORGTIK-02.svg",
+    "role": "Official black OrgTik lockup"
   },
   {
-    "file": "lockup-white.svg",
-    "source": "ORGTIK.pdf page 14; exact original vector path coordinates",
-    "role": "Supplied brand artwork, mechanically converted to SVG"
+    "file": "logo/orgtik-lockup-white.svg",
+    "source": "../assits/LOGO/ORGTIK-03.svg",
+    "role": "Official white OrgTik lockup"
   },
   {
-    "file": "wordmark-plum.svg",
-    "source": "ORGTIK.pdf page 12; exact original vector path coordinates",
-    "role": "Supplied brand artwork, mechanically converted to SVG"
+    "file": "logo/orgtik-wordmark-black.svg",
+    "source": "../assits/LOGO/ORGTIK-04.svg",
+    "role": "Official black OrgTik wordmark"
   },
   {
-    "file": "emblem-plum.svg",
-    "source": "ORGTIK.pdf page 12; exact original vector path coordinates",
-    "role": "Supplied brand artwork, mechanically converted to SVG"
+    "file": "logo/orgtik-wordmark-white.svg",
+    "source": "../assits/LOGO/ORGTIK-05.svg",
+    "role": "Official white OrgTik wordmark"
   },
   {
-    "file": "lockup-plum.svg",
-    "source": "ORGTIK.pdf page 12; exact original vector path coordinates",
-    "role": "Supplied brand artwork, mechanically converted to SVG"
+    "file": "logo/orgtik-mark-black.svg",
+    "source": "../assits/LOGO/ORGTIK-06.svg",
+    "role": "Official black OrgTik mark"
+  },
+  {
+    "file": "logo/orgtik-mark-white.svg",
+    "source": "../assits/LOGO/ORGTIK-07.svg",
+    "role": "Official white OrgTik mark"
+  },
+  {
+    "file": "logo/orgtik-app-icon.svg",
+    "source": "../assits/LOGO/1svg-01.svg",
+    "role": "Official OrgTik app icon"
   }
 ]

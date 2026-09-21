@@ -10,39 +10,6 @@ import {
   Lifebuoy,
 } from "@phosphor-icons/react";
 
-export const directions = [
-  {
-    id: "cinematic",
-    number: "01",
-    name: "Cinematic brand",
-    label: "Presence, with purpose.",
-    description:
-      "An immersive, dark canvas. Sculptural imagery, confident typography, and a slower, cinematic rhythm.",
-    image: "brand-glass",
-    tags: ["Atmospheric", "Expressive", "Brand-led"],
-  },
-  {
-    id: "editorial",
-    number: "02",
-    name: "Editorial technology",
-    label: "Clarity makes an impact.",
-    description:
-      "A warm, open composition. Oversized typography, editorial storytelling, and deliberate contrast.",
-    image: "brand-cards",
-    tags: ["Refined", "Human", "Services-led"],
-  },
-  {
-    id: "connected",
-    number: "03",
-    name: "Connected systems",
-    label: "Everything, working together.",
-    description:
-      "A precise, indigo experience. Interactive modules, a visible system, and a clear path to the right tools.",
-    image: "brand-phone",
-    tags: ["Interactive", "Structured", "Product-led"],
-  },
-];
-
 export const modules = [
   {
     id: "hr",
@@ -142,7 +109,10 @@ export const services = [
     category: "Make it matter",
     icon: Palette,
     text: "From the first impression to the smallest interaction. Identity and experiences built around your audience.",
-    details: "Brand strategy · Visual identity · UI/UX design",
+    tags: ["Brand systems", "Visual identity", "UI/UX design"],
+    image: "brand-cards.webp",
+    imageAlt: "OrgTik identity applied to a premium business card system",
+    caption: "Identity systems, made tangible",
     index: "01",
   },
   {
@@ -150,7 +120,10 @@ export const services = [
     category: "Make it work",
     icon: Code,
     text: "Translate an ambitious idea into a considered digital experience. Websites and applications with a purpose.",
-    details: "Websites · Applications · Digital experiences",
+    tags: ["Web platforms", "Applications", "E-commerce"],
+    image: "brand-tablet.webp",
+    imageAlt: "OrgTik digital identity displayed on a tablet",
+    caption: "Digital experiences with a clear purpose",
     index: "02",
   },
   {
@@ -158,7 +131,10 @@ export const services = [
     category: "Make it move",
     icon: Megaphone,
     text: "Connect your story with the people who need to hear it. A clearer strategy for meaningful attention.",
-    details: "Search · Campaigns · Content strategy",
+    tags: ["Campaign strategy", "Search", "Content systems"],
+    image: "brand-glass.webp",
+    imageAlt: "The OrgTik mark suspended in a sculptural glass form",
+    caption: "Attention shaped around a stronger story",
     index: "03",
   },
   {
@@ -166,7 +142,10 @@ export const services = [
     category: "Keep it moving",
     icon: Lifebuoy,
     text: "A dependable partner for the work after launch. Keep improving the systems your business relies on.",
-    details: "Website care · Technical support · Improvements",
+    tags: ["Website care", "Technical support", "Improvements"],
+    image: "brand-phone.webp",
+    imageAlt: "OrgTik identity displayed on a mobile device",
+    caption: "Ongoing care for the systems behind the work",
     index: "04",
   },
 ];

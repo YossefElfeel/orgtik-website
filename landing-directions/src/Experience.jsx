@@ -309,9 +309,82 @@ const testimonialPreviews = [
     focus: "Connected systems",
     quote: "A client’s experience of making everyday work feel more connected.",
   },
+  {
+    focus: "Web & app development",
+    quote:
+      "A client’s perspective on turning a digital idea into something people can use.",
+  },
+  {
+    focus: "Marketing & growth",
+    quote:
+      "A client’s story of finding a clearer way to connect with their audience.",
+  },
+  {
+    focus: "Ongoing partnership",
+    quote: "A client’s experience of working together beyond the first launch.",
+  },
 ];
 
 export function Testimonials() {
+  const track = useRef(null);
+  const trackId = useId();
+  const [range, setRange] = useState({ first: 0, visible: 3 });
+
+  function measure() {
+    const element = track.current;
+    if (!element?.firstElementChild) return;
+    const gap = parseFloat(getComputedStyle(element).columnGap) || 0;
+    const step = element.firstElementChild.getBoundingClientRect().width + gap;
+    const visible = Math.max(1, Math.round((element.clientWidth + gap) / step));
+    const first = Math.max(
+      0,
+      Math.min(
+        testimonialPreviews.length - visible,
+        Math.round(element.scrollLeft / step),
+      ),
+    );
+    setRange((previous) =>
+      previous.first === first && previous.visible === visible
+        ? previous
+        : { first, visible },
+    );
+  }
+
+  useEffect(() => {
+    const observer = new ResizeObserver(measure);
+    observer.observe(track.current);
+    return () => observer.disconnect();
+  }, []);
+
+  function navigate(direction) {
+    const element = track.current;
+    const gap = parseFloat(getComputedStyle(element).columnGap) || 0;
+    const step = element.firstElementChild.getBoundingClientRect().width + gap;
+    const last = testimonialPreviews.length - range.visible;
+    const next =
+      direction === "first"
+        ? 0
+        : direction === "last"
+          ? last
+          : Math.max(
+              0,
+              Math.min(last, Math.round(element.scrollLeft / step) + direction),
+            );
+    element.scrollTo({
+      left: next * step,
+      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
+    });
+  }
+
+  function onKeyDown(event) {
+    const keys = { ArrowLeft: -1, ArrowRight: 1, Home: "first", End: "last" };
+    if (!(event.key in keys)) return;
+    event.preventDefault();
+    navigate(keys[event.key]);
+  }
+
   return (
     <section
       className="testimonials-section section-pad"
@@ -329,7 +402,15 @@ export function Testimonials() {
             Approved client stories will appear here.
           </p>
         </div>
-        <ul className="testimonial-grid" aria-label="Testimonial placeholders">
+        <ul
+          className="testimonial-grid"
+          id={trackId}
+          ref={track}
+          aria-label="Testimonial placeholders. Use left and right arrow keys to browse."
+          tabIndex={0}
+          onScroll={measure}
+          onKeyDown={onKeyDown}
+        >
           {testimonialPreviews.map((testimonial) => (
             <li className="testimonial-card" key={testimonial.focus}>
               <figure>
@@ -354,6 +435,52 @@ export function Testimonials() {
             </li>
           ))}
         </ul>
+        <div className="testimonial-navigation">
+          <p
+            className="testimonial-range"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span>
+              {String(range.first + 1).padStart(2, "0")}
+              {range.visible > 1 &&
+                `–${String(Math.min(range.first + range.visible, testimonialPreviews.length)).padStart(2, "0")}`}
+            </span>
+            <span>
+              {" "}
+              of {String(testimonialPreviews.length).padStart(2, "0")}
+            </span>
+          </p>
+          <div
+            className="testimonial-arrows"
+            role="group"
+            aria-label="Testimonial navigation"
+          >
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Previous testimonials"
+              aria-controls={trackId}
+              disabled={range.first === 0}
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft size={21} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Next testimonials"
+              aria-controls={trackId}
+              disabled={
+                range.first + range.visible >= testimonialPreviews.length
+              }
+              onClick={() => navigate(1)}
+            >
+              <ArrowRight size={21} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

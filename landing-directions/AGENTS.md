@@ -9,8 +9,9 @@
 - The user supplied the official logo exports in `../assits/LOGO`; use those files instead of PDF-extracted logo approximations.
 - The Services section should use premium expandable service rows inspired by the supplied dark accordion reference, translated into OrgTik's own cinematic brand language.
 - The FAQ should end with a prominent violet contact band, not a small text-only link.
-- The FAQ uses larger, unnumbered editorial disclosures and a full-width violet contact band with a subtle official OrgTik mark.
-- Testimonials show three cards in one row on desktop/tablet and stack on mobile. The user approved clearly labeled placeholders; do not invent client names, quotes, endorsements, or ratings.
+- The FAQ follows the Services hierarchy: a full-width heading row, a dark-plum accordion with generous unnumbered rows, and a compact violet contact band aligned below. Question text stays off-white, brightens on hover/focus, and is white when open; reserve the stronger violet accent for the active toggle. Answers use readable muted lavender.
+- Testimonials use previous/next arrows and a scroll-snap track: three visible cards on desktop/tablet, one on mobile, with native horizontal scrolling and keyboard arrows/Home/End. Disable controls at the boundaries. The user approved clearly labeled placeholders; do not invent client names, quotes, endorsements, or ratings.
+- Footer links are readable (16px desktop, 15px mobile), with a dedicated logo/back-to-top row, top-aligned brand and navigation columns, and grouped social/origin details. Keep the animated bottom glow but use overflow clipping so it cannot create an internally scrollable footer or excess bottom space.
 - Use the shared `src/Action.jsx` component for CTAs: 54px pill, 12px label, and a consistent circular arrow. The header uses the same anatomy at 46px. Light/dark and secondary variants belong to this system; tabs, disclosures, and navigation remain distinct controls.
 - Frontend only. Use the original assets and colors from `../ORGTIK.pdf`, with an actual animated video placeholder in each hero. Never recreate the custom logo as text.
 - Do not implement backend services, real authentication, transactions, or message delivery. All contact/account/plan behavior is labelled as a local preview.

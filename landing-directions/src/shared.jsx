@@ -576,11 +576,17 @@ export function Footer({ theme = "dark", onContact, onPlan }) {
   return (
     <footer className={`site-footer ${theme}`}>
       <div className="footer-aurora" aria-hidden="true" />
+      <div className="footer-top">
+        <a href="#top" aria-label="OrgTik — back to top">
+          <Logo light={theme === "dark"} />
+        </a>
+        <a href="#top" className="back-top" aria-label="Back to top">
+          <span>Back to top</span>
+          <ArrowUpRight size={22} aria-hidden="true" />
+        </a>
+      </div>
       <div className="footer-main">
         <div className="footer-intro">
-          <a href="#top" aria-label="Back to top">
-            <Logo light={theme === "dark"} />
-          </a>
           <h2>
             Make the next move <em>matter.</em>
           </h2>
@@ -594,7 +600,7 @@ export function Footer({ theme = "dark", onContact, onPlan }) {
         </div>
         <nav className="footer-links" aria-label="Footer navigation">
           <div>
-            <span>Explore</span>
+            <h3>Explore</h3>
             <a href="#platform">Platform</a>
             <a href="#services">Services</a>
             <a href="#work">Selected work</a>
@@ -602,14 +608,12 @@ export function Footer({ theme = "dark", onContact, onPlan }) {
             <a href="#testimonials">Testimonials</a>
           </div>
           <div>
-            <span>Start here</span>
+            <h3>Start here</h3>
             <button onClick={onPlan}>Explore plans</button>
             <button onClick={onContact}>Tell us about your project</button>
+            <a href="#faq">Common questions</a>
           </div>
         </nav>
-        <a href="#top" className="back-top" aria-label="Back to top">
-          <ArrowUpRight size={24} />
-        </a>
       </div>
       <div className="footer-connect">
         <div

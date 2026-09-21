@@ -191,12 +191,11 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
           <div className="wrap faq-layout">
             <div className="faq-intro" data-reveal>
               <h2 id="faq-title">
-                Before we <br />
-                <span>begin.</span>
+                Before we <span>begin.</span>
               </h2>
               <p>A few answers to help you take the first step.</p>
             </div>
-            <div data-reveal>
+            <div className="faq-content" data-reveal>
               <FAQ />
             </div>
             <div className="faq-contact-band" data-reveal>

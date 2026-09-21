@@ -11,7 +11,8 @@ The selected OrgTik landing-page direction, built with React and Vite from the o
 - Hover-selected approach stages with original OrgTik imagery and narrative, plus mobile tap and keyboard navigation.
 - Eight-second automatic system tour with pauses for hover, focus, visibility, and reduced motion; no separate status toolbar or playback controls.
 - Smooth Services and FAQ disclosures, scroll reveals, and contextual project/gateway cursors.
-- Three testimonial preview cards in one desktop row, stacked on mobile; all content is explicitly placeholder until approved client stories are supplied.
+- Six labeled testimonial placeholders with previous/next navigation: three visible on desktop, one on mobile, plus horizontal scrolling and keyboard support. Replace with approved client stories when supplied.
+- Full-width dark FAQ accordion with high-contrast hover/open states, and a footer with readable navigation, official horizontal branding, and a clipped animated glow.
 - One shared pill-button system across CTAs, with context-aware light/dark and secondary variants.
 - On-page project viewer with keyboard dismissal and an automatically animated closing section.
 - Local plan, account, and enquiry previews. No backend, authentication, payment, or message delivery is implemented.

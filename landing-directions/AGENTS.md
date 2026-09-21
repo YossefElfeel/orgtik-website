@@ -40,6 +40,8 @@
 - The user confirmed that social icons should remain unlinked placeholders for now.
 - Platform details use larger balanced headlines, violet sentence emphasis, a grouped feature list, and a prominent rounded plan CTA. Preserve the real copy and eight-second rotation.
 - The approach section uses a hover stage selector for Understand, Design, Deliver, and Evolve, paired with large supplied OrgTik imagery and the original stage narrative. Preserve mobile tap and keyboard navigation, including arrows, Home, and End, with a stacked mobile layout.
+- The “View all projects” CTA belongs in the “Our identity, in the world” section introduction, aligned to the right of the heading copy on larger screens and stacked with the introduction on mobile.
+- Services include a fifth “OrgTik hosting” offer in the existing cinematic accordion, covering managed hosting, monitoring/backups, and performance care without unverified uptime claims.
 
 Run the local server yourself and open the preview in the browser available to this environment. Do not give the user server-start instructions when you can run it.
 

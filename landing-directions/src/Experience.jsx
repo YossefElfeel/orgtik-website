@@ -60,7 +60,7 @@ export function Services({ onContact }) {
       <div className="service-stage-intro" data-reveal>
         <span>From first impression to what comes next.</span>
         <span>
-          Four ways forward <ArrowUpRight size={16} />
+          Five ways forward <ArrowUpRight size={16} />
         </span>
       </div>
       <div className="service-accordions">
@@ -180,12 +180,17 @@ export function CursorTarget({
   );
 }
 
-export function Projects() {
+export function Projects({ heading, description }) {
   const [selected, setSelected] = useState(null);
   const [overview, setOverview] = useState(false);
   const dialog = useRef(null);
   const previousFocus = useRef(null);
   const isOpen = selected !== null;
+  const openOverview = (event) => {
+    previousFocus.current = event.currentTarget;
+    setOverview(true);
+    setSelected(0);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -200,6 +205,13 @@ export function Projects() {
 
   return (
     <>
+      <div className="wrap brand-story-heading" data-reveal="stagger">
+        <div className="brand-story-heading-copy">{heading}</div>
+        <div className="brand-story-heading-aside">
+          <p>{description}</p>
+          <Action onClick={openOverview}>View all projects</Action>
+        </div>
+      </div>
       <div className="brand-story-images project-gallery">
         {projects.map((project, index) => (
           <figure
@@ -235,17 +247,6 @@ export function Projects() {
             </figcaption>
           </figure>
         ))}
-      </div>
-      <div className="wrap projects-action" data-reveal>
-        <Action
-          onClick={(event) => {
-            previousFocus.current = event.currentTarget;
-            setOverview(true);
-            setSelected(0);
-          }}
-        >
-          View all projects
-        </Action>
       </div>
       {isOpen && (
         <dialog

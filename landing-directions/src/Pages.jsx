@@ -1021,6 +1021,9 @@ function ModulePage({ module, navigate, path }) {
 function PlansPage({ navigate, path, search }) {
   const params = new URLSearchParams(search);
   const initialModule = params.get("module");
+  const initialModules = (params.get("modules") || initialModule || "")
+    .split(",")
+    .filter((id) => modules.some((module) => module.id === id));
   const initialMode =
     params.get("mode") || (initialModule ? "single" : "custom");
   const [mode, setMode] = useState(
@@ -1029,7 +1032,7 @@ function PlansPage({ navigate, path, search }) {
       : "custom",
   );
   const [selected, setSelected] = useState(() =>
-    modules.some((item) => item.id === initialModule) ? [initialModule] : [],
+    initialMode === "single" ? initialModules.slice(0, 1) : initialModules,
   );
   const toggle = (id) => {
     setSelected((current) => {
@@ -1099,26 +1102,38 @@ function PlansPage({ navigate, path, search }) {
             ))}
           </div>
           <div className="plan-compose">
-            <div className="plan-modules" aria-label="Select modules">
-              {modules.map((module) => {
-                const Icon = module.icon;
-                const active = selected.includes(module.id);
-                return (
-                  <button
-                    key={module.id}
-                    onClick={() => toggle(module.id)}
-                    className={active ? "selected" : ""}
-                    aria-pressed={active}
-                  >
-                    <Icon size={23} />
-                    <span>
-                      <strong>{module.formal}</strong>
-                      <small>{module.short}</small>
-                    </span>
-                    {active ? <Minus size={17} /> : <Plus size={17} />}
-                  </button>
-                );
-              })}
+            <div className="plan-selection">
+              <div className="plan-selection-heading">
+                <div>
+                  <small>02 · Select modules</small>
+                  <h3>Build your combination.</h3>
+                </div>
+                <span aria-live="polite">
+                  {selected.length}{" "}
+                  {selected.length === 1 ? "module" : "modules"}
+                </span>
+              </div>
+              <div className="plan-modules" aria-label="Select modules">
+                {modules.map((module) => {
+                  const Icon = module.icon;
+                  const active = selected.includes(module.id);
+                  return (
+                    <button
+                      key={module.id}
+                      onClick={() => toggle(module.id)}
+                      className={active ? "selected" : ""}
+                      aria-pressed={active}
+                    >
+                      <Icon size={22} />
+                      <span>
+                        <strong>{module.formal}</strong>
+                        <small>{module.short}</small>
+                      </span>
+                      {active ? <Minus size={16} /> : <Plus size={16} />}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <aside className="plan-summary" aria-live="polite">
               <Eyebrow>Your review</Eyebrow>

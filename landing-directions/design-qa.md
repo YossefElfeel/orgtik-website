@@ -1,5 +1,29 @@
 # OrgTik cinematic website design QA
 
+## Pricing plan-builder density and alignment — 2026-09-21
+
+Source visual truth: the approved cinematic routed design system and the user-supplied state `/pricing?mode=custom&modules=hr`. No separate pricing mock was supplied; the existing page content, type system, palette, and interaction model were retained.
+
+Implementation evidence: browser-rendered pricing builder at 1440 × 900 and 390 × 844 CSS viewports at density 1. The supplied plural `modules=hr` deep link was loaded directly, then CRM was added through the interface to verify selection state, the count, review content, and URL synchronization.
+
+State: the five plan choices now render as compact 90 px selectors. The six module choices use a balanced three-by-two desktop grid with 108 px content-hugging cards, two columns on tablet, and one column on mobile. A numbered module heading and live selection-count pill clarify the builder sequence. The review card is top-aligned, reduced from approximately 542 px to 381 px, and no longer stretches the module rows.
+
+Findings: no actionable P0/P1/P2 issues remain. At desktop the selection area is approximately 965 px wide and 300 px high, with a 328 px review panel beside it. At mobile the content uses the established 20 px gutter and approximately 335 px cards. The page has no horizontal overflow. Loading the supplied URL restores HR; selecting CRM changes the pill to “2 modules,” updates the review to “HR · CRM,” and writes `modules=hr%2Ccrm` to the URL.
+
+final result: passed
+
+## Contained closing CTAs across routed pages — 2026-09-21
+
+Source visual truth: the approved homepage `.faq-contact-band` treatment and the Services refinement documented immediately below.
+
+Implementation evidence: browser-rendered closing states at `/services`, service family/detail, `/insights` and article detail, `/about`, `/platform` and module detail, `/pricing`, `/work` and case-study detail, and `/roadmap`. Desktop checks used 1440 × 900 CSS pixels; responsive checks used 390 × 844 at density 1.
+
+State: the shared `PageCTA` component now defaults to its contained treatment. Every route that renders this closing action uses the same warm-paper surround, 16 px violet panel, official OrgTik mark, two-column desktop composition, and stacked mobile composition. Utility and task-focused routes without a marketing closing action remain unchanged.
+
+Findings: no actionable P0/P1/P2 issues remain. At desktop, all twelve checked template states render one contained CTA approximately 1313 px wide with a 56 px page margin. At mobile, representative routes render a single-column CTA approximately 335 px wide with a 20 px margin. All checked routes retain their page-specific copy and destination, show no horizontal overflow, and produce no browser warning/error logs.
+
+final result: passed
+
 ## Services closing CTA containment — 2026-09-21
 
 Source visual truth: `C:/Users/USER/AppData/Local/Temp/codex-clipboard-9b078f29-4145-4c92-8007-2d7aa1d00889.png` (1892 × 472), showing the earlier full-bleed Services CTA, plus the approved homepage `.faq-contact-band` as the requested contained treatment.

@@ -190,7 +190,7 @@ export function PageCTA({
   body,
   href = "/contact",
   label = "Talk to us",
-  contained = false,
+  contained = true,
 }) {
   return (
     <section

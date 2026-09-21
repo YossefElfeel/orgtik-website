@@ -17,10 +17,15 @@ export function Disclosure({
   header,
   children,
   className = "",
+  reveal = false,
 }) {
   const id = useId();
   return (
-    <article className={`disclosure ${className}`} data-open={open}>
+    <article
+      className={`disclosure ${className}`}
+      data-open={open}
+      data-reveal={reveal ? "" : undefined}
+    >
       <h3 className="disclosure-heading">
         <button
           className="disclosure-trigger"
@@ -51,8 +56,8 @@ export function Disclosure({
 export function Services({ onContact }) {
   const [selected, setSelected] = useState(0);
   return (
-    <div className="service-stage" data-reveal>
-      <div className="service-stage-intro">
+    <div className="service-stage">
+      <div className="service-stage-intro" data-reveal>
         <span>From first impression to what comes next.</span>
         <span>
           Four ways forward <ArrowUpRight size={16} />
@@ -65,6 +70,7 @@ export function Services({ onContact }) {
             <Disclosure
               key={service.title}
               className="service-item"
+              reveal
               open={selected === index}
               onToggle={() => setSelected(selected === index ? null : index)}
               header={
@@ -176,6 +182,7 @@ export function CursorTarget({
 
 export function Projects() {
   const [selected, setSelected] = useState(null);
+  const [overview, setOverview] = useState(false);
   const dialog = useRef(null);
   const previousFocus = useRef(null);
   const isOpen = selected !== null;
@@ -200,13 +207,14 @@ export function Projects() {
               index === 0 ? "brand-story-primary" : "brand-story-secondary"
             }
             key={project.image}
-            data-reveal
+            data-reveal="image"
           >
             <CursorTarget
               className="project-trigger"
               aria-label={`View project: ${project.title}`}
               onClick={(event) => {
                 previousFocus.current = event.currentTarget;
+                setOverview(false);
                 setSelected(index);
               }}
             >
@@ -228,6 +236,17 @@ export function Projects() {
           </figure>
         ))}
       </div>
+      <div className="wrap projects-action" data-reveal>
+        <Action
+          onClick={(event) => {
+            previousFocus.current = event.currentTarget;
+            setOverview(true);
+            setSelected(0);
+          }}
+        >
+          View all projects
+        </Action>
+      </div>
       {isOpen && (
         <dialog
           className="project-dialog"
@@ -242,7 +261,9 @@ export function Projects() {
           }}
         >
           <div className="project-dialog-top">
-            <span>OrgTik / {projects[selected].category}</span>
+            <span>
+              OrgTik / {overview ? "All projects" : projects[selected].category}
+            </span>
             <button
               className="icon-button"
               aria-label="Close project"
@@ -251,6 +272,26 @@ export function Projects() {
               <X size={24} />
             </button>
           </div>
+          {overview && (
+            <nav className="project-collection" aria-label="All projects">
+              {projects.map((project, index) => (
+                <button
+                  key={project.image}
+                  aria-pressed={selected === index}
+                  onClick={() => setSelected(index)}
+                >
+                  <img
+                    src={`/assets/${project.image}`}
+                    alt=""
+                    width="120"
+                    height="80"
+                  />
+                  <span>{project.title}</span>
+                  <ArrowUpRight size={20} aria-hidden="true" />
+                </button>
+              ))}
+            </nav>
+          )}
           <img
             key={projects[selected].image}
             className="project-dialog-image"
@@ -329,6 +370,51 @@ export function Testimonials() {
   const track = useRef(null);
   const trackId = useId();
   const [range, setRange] = useState({ first: 0, visible: 3 });
+  const [autoEligible, setAutoEligible] = useState(false);
+  const [keyboardFocused, setKeyboardFocused] = useState(false);
+  const [autoplayRevision, setAutoplayRevision] = useState(0);
+  const autoplay = autoEligible && !keyboardFocused;
+
+  useEffect(() => {
+    const motion = matchMedia("(prefers-reduced-motion: reduce)");
+    let visible = false;
+    const update = () =>
+      setAutoEligible(visible && !document.hidden && !motion.matches);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        update();
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(track.current);
+    motion.addEventListener("change", update);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      observer.disconnect();
+      motion.removeEventListener("change", update);
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!autoplay) return;
+    const timer = window.setInterval(() => {
+      const element = track.current;
+      if (!element?.firstElementChild || document.querySelector("dialog[open]"))
+        return;
+      const gap = parseFloat(getComputedStyle(element).columnGap) || 0;
+      const step =
+        element.firstElementChild.getBoundingClientRect().width + gap;
+      const last = Math.max(0, testimonialPreviews.length - range.visible);
+      const current = Math.round(element.scrollLeft / step);
+      element.scrollTo({
+        left: (current >= last ? 0 : current + 1) * step,
+        behavior: "smooth",
+      });
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, [autoplay, autoplayRevision, range.visible]);
 
   function measure() {
     const element = track.current;
@@ -357,6 +443,7 @@ export function Testimonials() {
   }, []);
 
   function navigate(direction) {
+    setAutoplayRevision((revision) => revision + 1);
     const element = track.current;
     const gap = parseFloat(getComputedStyle(element).columnGap) || 0;
     const step = element.firstElementChild.getBoundingClientRect().width + gap;
@@ -390,9 +477,22 @@ export function Testimonials() {
       className="testimonials-section section-pad"
       id="testimonials"
       aria-labelledby="testimonials-title"
+      data-autoplay={autoplay}
+      onPointerDownCapture={() => {
+        setKeyboardFocused(false);
+        setAutoplayRevision((revision) => revision + 1);
+      }}
+      onKeyDownCapture={() => setKeyboardFocused(true)}
+      onFocusCapture={(event) => {
+        if (event.target.matches(":focus-visible")) setKeyboardFocused(true);
+      }}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget))
+          setKeyboardFocused(false);
+      }}
     >
-      <div className="wrap" data-reveal>
-        <div className="testimonials-heading">
+      <div className="wrap">
+        <div className="testimonials-heading" data-reveal="stagger">
           <h2 id="testimonials-title">
             In our clients’ <span>words.</span>
           </h2>
@@ -404,6 +504,7 @@ export function Testimonials() {
         </div>
         <ul
           className="testimonial-grid"
+          data-reveal="stagger"
           id={trackId}
           ref={track}
           aria-label="Testimonial placeholders. Use left and right arrow keys to browse."
@@ -439,7 +540,7 @@ export function Testimonials() {
           <p
             className="testimonial-range"
             role="status"
-            aria-live="polite"
+            aria-live={autoplay ? "off" : "polite"}
             aria-atomic="true"
           >
             <span>
@@ -513,7 +614,7 @@ export function Closing({ onContact }) {
       </div>
       <div className="closing-light closing-light-one" aria-hidden="true" />
       <div className="closing-light closing-light-two" aria-hidden="true" />
-      <div className="wrap closing-content" data-reveal>
+      <div className="wrap closing-content" data-reveal="stagger">
         <p className="eyebrow">The next connection starts here</p>
         <h2>
           <span>What could we</span>
@@ -525,7 +626,7 @@ export function Closing({ onContact }) {
           Your next idea. Our shared ambition.
         </p>
         <Action className="closing-action" onClick={onContact}>
-          Start a conversation
+          Talk to us
         </Action>
       </div>
     </section>

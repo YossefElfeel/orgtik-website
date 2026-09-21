@@ -171,8 +171,31 @@ export function VideoScene({
 
 export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(() => window.scrollY > 24);
+  const [activeSection, setActiveSection] = useState("");
   const dialog = useRef(null);
   const trigger = useRef(null);
+  useEffect(() => {
+    const sections = [...document.querySelectorAll("main > section[id]")];
+    let frame;
+    const update = () => {
+      setScrolled(window.scrollY > 24);
+      const current = sections
+        .filter((section) => section.getBoundingClientRect().top <= 180)
+        .at(-1);
+      setActiveSection(current?.id || "");
+      frame = undefined;
+    };
+    const schedule = () => {
+      if (frame === undefined) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", schedule, { passive: true });
+    update();
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
   useEffect(() => {
     if (open) {
       dialog.current?.showModal();
@@ -195,13 +218,17 @@ export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
     ["Our approach", "#approach"],
   ];
   return (
-    <header className={`site-header ${theme}`}>
+    <header className={`site-header ${theme}`} data-scrolled={scrolled}>
       <a className="logo-link" href="#top" aria-label="OrgTik home">
         <Logo light={theme === "dark"} />
       </a>
       <nav className="desktop-nav" aria-label="Main navigation">
         {links.map(([name, url]) => (
-          <a key={name} href={url}>
+          <a
+            key={name}
+            href={url}
+            aria-current={url === `#${activeSection}` ? "location" : undefined}
+          >
             {name}
           </a>
         ))}
@@ -282,13 +309,12 @@ export function Header({ theme = "dark", onContact, onAccount, onPlan }) {
 
 export function ModuleExplorer({ variant = "cinematic", onPlan }) {
   const [selected, setSelected] = useState("hr");
-  const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [visible, setVisible] = useState(false);
   const [pageVisible, setPageVisible] = useState(!document.hidden);
   const root = useRef(null);
   const reduced = useReducedMotion();
-  const running = !hovered && !focused && visible && pageVisible && !reduced;
+  const running = !focused && visible && pageVisible && !reduced;
   const active = modules.find((m) => m.id === selected);
   const activeIndex = modules.indexOf(active);
   const Icon = active.icon;
@@ -323,11 +349,11 @@ export function ModuleExplorer({ variant = "cinematic", onPlan }) {
       ref={root}
       className={`module-explorer explorer-${variant}`}
       data-running={running}
-      onPointerEnter={(e) => {
-        if (e.pointerType === "mouse") setHovered(true);
+      onPointerDown={() => setFocused(false)}
+      onKeyDownCapture={() => setFocused(true)}
+      onFocusCapture={(e) => {
+        if (e.target.matches(":focus-visible")) setFocused(true);
       }}
-      onPointerLeave={() => setHovered(false)}
-      onFocusCapture={() => setFocused(true)}
       onBlurCapture={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
       }}
@@ -367,6 +393,7 @@ export function ModuleExplorer({ variant = "cinematic", onPlan }) {
       </div>
       <div
         className="module-panel"
+        data-reveal="stagger"
         id={`${variant}-module-panel`}
         role="tabpanel"
         aria-labelledby={`${variant}-tab-${active.id}`}
@@ -386,9 +413,6 @@ export function ModuleExplorer({ variant = "cinematic", onPlan }) {
           </h3>
           <p>{active.description}</p>
           <div className="module-capabilities">
-            <span className="module-capability-mark" aria-hidden="true">
-              <Icon size={32} weight="light" />
-            </span>
             <ul>
               {active.tasks.map((t) => (
                 <li key={t}>
@@ -463,7 +487,7 @@ export function Process() {
     tabRefs.current[next]?.focus();
   }
   return (
-    <div className="process-studio">
+    <div className="process-studio" data-reveal="stagger">
       <div
         className="process-selector"
         role="tablist"
@@ -549,6 +573,7 @@ export function FAQ() {
         <Disclosure
           key={q}
           className="faq-item"
+          reveal
           open={selected === index}
           onToggle={() => setSelected(selected === index ? null : index)}
           header={<span className="faq-question">{q}</span>}
@@ -585,7 +610,7 @@ export function Footer({ theme = "dark", onContact, onPlan }) {
           <ArrowUpRight size={22} aria-hidden="true" />
         </a>
       </div>
-      <div className="footer-main">
+      <div className="footer-main" data-reveal="stagger">
         <div className="footer-intro">
           <h2>
             Make the next move <em>matter.</em>
@@ -595,7 +620,7 @@ export function Footer({ theme = "dark", onContact, onPlan }) {
             ambition: moving your business forward.
           </p>
           <Action onClick={onContact} secondary className="footer-contact">
-            Start a conversation
+            Talk to us
           </Action>
         </div>
         <nav className="footer-links" aria-label="Footer navigation">
@@ -875,26 +900,94 @@ export function Modal({ type, onClose, initialModule }) {
 export function useReveals() {
   const reduced = useReducedMotion();
   useEffect(() => {
-    if (reduced) return;
+    if (
+      reduced ||
+      !("IntersectionObserver" in window) ||
+      !Element.prototype.animate
+    )
+      return;
     const els = document.querySelectorAll("[data-reveal]");
+    const animations = new Map();
+    const entered = new Set();
+    const targets = (el) => {
+      if (el.dataset.reveal === "gateway")
+        return [...el.querySelectorAll(".gateway-media, .gateway-copy > *")];
+      return el.dataset.reveal === "stagger" ? [...el.children] : [el];
+    };
+    const cancel = (el) => {
+      animations.get(el)?.cancel();
+      animations.delete(el);
+    };
+    const focus = (event) => {
+      // Keyboard navigation should never wait for an entrance to finish.
+      animations.forEach((animation, el) => {
+        if (el.contains(event.target)) cancel(el);
+      });
+    };
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("revealed");
-            observer.unobserve(entry.target);
+          const items = targets(entry.target);
+          if (!entry.isIntersecting) {
+            // A moving entrance can briefly cross the viewport edge itself.
+            if (!items.some((el) => animations.has(el)))
+              entered.delete(entry.target);
+            return;
           }
+          if (entered.has(entry.target)) return;
+          entered.add(entry.target);
+          const compact = window.innerWidth <= 700;
+          items.forEach((el, index) => {
+            cancel(el);
+            if (el.contains(document.activeElement)) return;
+            const bounds = el.getBoundingClientRect();
+            // Do not choreograph cards outside the horizontal carousel viewport.
+            if (bounds.right <= 0 || bounds.left >= window.innerWidth) return;
+            const cardImage = el.classList.contains("gateway-media");
+            const image = entry.target.dataset.reveal === "image" || cardImage;
+            const heading = el.matches("h2, h3");
+            const animation = el.animate(
+              [
+                {
+                  opacity: 0.04,
+                  transform: cardImage
+                    ? "none"
+                    : `translate3d(0, ${compact ? 28 : 52}px, 0)`,
+                  ...(image ? { clipPath: "inset(0 0 18% 0)" } : {}),
+                  ...(heading ? { clipPath: "inset(0 0 70% 0)" } : {}),
+                },
+                {
+                  opacity: 1,
+                  transform: "translate3d(0, 0, 0)",
+                  ...(image || heading ? { clipPath: "inset(0)" } : {}),
+                },
+              ],
+              {
+                duration: image ? 1000 : 850,
+                delay: Math.min(index * 110, 330),
+                easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+                fill: "backwards",
+              },
+            );
+            animations.set(el, animation);
+            animation.onfinish = () => {
+              cancel(el);
+              const rect = entry.target.getBoundingClientRect();
+              if (rect.bottom <= 0 || rect.top >= window.innerHeight)
+                entered.delete(entry.target);
+            };
+          });
         });
       },
-      { threshold: 0.08 },
+      { threshold: 0, rootMargin: "0px 0px -80px 0px" },
     );
-    els.forEach((el) => {
-      el.classList.add("will-reveal");
-      observer.observe(el);
-    });
+    els.forEach((el) => observer.observe(el));
+    document.addEventListener("focusin", focus);
     return () => {
       observer.disconnect();
-      els.forEach((el) => el.classList.remove("will-reveal"));
+      document.removeEventListener("focusin", focus);
+      animations.forEach((animation) => animation.cancel());
+      animations.clear();
     };
   }, [reduced]);
 }

@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import Cinematic from "./Cinematic";
 import { Modal, useReveals } from "./shared";
+import { useSmoothScroll } from "./useSmoothScroll";
 
 export function App() {
   const [modal, setModal] = useState(null);
   const [initialModule, setInitialModule] = useState(undefined);
   useReveals();
+  useSmoothScroll();
 
   useEffect(() => {
     document.title = "OrgTik | Digital services and business software";

@@ -1,5 +1,23 @@
 # OrgTik cinematic website design QA
 
+## Review comments verification — 2026-09-21
+
+Source visual truth: `qa/cinematic-full-wide.png` (1424 × 6196) for the existing cinematic composition, plus the user’s requested CTA placement and fifth-service requirements. Brand imagery and palette remain grounded in `../ORGTIK.pdf` and `../assits/LOGO`.
+
+Implementation evidence: `qa/work-heading-updated.png` and `qa/hosting-service-updated.png` (1265 × 791 provider output from a 1280 × 800 CSS viewport), plus `qa/work-heading-mobile-updated.png` and `qa/hosting-service-mobile-updated.png` (375 × 811 provider output from a 390 × 844 CSS viewport). Density was approximately 1. The combined review input is `qa/review-comments-comparison.jpg` (1600 × 1205); it places the earlier work-section capture with the revised desktop and mobile states in one board.
+
+State reviewed: the projects introduction with the CTA beside the descriptive copy; the same introduction stacked on mobile; OrgTik hosting expanded on desktop and mobile; the projects overview dialog opened from the relocated CTA.
+
+Focused comparison was required because the requested changes concern the section-introduction alignment and one accordion row. The combined board makes the relocated CTA, new service row, supplied brand imagery, and responsive treatment readable without relying on a full-page reduction.
+
+Findings: no actionable P0/P1/P2 issues remain. The CTA now sits in the right-hand introduction column on desktop and follows the description on mobile. OrgTik hosting is service 05, uses the existing disclosure anatomy and a supplied OrgTik brand application, and avoids unsupported uptime or performance claims.
+
+Required fidelity surfaces: Montserrat hierarchy and optical weights are unchanged; the two-column heading rhythm matches adjacent split introductions; the existing plum, violet, paper, and pale-lavender tokens are reused; imagery remains an original PDF brand asset with the established crop and treatment; copy clearly describes managed hosting, monitoring/backups, and performance care. No replacement logo, fabricated customer proof, or custom illustration was introduced.
+
+Interaction and technical checks: the relocated button opens the existing accessible project dialog; OrgTik hosting expands and collapses through the shared disclosure; desktop and mobile pages have no horizontal overflow; browser warning/error logs are empty. `npm run format:check` and `npm run build` pass. Production output is 55.82 kB CSS (12.77 kB gzip) and 338.45 kB JavaScript (99.29 kB gzip).
+
+final result: passed
+
 Status: passed after the approach hover interaction refinement.
 
 ## Scope

@@ -175,15 +175,18 @@ export default function Cinematic({ onContact, onAccount, onPlan }) {
           </div>
         </section>
         <section className="cinematic-brand" id="work">
-          <div className="wrap brand-story-heading" data-reveal="stagger">
-            <Eyebrow>Our identity, in the world</Eyebrow>
-            <h2>
-              We don’t chase attention. <br />
-              <span>We attract it.</span>
-            </h2>
-            <p>The OrgTik identity. From a clear idea to every touchpoint.</p>
-          </div>
-          <Projects />
+          <Projects
+            heading={
+              <>
+                <Eyebrow>Our identity, in the world</Eyebrow>
+                <h2>
+                  We don’t chase attention. <br />
+                  <span>We attract it.</span>
+                </h2>
+              </>
+            }
+            description="The OrgTik identity. From a clear idea to every touchpoint."
+          />
         </section>
         <section className="cinematic-process section-pad" id="approach">
           <div className="wrap">

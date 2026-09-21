@@ -8,6 +8,7 @@ import {
   Palette,
   Code,
   Lifebuoy,
+  HardDrives,
 } from "@phosphor-icons/react";
 
 export const modules = [
@@ -147,6 +148,17 @@ export const services = [
     imageAlt: "OrgTik identity displayed on a mobile device",
     caption: "Ongoing care for the systems behind the work",
     index: "04",
+  },
+  {
+    title: "OrgTik hosting",
+    category: "Keep it online",
+    icon: HardDrives,
+    text: "Reliable hosting shaped for your website, with the performance, monitoring, backups, and support it needs to stay ready.",
+    tags: ["Managed hosting", "Monitoring & backups", "Performance care"],
+    image: "brand-glass.webp",
+    imageAlt: "The OrgTik mark suspended in a sculptural glass form",
+    caption: "A dependable home for your digital presence",
+    index: "05",
   },
 ];
 

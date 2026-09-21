@@ -10,7 +10,7 @@ The selected OrgTik landing-page direction, built with React and Vite from the o
 - Interactive six-module explorer with keyboard navigation.
 - Hover-selected approach stages with original OrgTik imagery and narrative, plus mobile tap and keyboard navigation.
 - Eight-second automatic system tour that continues during mouse hover and pointer clicks, with pauses for keyboard interaction, visibility, and reduced motion; no separate status toolbar or playback controls.
-- Smooth Services and FAQ disclosures, replayable scroll entrances, and contextual project/gateway cursors.
+- Five expandable services—including OrgTik hosting—plus smooth FAQ disclosures, replayable scroll entrances, and contextual project/gateway cursors.
 - Persistent scroll navigation and a “View all projects” CTA with an on-page collection preview.
 - Subtle glass navigation, full-image gateway cards with staged text entrances, and Lenis mouse-wheel smoothing with native touch/dialog scrolling and reduced-motion support.
 - Six labeled testimonial placeholders with previous/next navigation: three visible on desktop, one on mobile, plus horizontal scrolling and keyboard support. Replace with approved client stories when supplied.

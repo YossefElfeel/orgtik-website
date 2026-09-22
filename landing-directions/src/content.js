@@ -24,6 +24,8 @@ export const modules = [
     tasks: ["People & teams", "Leave & onboarding", "Employee documents"],
     category: "Operations",
     number: "01",
+    monthlyPrice: 39,
+    image: "brand-phone.webp",
   },
   {
     id: "crm",
@@ -41,6 +43,8 @@ export const modules = [
     ],
     category: "Growth",
     number: "02",
+    monthlyPrice: 49,
+    image: "brand-glass.webp",
   },
   {
     id: "files",
@@ -58,6 +62,8 @@ export const modules = [
     ],
     category: "Operations",
     number: "03",
+    monthlyPrice: 19,
+    image: "brand-cards.webp",
   },
   {
     id: "tasks",
@@ -75,6 +81,8 @@ export const modules = [
     ],
     category: "Operations",
     number: "04",
+    monthlyPrice: 25,
+    image: "brand-tablet.webp",
   },
   {
     id: "marketing",
@@ -88,6 +96,8 @@ export const modules = [
     tasks: ["Campaign planning", "Content calendar", "Performance overview"],
     category: "Growth",
     number: "05",
+    monthlyPrice: 35,
+    image: "brand-glass.webp",
   },
   {
     id: "website",
@@ -101,6 +111,8 @@ export const modules = [
     tasks: ["Content management", "Website requests", "Maintenance overview"],
     category: "Growth",
     number: "06",
+    monthlyPrice: 29,
+    image: "brand-tablet.webp",
   },
 ];
 

@@ -47,6 +47,12 @@
 - Keep the `/pricing` plan builder compact and aligned: five short plan selectors, a three-by-two desktop module grid, two columns on tablet, one column on mobile, and a top-aligned review card. Module cards should hug their content rather than stretch to the review panel's height. Preserve `mode` and plural `modules` URL state for shareable local previews.
 - “Discuss this plan” in the pricing builder opens `/pricing/plans`, carrying the selected mode and module IDs into a dedicated three-plan comparison. Keep Launch, Connected (recommended), and Partnership as contact-led service-scope options; preserve the selected systems, clear frontend-preview boundary, responsive three-column/stacked layout, and the final handoff into the contact preview.
 - The shared header navigation includes an explicit Home link in both desktop and mobile menus. Keep the official logo linked to Home as an additional route, not the sole way back.
+- The public information architecture treats `/platform` and `/pricing` as one SaaS-products journey. Use “SaaS products” in navigation, keep plans inside that journey, and do not restore a separate top-level Plans tab.
+- Routed product and service cards must use the homepage’s cinematic, image-led visual language. Avoid oversized flat white bordered cards with large empty areas; use supplied brand imagery, dark gradients, tighter hierarchy, and purposeful hover or focus motion.
+- The SaaS plan builder compares single, bundle, complete, and custom selections with a duration selector and clearly labelled prototype CHF estimates. Keep the commercial numbers configurable in frontend data and keep the no-transaction boundary visible.
+- The platform “One workspace” illustration is an interactive constellation of the real module icons with live context changes, connection motion, keyboard focus behavior, and a reduced-motion fallback.
+- Each top-level service family connects to a labelled sample project. Project details include a supplied-asset gallery and related Insights selected by project category.
+- OrgTik hosting CTAs leave the prototype for an external OrgTik destination. Keep the URL in one frontend constant until the final hosting domain is confirmed.
 
 Run the local server yourself and open the preview in the browser available to this environment. Do not give the user server-start instructions when you can run it.
 

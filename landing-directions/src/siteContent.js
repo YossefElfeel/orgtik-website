@@ -276,6 +276,9 @@ export const projects = [
       "From a strong mark to a complete, flexible brand experience.",
     image: "brand-cards.webp",
     status: "OrgTik-owned work",
+    service: "design",
+    insightCategory: "Design",
+    gallery: ["brand-cards.webp", "brand-phone.webp", "brand-glass.webp"],
   },
   {
     slug: "connected-platform-concept",
@@ -287,6 +290,9 @@ export const projects = [
     transformation: "From disconnected tools to one clearer operating picture.",
     image: "brand-tablet.webp",
     status: "Concept preview",
+    service: "development",
+    insightCategory: "Development",
+    gallery: ["brand-tablet.webp", "brand-phone.webp", "brand-cards.webp"],
   },
   {
     slug: "managed-digital-presence",
@@ -299,6 +305,39 @@ export const projects = [
       "From launch-day delivery to a dependable long-term digital partnership.",
     image: "brand-glass.webp",
     status: "Private-preview sample",
+    service: "hosting",
+    insightCategory: "IT support",
+    gallery: ["brand-glass.webp", "brand-tablet.webp", "brand-phone.webp"],
+  },
+  {
+    slug: "campaign-growth-system",
+    name: "Campaign growth system",
+    category: "Marketing & growth",
+    sector: "Professional services",
+    summary:
+      "A mock campaign system connecting audience decisions, content, publishing, and the learning loop.",
+    transformation:
+      "From scattered activity to a campaign rhythm the whole team can see.",
+    image: "brand-phone.webp",
+    status: "Mock project",
+    service: "digital-marketing",
+    insightCategory: "Marketing",
+    gallery: ["brand-phone.webp", "brand-glass.webp", "brand-cards.webp"],
+  },
+  {
+    slug: "support-continuity-system",
+    name: "Support continuity system",
+    category: "IT support",
+    sector: "Business operations",
+    summary:
+      "A mock support experience that makes requests, priorities, fixes, and follow-up easier to understand.",
+    transformation:
+      "From reactive fixes to a visible rhythm of care and improvement.",
+    image: "brand-phone.webp",
+    status: "Mock project",
+    service: "it-support",
+    insightCategory: "IT support",
+    gallery: ["brand-phone.webp", "brand-tablet.webp", "brand-glass.webp"],
   },
 ];
 

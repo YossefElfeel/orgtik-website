@@ -177,12 +177,147 @@ const servicePackages = [
   },
 ];
 
+const serviceCardVisuals = [
+  "brand-glass.webp",
+  "brand-phone.webp",
+  "brand-cards.webp",
+];
+
+const serviceCapabilityStories = [
+  {
+    title: "A clear starting point",
+    body: (capability) =>
+      `Shape ${capability.toLowerCase()} around the audience, the immediate need, and one useful outcome.`,
+  },
+  {
+    title: "A connected delivery rhythm",
+    body: (capability) =>
+      `Turn ${capability.toLowerCase()} into visible decisions, practical outputs, and a rhythm the team can follow.`,
+  },
+  {
+    title: "A stronger next step",
+    body: (capability) =>
+      `Connect ${capability.toLowerCase()} to ownership, learning, and the next improvement that matters.`,
+  },
+];
+
 const formatCHF = (value) =>
   new Intl.NumberFormat("en-CH", {
     style: "currency",
     currency: "CHF",
     maximumFractionDigits: 0,
   }).format(value);
+
+function ServicePlans({ family, service }) {
+  const selectedName = service?.name || family.name;
+  const selectedDescription = service?.summary || family.intro;
+  const capabilities =
+    service?.capabilities || family.children.map((item) => item.name);
+  const ServiceIcon =
+    family.slug === "marketing"
+      ? Megaphone
+      : family.slug === "development"
+        ? Code
+        : family.slug === "design"
+          ? Palette
+          : family.slug === "hosting"
+            ? HardDrives
+            : Lifebuoy;
+  const isHosting = family.slug === "hosting";
+
+  const featuresFor = (plan) => {
+    if (plan.id === "focus") {
+      return [
+        capabilities[0],
+        "Clear brief and success criteria",
+        "Defined delivery window",
+      ].filter(Boolean);
+    }
+    if (plan.id === "connected") {
+      return [...capabilities.slice(0, 3), "One connected delivery roadmap"];
+    }
+    return [
+      ...capabilities.slice(0, 3),
+      "Ongoing support rhythm",
+      "Improvement roadmap",
+    ];
+  };
+
+  return (
+    <section className="page-section paper-section product-plan-section service-detail-plans">
+      <div className="wrap" id="plan-builder">
+        <SectionIntro
+          number="03"
+          eyebrow={`${selectedName} plans`}
+          title="Choose the engagement that fits the work."
+          body={`You have already chosen ${selectedName}. Compare three clear ways to begin, then carry the preferred shape into the conversation.`}
+        />
+        <div className="product-plan-choice service-plan-choice">
+          <span className="product-plan-choice-icon" aria-hidden="true">
+            <ServiceIcon size={25} weight="fill" />
+          </span>
+          <span>
+            <small>Selected service</small>
+            <strong>{selectedName}</strong>
+            <em>{selectedDescription}</em>
+          </span>
+          <span className="product-plan-choice-status">
+            Fixed for this comparison
+          </span>
+        </div>
+        <PreviewNote>
+          Indicative CHF estimates for {selectedName}. Final scope, timing,
+          availability, taxes, and contractual terms require confirmation.
+        </PreviewNote>
+        <div className="recommendation-grid product-plan-grid service-plan-grid">
+          {servicePackages.map((plan, index) => (
+            <article
+              className={`recommendation-card ${plan.featured ? "featured" : ""}`}
+              key={plan.id}
+            >
+              <div className="recommendation-card-top">
+                <small>{String(index + 1).padStart(2, "0")}</small>
+                {plan.featured && <span>Recommended</span>}
+              </div>
+              <p className="recommendation-eyebrow">{family.kicker}</p>
+              <h3>{plan.name}</h3>
+              <p className="recommendation-body">{plan.note}</p>
+              <div className="recommendation-scope">
+                <small>Service scope</small>
+                <strong>
+                  {selectedName} · {plan.name}
+                </strong>
+              </div>
+              <FeatureList items={featuresFor(plan)} />
+              <div className="recommendation-commercial">
+                <span>
+                  <small>Prototype estimate</small>
+                  <strong>From {formatCHF(plan.price)}</strong>
+                </span>
+                <span>
+                  <small>Engagement rhythm</small>
+                  <strong>
+                    {plan.recurring ? "Monthly" : "Defined scope"}
+                  </strong>
+                </span>
+              </div>
+              <Action
+                href={
+                  isHosting
+                    ? HOSTING_EXTERNAL_URL
+                    : `/contact?service=${service?.slug || family.slug}&package=${plan.id}`
+                }
+                tone={plan.featured ? "light" : undefined}
+              >
+                {isHosting ? "Continue to hosting" : `Choose ${plan.name}`}
+              </Action>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function getWorkspacePrice(selected, mode, durationId = "annual") {
   const duration =
@@ -415,7 +550,10 @@ function ServiceFamilyPage({ family, navigate, path }) {
           ]}
         />
       </PageHero>
-      <section className="page-section paper-section" id="page-content">
+      <section
+        className="page-section paper-section service-family-services"
+        id="page-content"
+      >
         <div className="wrap">
           <SectionIntro
             number="01"
@@ -423,7 +561,10 @@ function ServiceFamilyPage({ family, navigate, path }) {
             title={`One connected team for better ${family.name.toLowerCase()}.`}
             body="Choose one focused service or combine the capabilities that need to move together. Every engagement starts with a clear outcome."
           />
-          <div className="family-card-grid" id="family-services">
+          <div
+            className={`family-card-grid family-card-bento family-card-bento-${family.children.length}`}
+            id="family-services"
+          >
             {family.children.map((service, index) => (
               <CursorTarget
                 as="a"
@@ -433,7 +574,11 @@ function ServiceFamilyPage({ family, navigate, path }) {
                 key={service.slug}
               >
                 <span className="family-card-media" aria-hidden="true">
-                  <img src={`/assets/${family.image}`} alt="" loading="lazy" />
+                  <img
+                    src={`/assets/${index === 0 ? family.image : serviceCardVisuals[index % serviceCardVisuals.length]}`}
+                    alt=""
+                    loading="lazy"
+                  />
                 </span>
                 <span className="family-card-copy">
                   <span className="family-card-number">
@@ -441,6 +586,11 @@ function ServiceFamilyPage({ family, navigate, path }) {
                   </span>
                   <h3>{service.name}</h3>
                   <p>{service.outcome}</p>
+                  <span className="family-card-features">
+                    {service.capabilities.slice(0, 2).map((capability) => (
+                      <span key={capability}>{capability}</span>
+                    ))}
+                  </span>
                   <span className="family-card-action">
                     Explore the service <ArrowRight size={18} />
                   </span>
@@ -450,7 +600,7 @@ function ServiceFamilyPage({ family, navigate, path }) {
           </div>
         </div>
       </section>
-      <section className="page-section deep-section">
+      <section className="page-section deep-section service-family-story">
         <div className="wrap media-story-grid">
           <BrandMedia
             image={family.image}
@@ -475,49 +625,7 @@ function ServiceFamilyPage({ family, navigate, path }) {
           </div>
         </div>
       </section>
-      <section className="page-section paper-section service-plans-section">
-        <div className="wrap">
-          <SectionIntro
-            number="03"
-            eyebrow="Ways to work together"
-            title="Start focused or connect the services."
-            body="Indicative frontend pricing helps compare engagement shapes. The final scope and estimate are confirmed before work begins."
-          />
-          <div className="service-package-grid">
-            {servicePackages.map((option) => (
-              <article
-                className={option.featured ? "featured" : ""}
-                key={option.id}
-              >
-                <span className="service-package-icon">
-                  {option.id === "focus" ? (
-                    <Lightning size={22} />
-                  ) : option.id === "connected" ? (
-                    <CirclesThreePlus size={22} />
-                  ) : (
-                    <Sparkle size={22} />
-                  )}
-                </span>
-                <small>
-                  {option.featured ? "Most flexible" : "Engagement option"}
-                </small>
-                <h3>{option.name}</h3>
-                <p>{option.note}</p>
-                <div className="service-package-price">
-                  <span>From</span>
-                  <strong>{formatCHF(option.price)}</strong>
-                  <small>{option.recurring ? "/ month" : "/ engagement"}</small>
-                </div>
-                <a
-                  href={`/contact?service=${family.slug}&package=${option.id}`}
-                >
-                  Discuss {option.name.toLowerCase()} <ArrowRight size={17} />
-                </a>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ServicePlans family={family} />
       <PageCTA
         title={`Ready to improve ${family.name.toLowerCase()}?`}
         body="Tell us what needs to work better and we’ll shape the right engagement around it."
@@ -541,10 +649,10 @@ function ServiceDetailPage({ family, service, navigate, path }) {
         title={service.outcome}
         body={service.summary}
         primary={{
-          label: isHosting ? "Open hosting website" : "Discuss this project",
-          href: isHosting
-            ? HOSTING_EXTERNAL_URL
-            : `/contact?service=${service.slug}`,
+          label: isHosting
+            ? "Open hosting website"
+            : `View ${service.name} plans`,
+          href: isHosting ? HOSTING_EXTERNAL_URL : "#plan-builder",
         }}
         secondary={{ label: "See the approach", href: "#service-approach" }}
         image={family.image}
@@ -557,19 +665,58 @@ function ServiceDetailPage({ family, service, navigate, path }) {
           ]}
         />
       </PageHero>
-      <section className="page-section paper-section" id="page-content">
-        <div className="wrap outcome-grid">
-          <div>
-            <Eyebrow number="01">The outcome</Eyebrow>
-            <h2>Built around the result, not a list of deliverables.</h2>
+      <section
+        className="page-section paper-section service-detail-outcome-section"
+        id="page-content"
+      >
+        <div className="wrap product-outcome service-detail-outcome">
+          <div className="outcome-grid">
+            <div>
+              <Eyebrow number="01">Built around the outcome</Eyebrow>
+              <h2>{service.outcome}</h2>
+              <Action href="#service-approach" className="product-demo-action">
+                See the approach
+              </Action>
+            </div>
+            <div>
+              <p className="lead-copy">{service.summary}</p>
+            </div>
           </div>
-          <div>
-            <p className="lead-copy">{service.summary}</p>
-            <FeatureList items={service.capabilities} />
+          <div className="product-highlight-grid" data-reveal="stagger">
+            {service.capabilities.map((capability, index) => {
+              const story = serviceCapabilityStories[index];
+              return (
+                <article key={capability}>
+                  <div className="product-highlight-meta">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <div className="product-highlight-icon" aria-hidden="true">
+                      {index === 0 ? (
+                        <Lightning size={23} />
+                      ) : index === 1 ? (
+                        <CirclesThreePlus size={23} />
+                      ) : (
+                        <Sparkle size={23} />
+                      )}
+                    </div>
+                  </div>
+                  <div className="product-highlight-copy">
+                    <h3>{story.title}</h3>
+                    <p>{story.body(capability)}</p>
+                    <span className="product-highlight-feature">
+                      <CheckCircle size={18} weight="fill" aria-hidden="true" />
+                      {capability}
+                    </span>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
-      <section className="page-section deep-section" id="service-approach">
+      <section
+        className="page-section deep-section service-approach-section"
+        id="service-approach"
+      >
         <div className="wrap">
           <SectionIntro
             number="02"
@@ -580,33 +727,7 @@ function ServiceDetailPage({ family, service, navigate, path }) {
           <NumberedSteps items={processSteps} />
         </div>
       </section>
-      <section className="page-section paper-section">
-        <div className="wrap engagement-grid">
-          <div>
-            <Eyebrow number="03">Engagement</Eyebrow>
-            <h2>A clear scope before the work begins.</h2>
-            <p>
-              Pricing follows the agreed outcome, level of complexity, and
-              delivery model. We’ll define the scope and estimate before any
-              commitment.
-            </p>
-            <Action
-              href={
-                isHosting
-                  ? HOSTING_EXTERNAL_URL
-                  : `/contact?service=${service.slug}`
-              }
-            >
-              {isHosting ? "Continue to hosting" : "Request an estimate"}
-            </Action>
-          </div>
-          <BrandMedia
-            image={family.image}
-            alt={`OrgTik visual for ${service.name}`}
-            label="Service concept · Owner review required"
-          />
-        </div>
-      </section>
+      <ServicePlans family={family} service={service} />
       {sampleProject && (
         <section className="page-section paper-section service-project-section">
           <div className="wrap">
@@ -1669,19 +1790,27 @@ function ModulePage({ module, navigate, path, search }) {
           </div>
         </div>
       </section>
-      <section className="page-section deep-section" id="product-demo">
+      <section
+        className="page-section deep-section product-demo-section"
+        id="product-demo"
+      >
         <div className="wrap product-demo-layout">
           <div className="product-demo-intro">
             <Eyebrow number="02">Ways to use {module.formal}</Eyebrow>
-            <h2>See the work move, one scenario at a time.</h2>
-            <p>
-              Choose a common {module.formal} moment to preview how context,
-              ownership, and the next action stay connected.
-            </p>
-            <PreviewNote>
-              Interactive frontend demo · Interface and workflow details remain
-              prototype content until product captures are approved.
-            </PreviewNote>
+            <h2>
+              See the work move.
+              <span>One scenario at a time.</span>
+            </h2>
+            <div className="product-demo-side">
+              <p>
+                Choose a common {module.formal} moment to preview how context,
+                ownership, and the next action stay connected.
+              </p>
+              <PreviewNote>
+                Interactive frontend demo · Interface and workflow details
+                remain prototype content until product captures are approved.
+              </PreviewNote>
+            </div>
           </div>
           <ProductDemo module={module} />
         </div>

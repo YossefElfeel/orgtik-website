@@ -1,5 +1,17 @@
 # OrgTik cinematic website design QA
 
+## Service-family bento and unified service plans — 2026-09-22
+
+`/services/marketing` now replaces the three equal 371 × 440 px cards with an asymmetric supplied-asset bento: one 666 × 522 px lead card and two 471 px supporting cards at 264/242 px. Every card contains two service-specific capability tags and retains the contextual cursor and visible action. At 439 px, the same cards stack into three 384 × 390 px cards with no horizontal overflow.
+
+All service-family and child-detail routes now use one shared Focus, Connected, and Partnership plan component based on the SaaS product-plan anatomy. It includes a selected-service lockup, full-width indicative CHF notice, service-specific scope and feature lists, prototype estimates, one recommended dark card, and clear contact handoff. Child routes no longer use the sparse image-and-copy Engagement split. Marketing detail pages now use the same 666/471 px capability bento as SaaS, stacking to 384 px cards at 320/280/280 px on mobile.
+
+The variable family layouts were checked at 1280 px: Development uses a 666/471 px two-card split, while Hosting uses one intentional 1153 × 420 px card. All three Hosting plan actions continue to `https://orgtik.ch`. Desktop and 439 px mobile checks report no horizontal overflow.
+
+`npm run format:check`, `git diff --check`, and the production build pass.
+
+final result: passed for the frontend prototype; service pricing remains indicative until commercial approval
+
 ## SaaS card balance, bento capabilities and product-only plans — 2026-09-22
 
 The `/platform` builder now balances its two-column composition: the six product selectors divide the review panel's 526 px desktop height into two equal 221 px rows. Each card uses that space for the product description, three included capabilities, category, and starting monthly prototype estimate. The four bundle cards were tightened from 148 px to 124 px and the Custom row from 92 px to 80 px. At 439 px mobile width, cards return to content-driven 165 px heights and one 384 px column.
@@ -10,7 +22,7 @@ Every `/platform/:product` “Built for the everyday work” section now uses an
 
 Product detail routes now treat the product as already chosen. The full bundle configurator is removed from all six detail routes and replaced with product-specific Essential, Connected, and Partnership cards, plus Monthly, 12-month, and 24-month duration switching. Browser checks confirmed three plans, three bento capabilities, no duplicate configurator, and no horizontal overflow for HR, CRM, Files, Tasks, Marketing, and Website Manager. Switching Website Manager from 12 months to Monthly updated the prototype estimate and URL state.
 
-The product workflow demo now uses the homepage process-heading scale (38–60 px desktop, 39 px mobile) instead of the previous hero-sized type. At 1280 px the prototype stage is 768 × 427 px and aligns with a more compact scenario selector; the product-plan estimate notice spans the full 1153 px content container. The 439 px mobile check keeps the interface preview readable and reports no horizontal overflow.
+The product workflow demo now follows the homepage process typography language instead of hero-sized type: Montserrat Variable at 500 weight, a lilac second line, a 34–52 px responsive desktop scale, and 36 px mobile type. Supporting copy and the prototype notice share one side column, removing the unnecessary third intro row. At 1280 px the intro is 172 px high instead of 301 px, the complete section is 816 px instead of 996 px, and the prototype stage remains 768 × 427 px. At the reported 1856 px desktop size the section is 883 px high with the title capped at 52 px. The 439 px mobile check reports no horizontal overflow. The product-plan estimate notice spans the full content container.
 
 “Choose. Review. Discuss.” now renders as three equal 374 × 253 px horizontal cards at desktop with violet edge, lift, number, and arrow hover treatments; mobile stacks them to the standard 384 px content width. Reduced-motion styles remove the transforms.
 

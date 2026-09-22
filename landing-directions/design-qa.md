@@ -1,5 +1,17 @@
 # OrgTik cinematic website design QA
 
+## SaaS, service and project-system refinement — 2026-09-22
+
+The routed experience now follows the homepage’s cinematic language instead of the previous oversized white card grid. `/platform` uses two-column image-led product stories built from the supplied OrgTik assets; service details use the same dark-gradient anatomy; the “One workspace” section is now an interactive six-product constellation with Phosphor icons, automatic context changes, hover/focus selection, data pulses, and reduced-motion behavior.
+
+The information architecture now labels Platform as “SaaS products” and removes the separate top-level Plans tab. The SaaS flow runs from product/bundle selection through monthly, 12-month, or 24-month duration, a live prototype CHF estimate, and three plan levels. Service families include Focus, Connected, and Partnership pricing examples. Hosting CTAs leave the frontend for the external OrgTik destination; the single URL remains isolated for owner confirmation.
+
+Work now contains five labelled projects so every top-level service family has a relevant example. Project details add a responsive three-image gallery and Insights filtered by project category. Browser review covered `/platform`, its animated workspace, `/pricing`, `/pricing/plans`, `/services/design`, service packages, and `/work/campaign-growth-system` at 1440 × 900 and 390 × 844. The mobile pricing mode chooser was changed from horizontal scrolling to a clear two-column grid. No horizontal overflow remained in the checked states.
+
+`npm run format:check` and the production `npm run build` pass. Current production output is 102.91 kB CSS (21.82 kB gzip) and 439.68 kB JavaScript (125.57 kB gzip).
+
+final result: passed for frontend prototype; commercial prices and the final external hosting URL require owner approval
+
 ## Explicit Home navigation — 2026-09-21
 
 The shared header now exposes Home as the first text link on desktop and as item 01 in the mobile menu, while retaining the official logo link. Browser checks from the plan-recommendation screen verified that both versions navigate to `/`, the mobile dialog closes after selection, and Home receives the active-page state on arrival. The additional link fits the existing 1440 px header and the 390 px mobile menu without horizontal overflow or browser warning/error logs.

@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
+  Broadcast,
   CheckCircle,
+  CirclesThreePlus,
   Copy,
   Eye,
   EyeSlash,
+  Lightning,
   MagnifyingGlass,
   Minus,
   Plus,
+  Sparkle,
   X,
 } from "@phosphor-icons/react";
 import { Action, Eyebrow, Logo } from "./shared";
@@ -54,6 +58,8 @@ const processSteps = [
   },
 ];
 
+const HOSTING_EXTERNAL_URL = "https://orgtik.ch";
+
 const recommendationPlans = [
   {
     id: "launch",
@@ -99,6 +105,136 @@ const recommendationPlans = [
     ],
   },
 ];
+
+const durationOptions = [
+  { id: "monthly", label: "Monthly", months: 1, discount: 0 },
+  { id: "annual", label: "12 months", months: 12, discount: 0.15 },
+  { id: "biennial", label: "24 months", months: 24, discount: 0.22 },
+];
+
+const servicePackages = [
+  {
+    id: "focus",
+    name: "Focus",
+    note: "One service, one clear outcome, and a defined delivery window.",
+    price: 1800,
+  },
+  {
+    id: "connected",
+    name: "Connected",
+    note: "A coordinated bundle for two adjacent capabilities that need to move together.",
+    price: 4200,
+    featured: true,
+  },
+  {
+    id: "partnership",
+    name: "Partnership",
+    note: "An ongoing service rhythm with delivery, support, and measured improvement.",
+    price: 1450,
+    recurring: true,
+  },
+];
+
+const formatCHF = (value) =>
+  new Intl.NumberFormat("en-CH", {
+    style: "currency",
+    currency: "CHF",
+    maximumFractionDigits: 0,
+  }).format(value);
+
+function getWorkspacePrice(selected, mode, durationId = "annual") {
+  const duration =
+    durationOptions.find((option) => option.id === durationId) ||
+    durationOptions[1];
+  const subtotal = modules
+    .filter((module) => selected.includes(module.id))
+    .reduce((sum, module) => sum + module.monthlyPrice, 0);
+  const bundleDiscount =
+    mode === "complete"
+      ? 0.25
+      : ["operations", "growth"].includes(mode)
+        ? 0.15
+        : selected.length > 1
+          ? 0.1
+          : 0;
+  const bundledMonthly = subtotal * (1 - bundleDiscount);
+  const monthly = Math.round(bundledMonthly * (1 - duration.discount));
+  return {
+    duration,
+    subtotal,
+    bundleDiscount,
+    monthly,
+    billingTotal: monthly * duration.months,
+  };
+}
+
+function WorkspaceConstellation() {
+  const [activeId, setActiveId] = useState("website");
+  const active = modules.find((module) => module.id === activeId) || modules[0];
+  const ActiveIcon = active.icon;
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => {
+      setActiveId((current) => {
+        const index = modules.findIndex((module) => module.id === current);
+        return modules[(index + 1) % modules.length].id;
+      });
+    }, 3200);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <div
+      className="workspace-constellation"
+      aria-label="Interactive view of connected OrgTik SaaS products"
+    >
+      <div className="constellation-glow" aria-hidden="true" />
+      <div
+        className="constellation-ring constellation-ring-outer"
+        aria-hidden="true"
+      />
+      <div
+        className="constellation-ring constellation-ring-inner"
+        aria-hidden="true"
+      />
+      <div className="constellation-pulse pulse-one" aria-hidden="true" />
+      <div className="constellation-pulse pulse-two" aria-hidden="true" />
+      {modules.map((module, index) => {
+        const Icon = module.icon;
+        return (
+          <button
+            type="button"
+            className={`constellation-node ${activeId === module.id ? "active" : ""}`}
+            style={{ "--node-index": index }}
+            key={module.id}
+            onPointerEnter={() => setActiveId(module.id)}
+            onFocus={() => setActiveId(module.id)}
+            onClick={() => setActiveId(module.id)}
+            aria-pressed={activeId === module.id}
+          >
+            <Icon
+              size={21}
+              weight={activeId === module.id ? "fill" : "regular"}
+            />
+            <span>{module.formal}</span>
+          </button>
+        );
+      })}
+      <div className="constellation-core" aria-live="polite">
+        <span>
+          <ActiveIcon size={27} weight="fill" />
+        </span>
+        <small>Shared context</small>
+        <strong>{active.formal}</strong>
+        <p>{active.short}</p>
+      </div>
+      <div className="constellation-status">
+        <Broadcast size={15} weight="fill" /> Context synced
+      </div>
+    </div>
+  );
+}
 
 const matchFamily = (slug) =>
   serviceFamilies.find((family) => family.slug === slug);
@@ -200,13 +336,18 @@ function ServiceFamilyPage({ family, navigate, path }) {
                 href={`/services/${family.slug}/${service.slug}`}
                 key={service.slug}
               >
-                <span className="family-card-number">
-                  {String(index + 1).padStart(2, "0")}
+                <span className="family-card-media" aria-hidden="true">
+                  <img src={`/assets/${family.image}`} alt="" loading="lazy" />
                 </span>
-                <h3>{service.name}</h3>
-                <p>{service.outcome}</p>
-                <span className="family-card-action">
-                  Explore the service <ArrowRight size={18} />
+                <span className="family-card-copy">
+                  <span className="family-card-number">
+                    {String(index + 1).padStart(2, "0")} · {family.kicker}
+                  </span>
+                  <h3>{service.name}</h3>
+                  <p>{service.outcome}</p>
+                  <span className="family-card-action">
+                    Explore the service <ArrowRight size={18} />
+                  </span>
                 </span>
               </a>
             ))}
@@ -238,6 +379,49 @@ function ServiceFamilyPage({ family, navigate, path }) {
           </div>
         </div>
       </section>
+      <section className="page-section paper-section service-plans-section">
+        <div className="wrap">
+          <SectionIntro
+            number="03"
+            eyebrow="Ways to work together"
+            title="Start focused or connect the services."
+            body="Indicative frontend pricing helps compare engagement shapes. The final scope and estimate are confirmed before work begins."
+          />
+          <div className="service-package-grid">
+            {servicePackages.map((option) => (
+              <article
+                className={option.featured ? "featured" : ""}
+                key={option.id}
+              >
+                <span className="service-package-icon">
+                  {option.id === "focus" ? (
+                    <Lightning size={22} />
+                  ) : option.id === "connected" ? (
+                    <CirclesThreePlus size={22} />
+                  ) : (
+                    <Sparkle size={22} />
+                  )}
+                </span>
+                <small>
+                  {option.featured ? "Most flexible" : "Engagement option"}
+                </small>
+                <h3>{option.name}</h3>
+                <p>{option.note}</p>
+                <div className="service-package-price">
+                  <span>From</span>
+                  <strong>{formatCHF(option.price)}</strong>
+                  <small>{option.recurring ? "/ month" : "/ engagement"}</small>
+                </div>
+                <a
+                  href={`/contact?service=${family.slug}&package=${option.id}`}
+                >
+                  Discuss {option.name.toLowerCase()} <ArrowRight size={17} />
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
       <PageCTA
         title={`Ready to improve ${family.name.toLowerCase()}?`}
         body="Tell us what needs to work better and we’ll shape the right engagement around it."
@@ -250,6 +434,10 @@ function ServiceFamilyPage({ family, navigate, path }) {
 
 function ServiceDetailPage({ family, service, navigate, path }) {
   const related = family.children.filter((item) => item.slug !== service.slug);
+  const isHosting = family.slug === "hosting";
+  const sampleProject = projects.find(
+    (project) => project.service === family.slug,
+  );
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -257,8 +445,10 @@ function ServiceDetailPage({ family, service, navigate, path }) {
         title={service.outcome}
         body={service.summary}
         primary={{
-          label: "Discuss this project",
-          href: `/contact?service=${service.slug}`,
+          label: isHosting ? "Open hosting website" : "Discuss this project",
+          href: isHosting
+            ? HOSTING_EXTERNAL_URL
+            : `/contact?service=${service.slug}`,
         }}
         secondary={{ label: "See the approach", href: "#service-approach" }}
         image={family.image}
@@ -304,8 +494,14 @@ function ServiceDetailPage({ family, service, navigate, path }) {
               delivery model. We’ll define the scope and estimate before any
               commitment.
             </p>
-            <Action href={`/contact?service=${service.slug}`}>
-              Request an estimate
+            <Action
+              href={
+                isHosting
+                  ? HOSTING_EXTERNAL_URL
+                  : `/contact?service=${service.slug}`
+              }
+            >
+              {isHosting ? "Continue to hosting" : "Request an estimate"}
             </Action>
           </div>
           <BrandMedia
@@ -315,6 +511,40 @@ function ServiceDetailPage({ family, service, navigate, path }) {
           />
         </div>
       </section>
+      {sampleProject && (
+        <section className="page-section paper-section service-project-section">
+          <div className="wrap">
+            <SectionIntro
+              number="04"
+              eyebrow="A project in this service"
+              title="See the direction in a real page flow."
+              body="Each service now connects to a labelled OrgTik-owned, concept, or mock project with a gallery and related insight content."
+            />
+            <a
+              className="service-project-card"
+              href={`/work/${sampleProject.slug}`}
+            >
+              <span className="service-project-media">
+                <img
+                  src={`/assets/${sampleProject.image}`}
+                  alt=""
+                  loading="lazy"
+                />
+              </span>
+              <span className="service-project-copy">
+                <small>
+                  {sampleProject.status} · {sampleProject.category}
+                </small>
+                <strong>{sampleProject.name}</strong>
+                <span>{sampleProject.summary}</span>
+                <em>
+                  View project <ArrowRight size={17} />
+                </em>
+              </span>
+            </a>
+          </div>
+        </section>
+      )}
       {related.length > 0 && (
         <section className="page-section paper-section related-section">
           <div className="wrap">
@@ -337,10 +567,20 @@ function ServiceDetailPage({ family, service, navigate, path }) {
         </section>
       )}
       <PageCTA
-        title="Bring us the part that needs to work better."
-        body="We’ll turn the problem into a practical next step and a transparent scope."
-        href={`/contact?service=${service.slug}`}
-        label="Discuss this project"
+        title={
+          isHosting
+            ? "Ready to choose your hosting?"
+            : "Bring us the part that needs to work better."
+        }
+        body={
+          isHosting
+            ? "Continue to the external OrgTik website to review availability and start the hosting conversation."
+            : "We’ll turn the problem into a practical next step and a transparent scope."
+        }
+        href={
+          isHosting ? HOSTING_EXTERNAL_URL : `/contact?service=${service.slug}`
+        }
+        label={isHosting ? "Visit hosting website" : "Discuss this project"}
       />
     </SiteLayout>
   );
@@ -864,8 +1104,8 @@ function PlatformPage({ navigate, path }) {
             title="Six focused systems. One familiar way to work."
             body="The descriptions below are public product positioning. Availability, limits, integrations, and product captures require product-owner confirmation."
           />
-          <div className="module-card-grid" id="modules">
-            {modules.map((module) => {
+          <div className="module-card-grid cinematic-card-grid" id="modules">
+            {modules.map((module, index) => {
               const Icon = module.icon;
               return (
                 <a
@@ -873,16 +1113,25 @@ function PlatformPage({ navigate, path }) {
                   href={`/platform/${module.id}`}
                   key={module.id}
                 >
-                  <span className="module-card-icon">
-                    <Icon size={24} />
+                  <span className="module-card-media" aria-hidden="true">
+                    <img
+                      src={`/assets/${module.image}`}
+                      alt=""
+                      loading={index > 1 ? "lazy" : "eager"}
+                    />
+                    <span className="module-card-icon">
+                      <Icon size={23} weight="fill" />
+                    </span>
                   </span>
-                  <small>
-                    {module.number} · {module.category}
-                  </small>
-                  <h3>{module.formal}</h3>
-                  <p>{module.description}</p>
-                  <span>
-                    Explore {module.formal} <ArrowRight size={17} />
+                  <span className="module-card-copy">
+                    <small>
+                      {module.number} · {module.category}
+                    </small>
+                    <h3>{module.formal}</h3>
+                    <p>{module.description}</p>
+                    <span className="module-card-action">
+                      Explore product <ArrowRight size={17} />
+                    </span>
                   </span>
                 </a>
               );
@@ -908,18 +1157,7 @@ function PlatformPage({ navigate, path }) {
               ]}
             />
           </div>
-          <div
-            className="workflow-nodes"
-            aria-label="Example connected workflow"
-          >
-            {["Marketing", "CRM", "Tasks", "Files", "Website"].map(
-              (item, index) => (
-                <span key={item} style={{ "--node-index": index }}>
-                  {item}
-                </span>
-              ),
-            )}
-          </div>
+          <WorkspaceConstellation />
         </div>
       </section>
       <section className="page-section paper-section">
@@ -928,7 +1166,7 @@ function PlatformPage({ navigate, path }) {
             number="03"
             eyebrow="Choose how to begin"
             title="Focused, bundled, or fully connected."
-            body="Commercial terms and prices remain contact-led until the approved product and pricing model is supplied."
+            body="Compare a single product, a ready-made bundle, or a custom workspace. Prototype prices update with the products and subscription duration you select."
           />
           <div className="path-grid">
             {planOptions.slice(0, 4).map((option) => (
@@ -1080,6 +1318,12 @@ function PlansPage({ navigate, path, search }) {
   const [selected, setSelected] = useState(() =>
     initialMode === "single" ? initialModules.slice(0, 1) : initialModules,
   );
+  const initialDuration = params.get("duration") || "annual";
+  const [duration, setDuration] = useState(
+    durationOptions.some((option) => option.id === initialDuration)
+      ? initialDuration
+      : "annual",
+  );
   const toggle = (id) => {
     setSelected((current) => {
       if (mode === "single") return [id];
@@ -1091,27 +1335,29 @@ function PlansPage({ navigate, path, search }) {
   useEffect(() => {
     const next = new URLSearchParams();
     next.set("mode", mode);
+    next.set("duration", duration);
     if (selected.length) next.set("modules", selected.join(","));
     window.history.replaceState({}, "", `${path}?${next}`);
     try {
       sessionStorage.setItem(
         "orgtik-plan-preview",
-        JSON.stringify({ mode, selected }),
+        JSON.stringify({ mode, selected, duration }),
       );
     } catch {
       /* optional local continuity */
     }
-  }, [mode, selected, path]);
+  }, [mode, selected, duration, path]);
   const chosenNames = modules
     .filter((module) => selected.includes(module.id))
     .map((module) => module.formal);
+  const price = getWorkspacePrice(selected, mode, duration);
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
-        eyebrow="Plans that grow with your operation"
-        title="Choose one system—or build"
-        accent="the workspace you need."
-        body="Start focused, combine the modules your team uses, or bring every system together. Pricing remains contact-led until commercial approval."
+        eyebrow="SaaS products / Plans"
+        title="Build the workspace."
+        accent="See the price change live."
+        body="Choose a single product, a ready-made bundle, or your own combination. Then select the subscription duration that fits."
         primary={{ label: "Build your plan", href: "#plan-builder" }}
         secondary={{ label: "Explore modules", href: "/platform" }}
         image="brand-glass.webp"
@@ -1122,7 +1368,7 @@ function PlansPage({ navigate, path, search }) {
             number="01"
             eyebrow="Choose how to start"
             title="A configuration you can understand before a conversation."
-            body="This builder stores only non-sensitive module IDs in the URL and session storage. It creates no account, order, or subscription."
+            body="Products, bundle savings, and duration work together in one clear SaaS journey. Prices are prototype values in CHF until commercial approval."
           />
           <div className="plan-mode-grid">
             {planOptions.map((option) => (
@@ -1147,16 +1393,40 @@ function PlansPage({ navigate, path, search }) {
               </button>
             ))}
           </div>
+          <div className="duration-selector" aria-label="Subscription duration">
+            <div>
+              <small>02 · Subscription duration</small>
+              <strong>Choose your billing commitment</strong>
+            </div>
+            <div className="duration-options">
+              {durationOptions.map((option) => (
+                <button
+                  type="button"
+                  key={option.id}
+                  className={duration === option.id ? "selected" : ""}
+                  aria-pressed={duration === option.id}
+                  onClick={() => setDuration(option.id)}
+                >
+                  <span>{option.label}</span>
+                  <small>
+                    {option.discount
+                      ? `${Math.round(option.discount * 100)}% saving`
+                      : "Flexible"}
+                  </small>
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="plan-compose">
             <div className="plan-selection">
               <div className="plan-selection-heading">
                 <div>
-                  <small>02 · Select modules</small>
+                  <small>03 · Select products</small>
                   <h3>Build your combination.</h3>
                 </div>
                 <span aria-live="polite">
                   {selected.length}{" "}
-                  {selected.length === 1 ? "module" : "modules"}
+                  {selected.length === 1 ? "product" : "products"}
                 </span>
               </div>
               <div className="plan-modules" aria-label="Select modules">
@@ -1191,29 +1461,40 @@ function PlansPage({ navigate, path, search }) {
               </p>
               <dl>
                 <div>
-                  <dt>Modules</dt>
+                  <dt>Products</dt>
                   <dd>{selected.length || "—"}</dd>
                 </div>
                 <div>
-                  <dt>Pricing</dt>
-                  <dd>Contact for pricing</dd>
+                  <dt>Bundle saving</dt>
+                  <dd>{Math.round(price.bundleDiscount * 100)}%</dd>
                 </div>
                 <div>
-                  <dt>Transaction</dt>
-                  <dd>Preview only</dd>
+                  <dt>Duration</dt>
+                  <dd>{price.duration.label}</dd>
                 </div>
               </dl>
+              <div className="plan-price-total">
+                <small>Estimated monthly</small>
+                <strong>
+                  {selected.length ? formatCHF(price.monthly) : "—"}
+                </strong>
+                <span>
+                  {price.duration.months > 1 && selected.length
+                    ? `${formatCHF(price.billingTotal)} billed for ${price.duration.label.toLowerCase()}`
+                    : "per workspace / month"}
+                </span>
+              </div>
               <PreviewNote>
-                No payment, subscription, or account is created.
+                Prototype pricing · No payment or subscription is created.
               </PreviewNote>
               <Action
-                href={`/pricing/plans?mode=${mode}&modules=${selected.join(",")}`}
+                href={`/pricing/plans?mode=${mode}&duration=${duration}&modules=${selected.join(",")}`}
                 aria-disabled={!selected.length}
                 onClick={(event) => {
                   if (!selected.length) event.preventDefault();
                 }}
               >
-                Discuss this plan
+                Review three SaaS plans
               </Action>
             </aside>
           </div>
@@ -1225,21 +1506,21 @@ function PlansPage({ navigate, path, search }) {
             number="02"
             eyebrow="What happens next"
             title="Choose. Review. Discuss."
-            body="A real commercial journey will require approved pricing, terms, billing logic, and backend integrations. This frontend keeps that boundary visible."
+            body="The frontend makes the product, bundle, duration, and estimate easy to compare before the final commercial conversation."
           />
           <NumberedSteps
             items={[
               {
                 title: "Choose",
-                body: "Select one module, a ready-made bundle, or a custom workspace.",
+                body: "Select one product, a ready-made bundle, or a custom workspace.",
               },
               {
                 title: "Review",
-                body: "Check the systems in the configuration and the questions still requiring commercial input.",
+                body: "Choose a duration and see bundle and commitment savings immediately.",
               },
               {
                 title: "Discuss",
-                body: "Compare three service plans around the selected systems, then carry the preferred direction into the contact preview.",
+                body: "Compare three SaaS support levels, then carry the preferred option into the contact preview.",
               },
             ]}
           />
@@ -1268,16 +1549,23 @@ function PlanOptionsPage({ navigate, path, search }) {
     ? requestedMode
     : "custom";
   const modeName = planOptions.find((option) => option.id === mode)?.name;
+  const requestedDuration = params.get("duration") || "annual";
+  const duration = durationOptions.some(
+    (option) => option.id === requestedDuration,
+  )
+    ? requestedDuration
+    : "annual";
+  const workspacePrice = getWorkspacePrice(selectedIds, mode, duration);
   const modulesValue = selectedIds.join(",");
-  const editHref = `/pricing?mode=${mode}${modulesValue ? `&modules=${modulesValue}` : ""}`;
+  const editHref = `/pricing?mode=${mode}&duration=${duration}${modulesValue ? `&modules=${modulesValue}` : ""}`;
 
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
-        eyebrow="Plan recommendations / Frontend preview"
-        title="Three ways to launch"
-        accent="your selected workspace."
-        body="Compare the level of guidance and continuity around the systems you chose. Final scope, availability, and commercial terms remain contact-led."
+        eyebrow="SaaS products / Plan comparison"
+        title="One workspace."
+        accent="Three levels of support."
+        body="Your selected products and duration stay fixed while onboarding, workflow guidance, and ongoing care change by plan."
         primary={{ label: "Compare the plans", href: "#plan-options" }}
         secondary={{ label: "Edit your systems", href: editHref }}
         video
@@ -1285,7 +1573,7 @@ function PlanOptionsPage({ navigate, path, search }) {
       >
         <Breadcrumbs
           items={[
-            { label: "Plans", href: editHref },
+            { label: "SaaS plans", href: editHref },
             { label: "Recommendations" },
           ]}
         />
@@ -1297,12 +1585,12 @@ function PlanOptionsPage({ navigate, path, search }) {
               <Eyebrow number="01">Your selected workspace</Eyebrow>
               <h2>
                 {selectedModules.length
-                  ? `${selectedModules.length} system${selectedModules.length === 1 ? "" : "s"}, three ways forward.`
+                  ? `${selectedModules.length} product${selectedModules.length === 1 ? "" : "s"}, three ways forward.`
                   : "Choose your systems first."}
               </h2>
               <p>
                 {selectedModules.length
-                  ? `${modeName} · Your systems stay consistent while the level of planning, connection, and ongoing support changes.`
+                  ? `${modeName} · ${workspacePrice.duration.label} · Your products stay consistent while the level of onboarding and support changes.`
                   : "Return to the plan builder and select at least one system before comparing these recommendations."}
               </p>
             </div>
@@ -1328,12 +1616,21 @@ function PlanOptionsPage({ navigate, path, search }) {
                 })}
               </div>
               <PreviewNote>
-                These plans compare service scope only. Prices, limits, timing,
-                and contractual terms require commercial approval.
+                Prototype CHF pricing for product review. Final limits,
+                contractual terms, taxes, and availability require approval.
               </PreviewNote>
               <div className="recommendation-grid">
                 {recommendationPlans.map((plan) => {
-                  const contactHref = `/contact?intent=platform&plan=${plan.id}&mode=${mode}&modules=${modulesValue}`;
+                  const levelMultiplier =
+                    plan.id === "launch"
+                      ? 1
+                      : plan.id === "connected"
+                        ? 1.2
+                        : 1.45;
+                  const monthlyPrice = Math.round(
+                    workspacePrice.monthly * levelMultiplier,
+                  );
+                  const contactHref = `/contact?intent=platform&plan=${plan.id}&mode=${mode}&duration=${duration}&modules=${modulesValue}`;
                   return (
                     <article
                       className={`recommendation-card ${plan.featured ? "featured" : ""}`}
@@ -1353,12 +1650,12 @@ function PlanOptionsPage({ navigate, path, search }) {
                       <FeatureList items={plan.features} />
                       <div className="recommendation-commercial">
                         <span>
-                          <small>Pricing</small>
-                          <strong>Contact-led</strong>
+                          <small>Monthly estimate</small>
+                          <strong>{formatCHF(monthlyPrice)}</strong>
                         </span>
                         <span>
-                          <small>Selected</small>
-                          <strong>{selectedModules.length} systems</strong>
+                          <small>Billing period</small>
+                          <strong>{workspacePrice.duration.label}</strong>
                         </span>
                       </div>
                       <Action
@@ -1384,8 +1681,8 @@ function PlanOptionsPage({ navigate, path, search }) {
       <PageCTA
         eyebrow="A plan shaped around the work"
         title="Bring the selected systems into one useful conversation."
-        body="We’ll clarify the fit, final scope, and commercial details before anything is agreed."
-        href={`/contact?intent=platform&mode=${mode}&modules=${modulesValue}`}
+        body="We’ll clarify the fit, final limits, and commercial details before anything is agreed."
+        href={`/contact?intent=platform&mode=${mode}&duration=${duration}&modules=${modulesValue}`}
         label="Talk through the options"
       />
     </SiteLayout>
@@ -1489,6 +1786,9 @@ function WorkPage({ navigate, path, search }) {
 }
 
 function CaseStudyPage({ project, navigate, path }) {
+  const relatedInsights = insights
+    .filter((article) => article.category === project.insightCategory)
+    .slice(0, 2);
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -1548,10 +1848,39 @@ function CaseStudyPage({ project, navigate, path }) {
           label={`${project.status} · Review before public release`}
         />
       </section>
-      <section className="page-section paper-section">
+      <section className="page-section paper-section project-gallery-section">
         <div className="wrap">
           <SectionIntro
             number="02"
+            eyebrow="Project gallery"
+            title="The direction, seen across touchpoints."
+            body="A visual gallery gives each project room to show the system, details, and real-world application instead of relying on a single hero image."
+          />
+          <div className="project-gallery">
+            {(project.gallery || [project.image]).map((image, index) => (
+              <figure key={`${image}-${index}`}>
+                <img
+                  src={`/assets/${image}`}
+                  alt={`${project.name} visual ${index + 1}`}
+                  loading={index ? "lazy" : "eager"}
+                />
+                <figcaption>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  {index === 0
+                    ? "System view"
+                    : index === 1
+                      ? "Experience detail"
+                      : "Brand in context"}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="page-section paper-section">
+        <div className="wrap">
+          <SectionIntro
+            number="03"
             eyebrow="The work"
             title="One direction, expressed across the system."
             body="Strategy, design, technology, and ongoing care are sequenced around a shared definition of success."
@@ -1561,7 +1890,7 @@ function CaseStudyPage({ project, navigate, path }) {
       </section>
       <section className="page-section deep-section">
         <div className="wrap result-moment">
-          <Eyebrow number="03">The result</Eyebrow>
+          <Eyebrow number="04">The result</Eyebrow>
           <h2>A qualitative outcome, described honestly.</h2>
           <p>
             This preview shows how verified metrics, baselines, periods, and
@@ -1570,6 +1899,30 @@ function CaseStudyPage({ project, navigate, path }) {
           </p>
         </div>
       </section>
+      {relatedInsights.length > 0 && (
+        <section className="page-section paper-section related-insights-section">
+          <div className="wrap">
+            <SectionIntro
+              number="05"
+              eyebrow="Related thinking"
+              title={`Insights connected to ${project.category.toLowerCase()}.`}
+              body="Continue with practical thinking selected by the type of work shown in this project."
+            />
+            <div className="related-insight-grid">
+              {relatedInsights.map((article) => (
+                <EditorialLink
+                  key={article.slug}
+                  href={`/insights/${article.slug}`}
+                  eyebrow={`${article.category} · ${article.readingTime}`}
+                  title={article.title}
+                  body={article.excerpt}
+                  image={article.image}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
       <PageCTA
         title="Start a similar project."
         body="Bring us the challenge and the evidence you want the work to create."
@@ -1891,7 +2244,7 @@ function SitemapPage({ navigate, path }) {
       [
         ["Overview", "/platform"],
         ...modules.map((module) => [module.formal, `/platform/${module.id}`]),
-        ["Plans", "/pricing"],
+        ["SaaS plan builder", "/pricing"],
         ["Sign in", "/sign-in"],
       ],
     ],

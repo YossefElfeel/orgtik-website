@@ -220,7 +220,7 @@ export function Header({
   };
   const links = [
     ["Home", "/"],
-    ["Platform", "/platform"],
+    ["SaaS products", "/platform"],
     ["Services", "/services"],
     ["Work", "/work"],
     ["Insights", "/insights"],
@@ -247,7 +247,6 @@ export function Header({
             {name}
           </a>
         ))}
-        <button onClick={onPlan}>Plans</button>
       </nav>
       <div className="header-actions">
         <button className="account-link" onClick={onAccount}>
@@ -302,14 +301,6 @@ export function Header({
               <ArrowUpRight size={24} />
             </a>
           ))}
-          <button
-            onClick={() => {
-              close();
-              onPlan();
-            }}
-          >
-            Plans <ArrowUpRight size={24} />
-          </button>
           <button
             onClick={() => {
               close();
@@ -651,7 +642,7 @@ export function Footer({ theme = "dark", onContact, onPlan }) {
         <nav className="footer-links" aria-label="Footer navigation">
           <div>
             <h3>Explore</h3>
-            <a href="/platform">Platform</a>
+            <a href="/platform">SaaS products</a>
             <a href="/services">Services</a>
             <a href="/work">Selected work</a>
             <a href="/insights">Insights</a>
@@ -659,7 +650,7 @@ export function Footer({ theme = "dark", onContact, onPlan }) {
           </div>
           <div>
             <h3>Start here</h3>
-            <button onClick={onPlan}>Explore plans</button>
+            <button onClick={onPlan}>Build a SaaS plan</button>
             <button onClick={onContact}>Tell us about your project</button>
             <a href="/roadmap">Roadmap</a>
             <a href="/sitemap">Sitemap</a>

@@ -1,5 +1,17 @@
 # OrgTik cinematic website design QA
 
+## About story, Roadmap direction and dark Insights cards — 2026-09-22
+
+`/about` now explains why OrgTik exists through an explicit mission, three goals, a four-chapter journey map, and four routed capability paths covering brand and demand, digital experiences, business systems, and continuity and care. The desktop mission bento measures 440 px high, the journey cards share a 330 px height, and the four capability cards share a 430 px height. At the narrow 319 px in-app viewport, all card groups stack into a 280 px content column without clipped copy; the mission, goal, journey, and capability cards remain content-complete.
+
+`/roadmap` now follows the supplied dark milestone reference in OrgTik's own system. Six clearly labelled preview milestones are grouped into 2025, 2026, and 2027, with stage pills, theme tags, restrained progress lines, and detail dialogs. The toolbar combines stage, theme, and search filters. Filtering Hosting returns one milestone; filtering Now returns two; opening a milestone presents the existing accessible dialog. The page adds a light problem-submission section and four explicitly labelled community-idea previews without introducing a backend, stored votes, or unverified product claims.
+
+`/insights` keeps the compact 568 × 228 px desktop / 384 × 206–207 px mobile editorial anatomy but moves it to dark plum cards with white hierarchy, lilac metadata, and restrained imagery. Categories, search, and the live result count now sit in one contained light-lilac filter panel. The panel is 167 px high at 1280 px and 201 px at 439 px. Searching “brand” still returns one matching article, and neither tested viewport introduces horizontal overflow.
+
+`npm run format:check`, `git diff --check`, and the production build pass.
+
+final result: passed for the frontend prototype; approved company history, roadmap sources, community data, and live submission endpoints remain content dependencies
+
 ## Insights editorial card density — 2026-09-22
 
 The `/insights` article index now uses a compact editorial card system that follows the OrgTik direction without making a long list visually heavy. Six articles form a two-column grid of consistent 568 × 228 px cards at 1280 px, with restrained 164 px imagery, 20–26 px titles, two-line summaries, quiet date metadata, and a small lilac action button. The grid occupies 715 px instead of the previous 897 px while preserving readable hierarchy and supplied imagery.

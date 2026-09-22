@@ -4305,7 +4305,63 @@ svg {
   display: block;
   color: #7c6d89;
   font-size: 11px;
-  margin-bottom: 20px;
+}
+.insights-filter-panel {
+  margin-bottom: 22px;
+  padding: 22px;
+  border: 1px solid #28123b16;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f1eaf6 0%, #f8f4f9 100%);
+}
+.insights-filter-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+.insights-filter-heading > div {
+  display: grid;
+  gap: 4px;
+}
+.insights-filter-heading small {
+  color: #806d8c;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.insights-filter-heading strong {
+  font-size: 22px;
+  letter-spacing: -0.035em;
+}
+.insights-filter-heading .result-count {
+  margin: 0;
+  color: #5f5168;
+}
+.insights-filter-bar {
+  margin: 0;
+  padding-top: 18px;
+  border-top: 1px solid #28123b13;
+}
+.insights-filter-bar .filter-links {
+  gap: 7px;
+}
+.insights-filter-bar .filter-links a {
+  min-height: 39px;
+  padding: 8px 15px;
+  background: #ffffff91;
+}
+.insights-filter-bar .filter-links a.active {
+  background: var(--plum);
+}
+.insights-filter-bar .search-field {
+  min-width: 230px;
+  min-height: 42px;
+  padding: 0 13px;
+  border: 1px solid #28123b1f;
+  border-radius: 12px;
+  background: #fff;
 }
 .insights-grid {
   display: grid;
@@ -4321,10 +4377,11 @@ svg {
   gap: 20px;
   padding: 14px;
   overflow: hidden;
-  border: 1px solid #28123b17;
+  border: 1px solid #ffffff16;
   border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 16px 40px #28103609;
+  color: #fff;
+  background: linear-gradient(145deg, #170a22 0%, #281037 100%);
+  box-shadow: 0 18px 44px #28103618;
   transition:
     transform 360ms var(--ease),
     border-color 220ms,
@@ -4348,7 +4405,7 @@ svg {
 .insights-grid .editorial-link-copy > span {
   display: -webkit-box;
   overflow: hidden;
-  color: #746a7d;
+  color: #cbbdd3;
   font-size: 13px;
   line-height: 1.55;
   -webkit-box-orient: vertical;
@@ -4357,8 +4414,8 @@ svg {
 .insights-grid .editorial-link-copy em {
   margin-top: auto;
   padding-top: 11px;
-  border-top: 1px solid #28123b12;
-  color: #80628f;
+  border-top: 1px solid #ffffff1a;
+  color: #c99cf1;
 }
 .insights-grid .editorial-link-arrow {
   position: absolute;
@@ -4366,14 +4423,14 @@ svg {
   bottom: 18px;
   width: 34px;
   height: 34px;
-  color: #5d3a70;
-  background: #f3ecf8;
+  color: #28123b;
+  background: #ead9f7;
   border-color: transparent;
 }
 .insights-grid .editorial-link:hover {
   transform: translateY(-4px);
-  border-color: #9458f44d;
-  box-shadow: 0 22px 52px #28103614;
+  border-color: #b980f266;
+  box-shadow: 0 26px 58px #2810362e;
 }
 .insights-grid .editorial-link:hover .editorial-link-media img {
   transform: scale(1.025);
@@ -4549,6 +4606,329 @@ svg {
 .principles-grid p {
   color: #746a7d;
   font-size: 15px;
+}
+.about-purpose .page-section-intro {
+  margin-bottom: 54px;
+}
+.about-purpose-bento {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr 0.88fr;
+  grid-template-rows: repeat(2, minmax(188px, auto));
+  gap: 16px;
+}
+.about-mission-card,
+.about-goal-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+}
+.about-mission-card {
+  grid-row: 1 / 3;
+  min-height: 440px;
+  color: #fff;
+  background: #170a22;
+}
+.about-mission-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    #14081d1f 5%,
+    #14081dcf 58%,
+    #14081df7 100%
+  );
+}
+.about-mission-card img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  transition: transform 900ms var(--ease);
+}
+.about-mission-card > div {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 32px;
+}
+.about-mission-card span,
+.about-goal-card span {
+  color: #c895f2;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.about-mission-card h3 {
+  max-width: 13ch;
+  margin: 13px 0 16px;
+  font-size: clamp(30px, 3vw, 43px);
+  line-height: 1.04;
+  letter-spacing: -0.05em;
+}
+.about-mission-card p {
+  max-width: 50ch;
+  color: #d6c9dd;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.about-mission-card:hover img {
+  transform: scale(1.035);
+}
+.about-goal-card {
+  min-height: 188px;
+  display: flex;
+  flex-direction: column;
+  padding: 26px;
+  border: 1px solid #28123b18;
+  background: #eee8f1;
+}
+.about-goal-card::before {
+  content: "";
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  right: -70px;
+  bottom: -90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #b77af155, transparent 70%);
+}
+.about-goal-lead {
+  grid-column: 2 / 4;
+  background: linear-gradient(120deg, #e8ddf1, #f5eff7);
+}
+.about-goal-card h3 {
+  max-width: 17ch;
+  margin: auto 0 9px;
+  font-size: clamp(22px, 2vw, 29px);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+.about-goal-card p {
+  position: relative;
+  max-width: 54ch;
+  color: #6f6377;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.about-journey {
+  overflow: hidden;
+}
+.about-journey-map {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 58px;
+}
+.about-journey-map::before {
+  content: "";
+  position: absolute;
+  top: 43px;
+  right: 8%;
+  left: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, #9d65d6, #c99bf2 52%, #ffffff24);
+}
+.about-journey-map article {
+  position: relative;
+  min-height: 330px;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border: 1px solid #ffffff18;
+  border-radius: 20px;
+  background: linear-gradient(150deg, #ffffff0c, #ffffff04);
+  transition:
+    transform 350ms var(--ease),
+    border-color 250ms,
+    background 250ms;
+}
+.about-journey-map article:hover {
+  transform: translateY(-5px);
+  border-color: #bb83ee66;
+  background: linear-gradient(150deg, #9a5fd51d, #ffffff06);
+}
+.about-journey-marker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.about-journey-marker span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #1a0b26;
+  background: #d7b3f3;
+  font-size: 10px;
+  font-weight: 700;
+}
+.about-journey-marker i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b57ce6;
+  box-shadow: 0 0 0 7px #ae70e41a;
+}
+.about-journey-map h3 {
+  margin: 62px 0 13px;
+  font-size: 24px;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+.about-journey-map p {
+  color: #bfb1c8;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.about-journey-map small {
+  width: fit-content;
+  margin-top: auto;
+  padding: 8px 11px;
+  border: 1px solid #ffffff17;
+  border-radius: 999px;
+  color: #d5b1f0;
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.about-journey-end {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid #ffffff1c;
+}
+.about-journey-end p {
+  color: #c8b9d0;
+}
+.about-capability-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 52px;
+}
+.about-capability-card {
+  position: relative;
+  min-height: 430px;
+  overflow: hidden;
+  border-radius: 22px;
+  color: #fff;
+  background: #160921;
+  box-shadow: 0 20px 52px #2810361a;
+  isolation: isolate;
+}
+.about-capability-card > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 900ms var(--ease);
+}
+.about-capability-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    #10061815 2%,
+    #10061891 46%,
+    #100618f5 100%
+  );
+}
+.about-capability-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 28px;
+}
+.about-capability-icon {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ffffff25;
+  border-radius: 14px;
+  background: #ffffff17;
+  backdrop-filter: blur(14px);
+}
+.about-capability-card small {
+  color: #d3c2df;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.about-capability-card h3 {
+  max-width: 18ch;
+  margin: 10px 0 10px;
+  font-size: clamp(29px, 2.5vw, 37px);
+  line-height: 1.03;
+  letter-spacing: -0.05em;
+}
+.about-capability-card p {
+  max-width: 58ch;
+  color: #d4c8da;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.about-capability-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 15px;
+}
+.about-capability-tags em {
+  padding: 7px 9px;
+  border: 1px solid #ffffff21;
+  border-radius: 999px;
+  color: #e3d8e9;
+  font-size: 8px;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.about-capability-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  margin-top: 17px;
+  padding-top: 13px;
+  border-top: 1px solid #ffffff2a;
+  font-size: 11px;
+  font-weight: 650;
+}
+.about-capability-action svg {
+  transition: transform 250ms var(--ease);
+}
+.about-capability-card:hover > img {
+  transform: scale(1.045);
+}
+.about-capability-card:hover .about-capability-action svg {
+  transform: translateX(5px);
+}
+.about-capability-card .context-cursor > span {
+  color: #28123b;
+  background: #eee3f7;
+  border-color: #fff;
 }
 .contact-section {
   padding-block: 105px;
@@ -5419,6 +5799,268 @@ svg {
   border-radius: 20px;
   background: var(--paper);
   color: var(--plum);
+}
+.roadmap-timeline-section {
+  background:
+    radial-gradient(circle at 82% 8%, #7035a922, transparent 30%), #100718;
+}
+.roadmap-filter-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  margin: 52px 0 18px;
+  padding: 16px;
+  border: 1px solid #ffffff17;
+  border-radius: 18px;
+  background: #ffffff08;
+}
+.roadmap-filter-panel .filter-links button {
+  color: #cbbdd3;
+  border-color: #ffffff1a;
+  background: #ffffff05;
+}
+.roadmap-filter-panel .filter-links button.active {
+  color: #28123b;
+  border-color: #d7b3f3;
+  background: #d7b3f3;
+}
+.roadmap-filter-fields {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.roadmap-theme-field select,
+.roadmap-filter-panel .search-field {
+  min-height: 44px;
+  border: 1px solid #ffffff17;
+  border-radius: 11px;
+  color: #e7dfea;
+  background: #09040f66;
+}
+.roadmap-theme-field select {
+  min-width: 155px;
+  padding: 0 34px 0 13px;
+}
+.roadmap-theme-field option {
+  color: #28123b;
+  background: #fff;
+}
+.roadmap-filter-panel .search-field {
+  min-width: 230px;
+  padding: 0 12px;
+  border-bottom: 1px solid #ffffff17;
+}
+.roadmap-result-count {
+  margin-bottom: 36px;
+  color: #9d8da7;
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.roadmap-years {
+  display: grid;
+  gap: 58px;
+}
+.roadmap-year-group {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #ffffff18;
+}
+.roadmap-year-group > header {
+  position: sticky;
+  top: 120px;
+  align-self: start;
+}
+.roadmap-year-group > header span {
+  color: #a593af;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.roadmap-year-group > header h3 {
+  margin: 8px 0 7px;
+  font-size: 42px;
+  letter-spacing: -0.055em;
+}
+.roadmap-year-group > header p {
+  color: #92849b;
+  font-size: 11px;
+}
+.roadmap-milestone-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.roadmap-milestone-card {
+  min-height: 292px;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow: hidden;
+  text-align: left;
+  border: 1px solid #ffffff16;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(145deg, #ffffff0d, #ffffff05);
+  box-shadow: inset 0 1px #ffffff0d;
+  transition:
+    transform 350ms var(--ease),
+    border-color 220ms,
+    background 220ms;
+}
+.roadmap-milestone-card:hover {
+  transform: translateY(-4px);
+  border-color: #ae70e451;
+  background: linear-gradient(145deg, #a56ad51c, #ffffff07);
+}
+.roadmap-milestone-meta,
+.roadmap-community-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.roadmap-milestone-meta small,
+.roadmap-milestone-meta em,
+.roadmap-community-topline small,
+.roadmap-community-topline em {
+  font-size: 8px;
+  font-style: normal;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.roadmap-milestone-meta small {
+  color: #d1a6f1;
+}
+.roadmap-milestone-meta em,
+.roadmap-community-topline em {
+  padding: 6px 8px;
+  border: 1px solid #ffffff18;
+  border-radius: 999px;
+  color: #bdaec6;
+}
+.roadmap-milestone-card > strong {
+  margin: 38px 0 10px;
+  font-size: 23px;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+.roadmap-milestone-body {
+  color: #bfb2c7;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.roadmap-progress {
+  width: 100%;
+  height: 2px;
+  margin-top: auto;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ffffff14;
+}
+.roadmap-progress i {
+  display: block;
+  width: var(--roadmap-progress);
+  height: 100%;
+  background: linear-gradient(90deg, #9458f4, #d3abf3);
+}
+.roadmap-milestone-action,
+.roadmap-community-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: #d3b0ee;
+  font-size: 10px;
+  font-weight: 650;
+}
+.roadmap-timeline-section .empty-state {
+  color: #fff;
+  border-color: #ffffff2b;
+}
+.roadmap-timeline-section .empty-state p {
+  color: #bfb1c8;
+}
+.roadmap-idea-section .idea-layout > div > p {
+  color: #746a7d;
+}
+.roadmap-idea-section .idea-form {
+  color: #fff;
+  background:
+    radial-gradient(circle at 85% 0%, #8748c72b, transparent 38%), #190b25;
+  box-shadow: 0 26px 70px #28103624;
+}
+.roadmap-idea-section .idea-form label {
+  color: #d9cedf;
+}
+.roadmap-idea-section .idea-form :is(input, textarea, select) {
+  color: #28123b;
+  background: #fff;
+}
+.roadmap-idea-section .preview-note {
+  color: #d9cedf;
+  border-color: #ffffff22;
+  background: #ffffff08;
+}
+.roadmap-community-section {
+  background:
+    radial-gradient(circle at 10% 90%, #5a278f25, transparent 28%), #100718;
+}
+.roadmap-community-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 52px 0 22px;
+}
+.roadmap-community-card {
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  text-align: left;
+  border: 1px solid #ffffff16;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(145deg, #22102f, #170a21);
+  transition:
+    transform 350ms var(--ease),
+    border-color 220ms;
+}
+.roadmap-community-card:nth-child(2),
+.roadmap-community-card:nth-child(3) {
+  background: linear-gradient(145deg, #2b1240, #180b23);
+}
+.roadmap-community-card:hover {
+  transform: translateY(-4px);
+  border-color: #b477eb5c;
+}
+.roadmap-community-topline small {
+  color: #bd84e9;
+}
+.roadmap-community-card > strong {
+  max-width: 24ch;
+  margin: 40px 0 11px;
+  font-size: 25px;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+.roadmap-community-card
+  > span:not(.roadmap-community-topline):not(.roadmap-community-action) {
+  color: #bcafc4;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.roadmap-community-action {
+  margin-top: auto;
+  padding-top: 20px;
+}
+.roadmap-community-section .preview-note {
+  color: #cbbdd3;
+  border-color: #ffffff1c;
+  background: #ffffff06;
 }
 .roadmap-dialog {
   width: min(700px, calc(100% - 32px));
@@ -7851,9 +8493,74 @@ svg {
   .insights-grid {
     grid-template-columns: 1fr;
   }
+  .about-purpose-bento {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, minmax(170px, auto));
+  }
+  .about-mission-card {
+    grid-row: 1 / 4;
+  }
+  .about-goal-lead {
+    grid-column: 2;
+  }
+  .about-journey-map {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .about-journey-map::before {
+    display: none;
+  }
+  .about-journey-map article {
+    min-height: 300px;
+  }
+  .roadmap-filter-panel,
+  .roadmap-filter-fields {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .roadmap-filter-panel .search-field,
+  .roadmap-theme-field select {
+    width: 100%;
+  }
+  .roadmap-year-group {
+    grid-template-columns: 110px minmax(0, 1fr);
+  }
+  .roadmap-milestone-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 600px) {
+  .insights-filter-panel {
+    padding: 16px;
+  }
+  .insights-filter-heading {
+    align-items: start;
+    margin-bottom: 15px;
+  }
+  .insights-filter-heading strong {
+    font-size: 19px;
+  }
+  .insights-filter-bar {
+    align-items: stretch;
+    gap: 14px;
+  }
+  .insights-filter-bar .filter-links {
+    flex-wrap: nowrap;
+    margin-right: -16px;
+    padding-right: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .insights-filter-bar .filter-links::-webkit-scrollbar {
+    display: none;
+  }
+  .insights-filter-bar .filter-links a {
+    flex: 0 0 auto;
+  }
+  .insights-filter-bar .search-field {
+    min-width: 0;
+    width: 100%;
+  }
   .insights-grid .editorial-link {
     min-height: 204px;
     grid-template-columns: 112px minmax(0, 1fr);
@@ -7886,13 +8593,100 @@ svg {
     width: 30px;
     height: 30px;
   }
+  .about-purpose .page-section-intro {
+    margin-bottom: 38px;
+  }
+  .about-purpose-bento,
+  .about-journey-map,
+  .about-capability-grid,
+  .roadmap-community-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-purpose-bento {
+    grid-template-rows: none;
+  }
+  .about-mission-card,
+  .about-goal-lead {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .about-mission-card {
+    min-height: 420px;
+  }
+  .about-mission-card > div {
+    padding: 26px;
+  }
+  .about-goal-card {
+    min-height: 210px;
+  }
+  .about-journey-map {
+    margin-top: 40px;
+  }
+  .about-journey-map article {
+    min-height: 260px;
+  }
+  .about-journey-map h3 {
+    margin-top: 38px;
+  }
+  .about-journey-end {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .about-capability-grid {
+    margin-top: 38px;
+  }
+  .about-capability-card {
+    min-height: 410px;
+  }
+  .roadmap-filter-panel {
+    margin-top: 38px;
+  }
+  .roadmap-filter-panel .filter-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .roadmap-filter-panel .filter-links button {
+    width: 100%;
+  }
+  .roadmap-year-group {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .roadmap-year-group > header {
+    position: static;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: end;
+    gap: 0 14px;
+  }
+  .roadmap-year-group > header span,
+  .roadmap-year-group > header p {
+    grid-column: 2;
+  }
+  .roadmap-year-group > header h3 {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    margin: 0;
+  }
+  .roadmap-milestone-card {
+    min-height: 280px;
+  }
+  .roadmap-community-card {
+    min-height: 255px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .product-screen,
   .product-demo-status i,
   .insights-grid .editorial-link,
-  .insights-grid .editorial-link-media img {
+  .insights-grid .editorial-link-media img,
+  .about-mission-card img,
+  .about-journey-map article,
+  .about-capability-card > img,
+  .about-capability-action svg,
+  .roadmap-milestone-card,
+  .roadmap-community-card {
     animation: none;
     transition: none;
   }
@@ -7909,7 +8703,13 @@ svg {
     transform: none;
   }
   .insights-grid .editorial-link:hover,
-  .insights-grid .editorial-link:hover .editorial-link-media img {
+  .insights-grid .editorial-link:hover .editorial-link-media img,
+  .about-mission-card:hover img,
+  .about-journey-map article:hover,
+  .about-capability-card:hover > img,
+  .about-capability-card:hover .about-capability-action svg,
+  .roadmap-milestone-card:hover,
+  .roadmap-community-card:hover {
     transform: none;
   }
 }

@@ -849,8 +849,8 @@ function InsightsPage({ category, navigate, path }) {
       </PageHero>
       <section className="page-section paper-section" id="page-content">
         <div className="wrap">
-          <div className="insights-filter-panel">
-            <div className="insights-filter-heading">
+          <div className="content-filter-panel">
+            <div className="content-filter-heading">
               <div>
                 <small>Explore the thinking</small>
                 <strong>Browse by topic.</strong>
@@ -860,7 +860,7 @@ function InsightsPage({ category, navigate, path }) {
                 {filtered.length === 1 ? "article" : "articles"}
               </p>
             </div>
-            <div className="filter-bar insights-filter-bar">
+            <div className="filter-bar content-filter-bar">
               <div className="filter-links" aria-label="Insight categories">
                 <a className={!category ? "active" : ""} href="/insights">
                   All
@@ -2397,14 +2397,19 @@ function WorkPage({ navigate, path, search }) {
   const params = new URLSearchParams(search);
   const initial = params.get("filter") || "All";
   const [filter, setFilter] = useState(initial);
+  const [query, setQuery] = useState("");
   const filters = [
     "All",
     ...new Set(projects.map((project) => project.category)),
   ];
-  const visible =
-    filter === "All"
-      ? projects
-      : projects.filter((project) => project.category === filter);
+  const normalizedQuery = query.trim().toLowerCase();
+  const visible = projects.filter(
+    (project) =>
+      (filter === "All" || project.category === filter) &&
+      `${project.name} ${project.summary} ${project.category} ${project.status}`
+        .toLowerCase()
+        .includes(normalizedQuery),
+  );
   useEffect(() => {
     const next =
       filter === "All" ? path : `${path}?filter=${encodeURIComponent(filter)}`;
@@ -2426,20 +2431,39 @@ function WorkPage({ navigate, path, search }) {
       />
       <section className="page-section paper-section" id="page-content">
         <div className="wrap" id="work-list">
-          <div className="filter-bar">
-            <div className="filter-links" aria-label="Filter projects">
-              {filters.map((item) => (
-                <button
-                  key={item}
-                  className={filter === item ? "active" : ""}
-                  onClick={() => setFilter(item)}
-                  aria-pressed={filter === item}
-                >
-                  {item}
-                </button>
-              ))}
+          <div className="content-filter-panel">
+            <div className="content-filter-heading">
+              <div>
+                <small>Explore the work</small>
+                <strong>Browse by focus.</strong>
+              </div>
+              <p className="result-count" aria-live="polite">
+                {visible.length} {visible.length === 1 ? "story" : "stories"}
+              </p>
             </div>
-            <span className="result-count">{visible.length} stories</span>
+            <div className="filter-bar content-filter-bar">
+              <div className="filter-links" aria-label="Filter projects">
+                {filters.map((item) => (
+                  <button
+                    key={item}
+                    className={filter === item ? "active" : ""}
+                    onClick={() => setFilter(item)}
+                    aria-pressed={filter === item}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <label className="search-field">
+                <MagnifyingGlass size={18} aria-hidden="true" />
+                <span className="sr-only">Search projects</span>
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search projects"
+                />
+              </label>
+            </div>
           </div>
           <div className="work-editorial-grid">
             {visible.map((project, index) => (

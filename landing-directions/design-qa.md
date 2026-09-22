@@ -1,5 +1,21 @@
 # OrgTik cinematic website design QA
 
+## Unified open filter controls — 2026-09-22
+
+Source visual truth: `C:/Users/USER/AppData/Local/Temp/codex-clipboard-127c85d8-be94-4054-a1e0-81f562f4aa67.png` (1693 × 298 px). The reference establishes the eyebrow/title, result count, topic pills, and search anatomy; the user's written direction overrides its enclosing lavender frame and requires the same revised design wherever filters appear.
+
+Implementation scope: `/insights`, `/work`, and `/roadmap`. Work and Insights now share one open filter component with a compact heading/count row, a quiet divider, category pills, and a bordered search field on the page surface. Work gains live project search and count feedback. Roadmap keeps its dark controls and richer period/theme inputs while removing the enclosing panel fill, border, and rounded frame so its toolbar follows the same open rhythm.
+
+Browser verification covered the default 1265 px viewport and the managed 375 px mobile viewport (requested 390 × 844; the in-app browser reserves 15 px for its rail). At desktop, Work and Insights share a 1153 × 121 px transparent filter region; Roadmap uses a 1153 × 63 px transparent toolbar with a single top divider and no radius. At mobile, Work and Insights share a 335 × 167 px filter region with a 335 px search field and horizontally scrollable pills; Roadmap stacks its period, theme, and search controls inside a 335 × 233 px open toolbar. All checked documents report `scrollWidth === clientWidth`.
+
+Interaction verification: searching Work for “identity” returns one story and clearing restores five; searching Insights for “brand” returns one article and clearing restores six. Result counts update through the existing polite live region, and Roadmap retains its period/theme filtering. Browser warning and error logs are empty.
+
+Pill alignment refinement: every shared filter anchor and button is an inline flex container with centered cross-axis and main-axis alignment, a one-unit line height, and centered text. This keeps single- and multi-word labels optically centered within the full pill height across Insights, Work, Roadmap, and other shared filter rows.
+
+`npm run format:check`, `git diff --check`, and the production build pass.
+
+final result: passed
+
 ## Unified Work project cards — 2026-09-22
 
 Source visual truth: `https://orgtik-website.vercel.app/work`, captured in the in-app browser before implementation. The live layout separated each rounded image from unframed title, summary, and CTA copy below it, which made the project action feel detached from the visual card.

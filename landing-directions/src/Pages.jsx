@@ -1423,12 +1423,187 @@ const moduleConnections = {
   website: ["marketing", "crm"],
 };
 
+function SaaSNextSteps() {
+  return (
+    <section className="page-section deep-section saas-next-steps">
+      <div className="wrap">
+        <SectionIntro
+          number="04"
+          eyebrow="What happens next"
+          title="Choose. Review. Discuss."
+          body="The frontend makes the product, duration, and estimate easy to compare before the final commercial conversation."
+        />
+        <NumberedSteps
+          variant="cards"
+          items={[
+            {
+              title: "Choose",
+              body: "Confirm the product and the support level that fits the way your team wants to begin.",
+            },
+            {
+              title: "Review",
+              body: "Compare the duration, included capabilities, and estimated monthly investment.",
+            },
+            {
+              title: "Discuss",
+              body: "Carry the preferred option into a focused commercial conversation with OrgTik.",
+            },
+          ]}
+        />
+      </div>
+    </section>
+  );
+}
+
+function ProductPlans({ module, path, search }) {
+  const params = new URLSearchParams(search);
+  const requestedDuration = params.get("duration") || "annual";
+  const [duration, setDuration] = useState(
+    durationOptions.some((option) => option.id === requestedDuration)
+      ? requestedDuration
+      : "annual",
+  );
+  const productPrice = getWorkspacePrice([module.id], "single", duration);
+  const ProductIcon = module.icon;
+  const tierNames = {
+    launch: "Essential",
+    connected: "Connected",
+    partnership: "Partnership",
+  };
+
+  useEffect(() => {
+    const next = new URLSearchParams();
+    next.set("mode", "single");
+    next.set("duration", duration);
+    next.set("modules", module.id);
+    window.history.replaceState({}, "", `${path}?${next}#plan-builder`);
+  }, [duration, module.id, path]);
+
+  const featuresFor = (plan) => {
+    if (plan.id === "launch") {
+      return [module.tasks[0], module.tasks[1], "Guided setup and handover"];
+    }
+    if (plan.id === "connected") {
+      return [...module.tasks, "Workflow and role mapping"];
+    }
+    return [...module.tasks, "Ongoing support", "Improvement roadmap"];
+  };
+
+  return (
+    <section className="page-section paper-section product-plan-section">
+      <div className="wrap" id="plan-builder">
+        <SectionIntro
+          number="03"
+          eyebrow={`${module.formal} plans`}
+          title={`Choose the right ${module.formal} plan.`}
+          body={`You have already chosen ${module.formal}. Compare only the setup and support levels for this product, then carry the preferred option into the conversation.`}
+        />
+        <div className="product-plan-choice">
+          <span className="product-plan-choice-icon" aria-hidden="true">
+            <ProductIcon size={25} weight="fill" />
+          </span>
+          <span>
+            <small>Selected product</small>
+            <strong>{module.formal}</strong>
+            <em>{module.short}</em>
+          </span>
+          <span className="product-plan-choice-status">
+            Fixed for this comparison
+          </span>
+        </div>
+        <div
+          className="duration-selector product-duration-selector"
+          aria-label={`${module.formal} subscription duration`}
+        >
+          <div>
+            <small>Subscription duration</small>
+            <strong>Choose your billing commitment</strong>
+          </div>
+          <div className="duration-options">
+            {durationOptions.map((option) => (
+              <button
+                type="button"
+                key={option.id}
+                className={duration === option.id ? "selected" : ""}
+                aria-pressed={duration === option.id}
+                onClick={() => setDuration(option.id)}
+              >
+                <span>{option.label}</span>
+                <small>
+                  {option.discount
+                    ? `${Math.round(option.discount * 100)}% saving`
+                    : "Flexible"}
+                </small>
+              </button>
+            ))}
+          </div>
+        </div>
+        <PreviewNote>
+          Prototype CHF estimates for {module.formal}. Final limits, taxes,
+          availability, and contractual terms require confirmation.
+        </PreviewNote>
+        <div className="recommendation-grid product-plan-grid">
+          {recommendationPlans.map((plan) => {
+            const levelMultiplier =
+              plan.id === "launch" ? 1 : plan.id === "connected" ? 1.2 : 1.45;
+            const monthlyPrice = Math.round(
+              productPrice.monthly * levelMultiplier,
+            );
+            const tierName = tierNames[plan.id];
+            return (
+              <article
+                className={`recommendation-card ${plan.featured ? "featured" : ""}`}
+                key={plan.id}
+              >
+                <div className="recommendation-card-top">
+                  <small>{plan.number}</small>
+                  {plan.featured && <span>Recommended</span>}
+                </div>
+                <p className="recommendation-eyebrow">{module.formal}</p>
+                <h3>{tierName}</h3>
+                <p className="recommendation-body">
+                  {plan.id === "launch"
+                    ? `Start ${module.formal} with the essential setup and a guided team handover.`
+                    : plan.id === "connected"
+                      ? `Shape ${module.formal} around the workflows, roles, and adoption support your team needs.`
+                      : `Keep ${module.formal} supported, reviewed, and improving after launch.`}
+                </p>
+                <div className="recommendation-scope">
+                  <small>Product scope</small>
+                  <strong>
+                    {module.formal} · {tierName}
+                  </strong>
+                </div>
+                <FeatureList items={featuresFor(plan)} />
+                <div className="recommendation-commercial">
+                  <span>
+                    <small>Monthly estimate</small>
+                    <strong>{formatCHF(monthlyPrice)}</strong>
+                  </span>
+                  <span>
+                    <small>Billing period</small>
+                    <strong>{productPrice.duration.label}</strong>
+                  </span>
+                </div>
+                <Action
+                  href={`/contact?intent=platform&plan=${plan.id}&mode=single&duration=${duration}&modules=${module.id}`}
+                  tone={plan.featured ? "light" : undefined}
+                >
+                  Choose {tierName}
+                </Action>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ModulePage({ module, navigate, path, search }) {
   const related = moduleConnections[module.id].map((id) =>
     modules.find((item) => item.id === id),
   );
-  const planSearch =
-    search || `?mode=single&duration=annual&modules=${module.id}`;
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -1436,11 +1611,11 @@ function ModulePage({ module, navigate, path, search }) {
         title={module.title}
         body={module.description}
         primary={{
-          label: "Choose this module",
-          href: `/platform?module=${module.id}&mode=single#plan-builder`,
+          label: `View ${module.formal} plans`,
+          href: "#plan-builder",
         }}
         secondary={{
-          label: "Add to a custom plan",
+          label: "Build a product bundle",
           href: `/platform?module=${module.id}&mode=custom#plan-builder`,
         }}
         image={module.image}
@@ -1464,24 +1639,31 @@ function ModulePage({ module, navigate, path, search }) {
             </div>
             <div>
               <p className="lead-copy">{module.description}</p>
-              <FeatureList items={module.tasks} />
             </div>
           </div>
           <div className="product-highlight-grid" data-reveal="stagger">
             {module.highlights.map((highlight, index) => (
               <article key={highlight.title}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <div className="product-highlight-icon" aria-hidden="true">
-                  {index === 0 ? (
-                    <Lightning size={23} />
-                  ) : index === 1 ? (
-                    <CirclesThreePlus size={23} />
-                  ) : (
-                    <Sparkle size={23} />
-                  )}
+                <div className="product-highlight-meta">
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <div className="product-highlight-icon" aria-hidden="true">
+                    {index === 0 ? (
+                      <Lightning size={23} />
+                    ) : index === 1 ? (
+                      <CirclesThreePlus size={23} />
+                    ) : (
+                      <Sparkle size={23} />
+                    )}
+                  </div>
                 </div>
-                <h3>{highlight.title}</h3>
-                <p>{highlight.body}</p>
+                <div className="product-highlight-copy">
+                  <h3>{highlight.title}</h3>
+                  <p>{highlight.body}</p>
+                  <span className="product-highlight-feature">
+                    <CheckCircle size={18} weight="fill" aria-hidden="true" />
+                    {module.tasks[index]}
+                  </span>
+                </div>
               </article>
             ))}
           </div>
@@ -1504,7 +1686,8 @@ function ModulePage({ module, navigate, path, search }) {
           <ProductDemo module={module} />
         </div>
       </section>
-      <SaaSConfigurator path={path} search={planSearch} />
+      <ProductPlans module={module} path={path} search={search} />
+      <SaaSNextSteps />
       <Testimonials
         items={module.testimonials}
         heading={`What ${module.formal} could`}
@@ -1564,9 +1747,9 @@ function ModulePage({ module, navigate, path, search }) {
       </section>
       <PageCTA
         title={`Put ${module.formal} in your workspace.`}
-        body="Preserve this module in the local plan builder and compare the available starting paths."
-        href={`/platform?module=${module.id}&mode=single#plan-builder`}
-        label="Choose this module"
+        body={`Compare the three ${module.formal} support levels, then bring the best fit into a focused conversation.`}
+        href="#plan-builder"
+        label={`Review ${module.formal} plans`}
       />
     </SiteLayout>
   );
@@ -1703,9 +1886,27 @@ function SaaSConfigurator({ path, search }) {
                       aria-pressed={active}
                     >
                       <Icon size={22} />
-                      <span>
-                        <strong>{module.formal}</strong>
-                        <small>{module.short}</small>
+                      <span className="plan-module-content">
+                        <span className="plan-module-heading">
+                          <strong>{module.formal}</strong>
+                          <small>{module.short}</small>
+                        </span>
+                        <span className="plan-module-features">
+                          {module.tasks.map((task) => (
+                            <span key={task}>
+                              <CheckCircle
+                                size={14}
+                                weight="fill"
+                                aria-hidden="true"
+                              />
+                              {task}
+                            </span>
+                          ))}
+                        </span>
+                        <span className="plan-module-meta">
+                          <span>{module.category}</span>
+                          <span>From {formatCHF(module.monthlyPrice)}/mo</span>
+                        </span>
                       </span>
                       {active ? <Minus size={16} /> : <Plus size={16} />}
                     </button>
@@ -1762,32 +1963,7 @@ function SaaSConfigurator({ path, search }) {
           </div>
         </div>
       </section>
-      <section className="page-section deep-section">
-        <div className="wrap">
-          <SectionIntro
-            number="04"
-            eyebrow="What happens next"
-            title="Choose. Review. Discuss."
-            body="The frontend makes the product, bundle, duration, and estimate easy to compare before the final commercial conversation."
-          />
-          <NumberedSteps
-            items={[
-              {
-                title: "Choose",
-                body: "Select one product, a ready-made bundle, or a custom workspace.",
-              },
-              {
-                title: "Review",
-                body: "Choose a duration and see bundle and commitment savings immediately.",
-              },
-              {
-                title: "Discuss",
-                body: "Compare three SaaS support levels, then carry the preferred option into the contact preview.",
-              },
-            ]}
-          />
-        </div>
-      </section>
+      <SaaSNextSteps />
     </>
   );
 }
@@ -2123,7 +2299,7 @@ function CaseStudyPage({ project, navigate, path }) {
             title="The direction, seen across touchpoints."
             body="A visual gallery gives each project room to show the system, details, and real-world application instead of relying on a single hero image."
           />
-          <div className="project-gallery">
+          <div className="project-detail-gallery">
             {(project.gallery || [project.image]).map((image, index) => (
               <figure key={`${image}-${index}`}>
                 <img

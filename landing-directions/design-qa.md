@@ -1,5 +1,33 @@
 # OrgTik cinematic website design QA
 
+## SaaS card balance, bento capabilities and product-only plans — 2026-09-22
+
+The `/platform` builder now balances its two-column composition: the six product selectors divide the review panel's 526 px desktop height into two equal 221 px rows. Each card uses that space for the product description, three included capabilities, category, and starting monthly prototype estimate. The four bundle cards were tightened from 148 px to 124 px and the Custom row from 92 px to 80 px. At 439 px mobile width, cards return to content-driven 165 px heights and one 384 px column.
+
+The configurator decision steps now share a consistent 24 px vertical gap: bundle selection to billing commitment, then billing commitment to product selection. The billing panel was tightened from 108 px to 100 px at desktop. Selected bundle paths stay on a light lilac surface while the billing duration remains the single dark decision band. Browser checks at 1280 px and 439 px confirm the same rhythm without horizontal overflow.
+
+Every `/platform/:product` “Built for the everyday work” section now uses an asymmetric bento layout. At 1280 px the lead story is 666 × 509 px and the two supporting stories are 471 × 247 px; each story contains the relevant capability previously shown in the detached checklist. The standalone checklist is removed. Mobile stacks the same stories at 384 px wide with 320/280/280 px heights.
+
+Product detail routes now treat the product as already chosen. The full bundle configurator is removed from all six detail routes and replaced with product-specific Essential, Connected, and Partnership cards, plus Monthly, 12-month, and 24-month duration switching. Browser checks confirmed three plans, three bento capabilities, no duplicate configurator, and no horizontal overflow for HR, CRM, Files, Tasks, Marketing, and Website Manager. Switching Website Manager from 12 months to Monthly updated the prototype estimate and URL state.
+
+The product workflow demo now uses the homepage process-heading scale (38–60 px desktop, 39 px mobile) instead of the previous hero-sized type. At 1280 px the prototype stage is 768 × 427 px and aligns with a more compact scenario selector; the product-plan estimate notice spans the full 1153 px content container. The 439 px mobile check keeps the interface preview readable and reports no horizontal overflow.
+
+“Choose. Review. Discuss.” now renders as three equal 374 × 253 px horizontal cards at desktop with violet edge, lift, number, and arrow hover treatments; mobile stacks them to the standard 384 px content width. Reduced-motion styles remove the transforms.
+
+`npm run format:check`, `git diff --check`, and the production build pass.
+
+final result: passed
+
+## Homepage gallery regression repair — 2026-09-22
+
+The homepage “Our identity, in the world” gallery is restored to its compact staggered two-image composition. The routed project-detail gallery now uses an isolated `project-detail-gallery` class, preventing its 860 px masonry lead image and absolute positioning from overriding the homepage cards through the older shared `project-gallery` class.
+
+Browser verification covered the homepage Work and SaaS sections at 1280 px desktop and 439 px mobile width. Both supplied project images load at their intended compact heights: 433/390 px on desktop and 265/260 px on mobile. The gallery measures 530 px tall on desktop and stacks to 657 px on mobile, with no horizontal overflow. The homepage SaaS explorer remains isolated from routed product-card styles, switches from HR to CRM correctly, retains all six tabs, and has no horizontal overflow at either viewport.
+
+`npm run format:check` and the production build pass.
+
+final result: passed
+
 ## Services overview cards, process and testimonials — 2026-09-22
 
 The `/services` overview now uses the same image-led cinematic card system as SaaS: five supplied-asset cards, family-specific Phosphor icons, visible action rows, restrained hover motion, and contextual “Explore” cursors on mouse/fine-pointer devices. Four cards form two balanced rows and the fifth OrgTik Hosting card spans the grid as a deliberate final pathway. Service-family child cards also receive contextual cursors without changing their routes.

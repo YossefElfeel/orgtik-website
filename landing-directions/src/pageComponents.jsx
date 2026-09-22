@@ -21,14 +21,14 @@ export function SiteLayout({
           currentPath={path}
           onContact={() => navigate("/contact")}
           onAccount={() => navigate("/sign-in")}
-          onPlan={() => navigate("/pricing")}
+          onPlan={() => navigate("/platform#plan-builder")}
         />
       )}
       <main id="main-content">{children}</main>
       {footer && (
         <Footer
           onContact={() => navigate("/contact")}
-          onPlan={() => navigate("/pricing")}
+          onPlan={() => navigate("/platform#plan-builder")}
         />
       )}
     </div>

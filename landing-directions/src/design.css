@@ -6641,3 +6641,75 @@ svg {
     transition: none;
   }
 }
+
+/* Inline SaaS configurator: make bundle scope and savings legible before pricing. */
+.plan-configurator-section {
+  padding-top: 112px;
+}
+.plan-configurator-section .plan-mode-grid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 12px;
+}
+.plan-configurator-section .plan-mode-grid button {
+  grid-column: span 3;
+  min-height: 148px;
+  padding: 20px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #fff, #f6f1f8);
+}
+.plan-configurator-section .plan-mode-grid button:last-child {
+  grid-column: 1 / -1;
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.42fr) minmax(220px, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+}
+.plan-configurator-section .plan-mode-grid button.selected {
+  background:
+    radial-gradient(circle at 92% 0, #9c62e43b, transparent 36%), var(--plum);
+  box-shadow: 0 20px 52px #28103622;
+}
+.plan-mode-grid em {
+  margin-top: auto;
+  color: #7540bd;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.plan-mode-grid button.selected em {
+  color: #d4b9ef;
+}
+.plan-configurator-section .duration-selector {
+  margin-top: 4px;
+}
+@media (max-width: 1100px) {
+  .plan-configurator-section .plan-mode-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .plan-configurator-section .plan-mode-grid button,
+  .plan-configurator-section .plan-mode-grid button:last-child {
+    grid-column: auto;
+  }
+  .plan-configurator-section .plan-mode-grid button:last-child {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+@media (max-width: 760px) {
+  .plan-configurator-section {
+    padding-top: 76px;
+  }
+  .plan-configurator-section .plan-mode-grid {
+    grid-template-columns: 1fr;
+  }
+  .plan-configurator-section .plan-mode-grid button,
+  .plan-configurator-section .plan-mode-grid button:last-child {
+    grid-column: 1;
+    min-height: 118px;
+    display: flex;
+  }
+}

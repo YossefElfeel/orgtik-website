@@ -113,6 +113,14 @@ const durationOptions = [
   { id: "biennial", label: "24 months", months: 24, discount: 0.22 },
 ];
 
+const planModeMeta = {
+  single: "1 product · Maximum flexibility",
+  operations: "3 products · 15% bundle saving",
+  growth: "3 products · 15% bundle saving",
+  complete: "6 products · 25% bundle saving",
+  custom: "Choose 2–5 · 10% bundle saving",
+};
+
 const servicePackages = [
   {
     id: "focus",
@@ -1085,7 +1093,7 @@ function ContactPage({ navigate, path, search }) {
   );
 }
 
-function PlatformPage({ navigate, path }) {
+function PlatformPage({ navigate, path, search }) {
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -1093,7 +1101,7 @@ function PlatformPage({ navigate, path }) {
         title="One workspace. Six systems."
         accent="Built to work together."
         body="Start with one module and expand when the business is ready. Every step stays connected to the same clearer operating picture."
-        primary={{ label: "Build your plan", href: "/pricing" }}
+        primary={{ label: "Build your plan", href: "#plan-builder" }}
         secondary={{ label: "Explore the modules", href: "#modules" }}
         video
       />
@@ -1163,42 +1171,13 @@ function PlatformPage({ navigate, path }) {
           <WorkspaceConstellation />
         </div>
       </section>
-      <section className="page-section paper-section">
-        <div className="wrap">
-          <SectionIntro
-            number="03"
-            eyebrow="Choose how to begin"
-            title="Focused, bundled, or fully connected."
-            body="Compare a single product, a ready-made bundle, or a custom workspace. Prototype prices update with the products and subscription duration you select."
-          />
-          <div className="path-grid">
-            {planOptions.slice(0, 4).map((option) => (
-              <article key={option.id}>
-                <small>
-                  {option.id === "single"
-                    ? "01"
-                    : option.id === "operations"
-                      ? "02"
-                      : option.id === "growth"
-                        ? "03"
-                        : "04"}
-                </small>
-                <h3>{option.name}</h3>
-                <p>{option.note}</p>
-                <a href={`/pricing?mode=${option.id}`}>
-                  Compare this path <ArrowRight size={17} />
-                </a>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SaaSConfigurator path={path} search={search} />
       <Testimonials />
       <PageCTA
         eyebrow="Your workspace"
         title="Choose what belongs in it."
         body="Build a local configuration, review the modules, and carry the selection into the enquiry preview."
-        href="/pricing"
+        href="#plan-builder"
         label="Build your plan"
       />
     </SiteLayout>
@@ -1229,11 +1208,11 @@ function ModulePage({ module, navigate, path }) {
         body={module.description}
         primary={{
           label: "Choose this module",
-          href: `/pricing?module=${module.id}&mode=single`,
+          href: `/platform?module=${module.id}&mode=single#plan-builder`,
         }}
         secondary={{
           label: "Add to a custom plan",
-          href: `/pricing?module=${module.id}&mode=custom`,
+          href: `/platform?module=${module.id}&mode=custom#plan-builder`,
         }}
         image="brand-tablet.webp"
       >
@@ -1299,14 +1278,14 @@ function ModulePage({ module, navigate, path }) {
       <PageCTA
         title={`Put ${module.formal} in your workspace.`}
         body="Preserve this module in the local plan builder and compare the available starting paths."
-        href={`/pricing?module=${module.id}&mode=single`}
+        href={`/platform?module=${module.id}&mode=single#plan-builder`}
         label="Choose this module"
       />
     </SiteLayout>
   );
 }
 
-function PlansPage({ navigate, path, search }) {
+function SaaSConfigurator({ path, search }) {
   const params = new URLSearchParams(search);
   const initialModule = params.get("module");
   const initialModules = (params.get("modules") || initialModule || "")
@@ -1341,7 +1320,7 @@ function PlansPage({ navigate, path, search }) {
     next.set("mode", mode);
     next.set("duration", duration);
     if (selected.length) next.set("modules", selected.join(","));
-    window.history.replaceState({}, "", `${path}?${next}`);
+    window.history.replaceState({}, "", `${path}?${next}#plan-builder`);
     try {
       sessionStorage.setItem(
         "orgtik-plan-preview",
@@ -1356,23 +1335,14 @@ function PlansPage({ navigate, path, search }) {
     .map((module) => module.formal);
   const price = getWorkspacePrice(selected, mode, duration);
   return (
-    <SiteLayout navigate={navigate} path={path}>
-      <PageHero
-        eyebrow="SaaS products / Plans"
-        title="Build the workspace."
-        accent="See the price change live."
-        body="Choose a single product, a ready-made bundle, or your own combination. Then select the subscription duration that fits."
-        primary={{ label: "Build your plan", href: "#plan-builder" }}
-        secondary={{ label: "Explore modules", href: "/platform" }}
-        image="brand-glass.webp"
-      />
-      <section className="page-section paper-section" id="page-content">
+    <>
+      <section className="page-section paper-section plan-configurator-section">
         <div className="wrap plan-builder" id="plan-builder">
           <SectionIntro
-            number="01"
+            number="03"
             eyebrow="Choose how to start"
-            title="A configuration you can understand before a conversation."
-            body="Products, bundle savings, and duration work together in one clear SaaS journey. Prices are prototype values in CHF until commercial approval."
+            title="Choose the products. See how the bundle changes."
+            body="Start with one product, choose a ready-made bundle, take the complete suite, or shape a custom workspace. Duration and savings update in the same view."
           />
           <div className="plan-mode-grid">
             {planOptions.map((option) => (
@@ -1394,6 +1364,7 @@ function PlansPage({ navigate, path, search }) {
               >
                 <small>{option.name}</small>
                 <span>{option.note}</span>
+                <em>{planModeMeta[option.id]}</em>
               </button>
             ))}
           </div>
@@ -1507,7 +1478,7 @@ function PlansPage({ navigate, path, search }) {
       <section className="page-section deep-section">
         <div className="wrap">
           <SectionIntro
-            number="02"
+            number="04"
             eyebrow="What happens next"
             title="Choose. Review. Discuss."
             body="The frontend makes the product, bundle, duration, and estimate easy to compare before the final commercial conversation."
@@ -1530,14 +1501,15 @@ function PlansPage({ navigate, path, search }) {
           />
         </div>
       </section>
-      <PageCTA
-        title="Need help shaping the workspace?"
-        body="Bring the team’s priorities and current tools. We’ll help identify a focused starting point."
-        href="/contact?intent=platform"
-        label="Talk through the options"
-      />
-    </SiteLayout>
+    </>
   );
+}
+
+function PricingRedirect({ navigate, search }) {
+  useEffect(() => {
+    navigate(`/platform${search || ""}#plan-builder`);
+  }, [navigate, search]);
+  return null;
 }
 
 function PlanOptionsPage({ navigate, path, search }) {
@@ -1561,7 +1533,7 @@ function PlanOptionsPage({ navigate, path, search }) {
     : "annual";
   const workspacePrice = getWorkspacePrice(selectedIds, mode, duration);
   const modulesValue = selectedIds.join(",");
-  const editHref = `/pricing?mode=${mode}&duration=${duration}${modulesValue ? `&modules=${modulesValue}` : ""}`;
+  const editHref = `/platform?mode=${mode}&duration=${duration}${modulesValue ? `&modules=${modulesValue}` : ""}#plan-builder`;
 
   return (
     <SiteLayout navigate={navigate} path={path}>
@@ -1677,7 +1649,11 @@ function PlanOptionsPage({ navigate, path, search }) {
             <EmptyState
               title="No systems selected"
               body="Build a workspace first, then return here to compare the three launch plans."
-              action={<Action href="/pricing">Build your workspace</Action>}
+              action={
+                <Action href="/platform#plan-builder">
+                  Build your workspace
+                </Action>
+              }
             />
           )}
         </div>
@@ -2248,7 +2224,7 @@ function SitemapPage({ navigate, path }) {
       [
         ["Overview", "/platform"],
         ...modules.map((module) => [module.formal, `/platform/${module.id}`]),
-        ["SaaS plan builder", "/pricing"],
+        ["SaaS plan builder", "/platform#plan-builder"],
         ["Sign in", "/sign-in"],
       ],
     ],
@@ -2421,7 +2397,9 @@ function SignInPage({ recovery = false, navigate, path }) {
                 ) : (
                   <a href="/sign-in/recovery">Forgot password?</a>
                 )}
-                <a href="/pricing">Need an account? Choose a plan</a>
+                <a href="/platform#plan-builder">
+                  Need an account? Choose a plan
+                </a>
                 <a href="/contact?intent=support">Contact support</a>
               </div>
             </>
@@ -2485,7 +2463,7 @@ export function RoutePage({ path, search, navigate }) {
       title = family.name;
     }
   } else if (path === "/platform") {
-    page = <PlatformPage {...{ navigate, path }} />;
+    page = <PlatformPage {...{ navigate, path, search }} />;
     title = "Platform";
   } else if (path.startsWith("/platform/")) {
     const module = matchModule(path.split("/")[2]);
@@ -2497,7 +2475,7 @@ export function RoutePage({ path, search, navigate }) {
     page = <PlanOptionsPage {...{ navigate, path, search }} />;
     title = "Plan recommendations";
   } else if (path === "/pricing") {
-    page = <PlansPage {...{ navigate, path, search }} />;
+    page = <PricingRedirect {...{ navigate, search }} />;
     title = "Plans";
   } else if (path === "/work") {
     page = <WorkPage {...{ navigate, path, search }} />;

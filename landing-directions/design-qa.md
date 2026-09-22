@@ -1,5 +1,15 @@
 # OrgTik cinematic website design QA
 
+## Inline SaaS configurator and bundle hierarchy — 2026-09-22
+
+The product configuration and “What happens next” sections now live directly on `/platform`, so the SaaS story no longer sends visitors to a separate builder before they can understand bundle scope, duration, and price. The section label is “Choose how to start,” followed by the live product and duration configuration, the three-step explanation, testimonials, and the closing action. Existing `/pricing` deep links redirect to the equivalent `/platform?...#plan-builder` state; `/pricing/plans` remains the dedicated three-plan comparison.
+
+The bundle selector now uses four aligned starting options plus a full-width Custom workspace row. Each option states its product count and prototype saving: one flexible product, two three-product bundles at 15%, the six-product suite at 25%, and a custom 2–5 product path at 10%. This removes the earlier orphaned fourth card and makes the commercial difference visible before product selection.
+
+Browser verification covered the configurator and relocated next-step section at 1440 × 900, the legacy `/pricing?mode=growth&duration=annual` redirect, and the one-column mobile bundle selector at 390 × 844. URL state, selected mode, five starting paths, and responsive overflow all passed.
+
+final result: passed
+
 ## SaaS card density, cursors and testimonials — 2026-09-22
 
 The `/platform` product grid now uses compact 448 px image cards at 1440 px and 390 px cards at 390 px. Copy is bottom-aligned inside a consistent 28 px desktop / 26 px mobile inset, with reduced heading, paragraph, and action spacing so each card hugs its useful content while preserving enough image area to communicate the brand. The grid uses a 16 px gap and no horizontal overflow at either checked viewport.

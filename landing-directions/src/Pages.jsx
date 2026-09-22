@@ -1327,41 +1327,6 @@ function ProductDemo({ module }) {
   );
 }
 
-function getModulePlans(module) {
-  return [
-    {
-      id: "essential",
-      name: `${module.formal} Essential`,
-      eyebrow: "Start focused",
-      price: module.monthlyPrice,
-      body: `A clear ${module.formal} foundation for a small team and its everyday work.`,
-      features: [module.tasks[0], module.tasks[1], "Core setup guidance"],
-    },
-    {
-      id: "team",
-      name: `${module.formal} Team`,
-      eyebrow: "Most adaptable",
-      price: Math.round(module.monthlyPrice * 1.55),
-      body: `Shared ${module.formal} workflows for a growing team that needs more coordination.`,
-      features: [...module.tasks, "Shared workflow setup", "Priority support"],
-      featured: true,
-    },
-    {
-      id: "scale",
-      name: `${module.formal} Scale`,
-      eyebrow: "Connect the work",
-      price: Math.round(module.monthlyPrice * 2.3),
-      body: `More control, guidance, and connection for ${module.formal} across the wider business.`,
-      features: [
-        ...module.tasks.slice(0, 2),
-        "Advanced roles & governance",
-        "Cross-product connection planning",
-        "Ongoing optimization review",
-      ],
-    },
-  ];
-}
-
 const moduleConnections = {
   hr: ["tasks", "files"],
   crm: ["marketing", "website"],
@@ -1371,11 +1336,12 @@ const moduleConnections = {
   website: ["marketing", "crm"],
 };
 
-function ModulePage({ module, navigate, path }) {
+function ModulePage({ module, navigate, path, search }) {
   const related = moduleConnections[module.id].map((id) =>
     modules.find((item) => item.id === id),
   );
-  const plans = getModulePlans(module);
+  const planSearch =
+    search || `?mode=single&duration=annual&modules=${module.id}`;
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -1451,50 +1417,7 @@ function ModulePage({ module, navigate, path }) {
           <ProductDemo module={module} />
         </div>
       </section>
-      <section
-        className="page-section paper-section product-plans-section"
-        id="product-plans"
-      >
-        <div className="wrap">
-          <SectionIntro
-            number="03"
-            eyebrow={`${module.formal} plans`}
-            title={`Choose how ${module.formal} should start.`}
-            body={`Compare three ${module.formal}-specific starting levels. Prices are frontend prototype estimates and update to the full workspace builder when you continue.`}
-          />
-          <div className="product-plan-grid" data-reveal="stagger">
-            {plans.map((plan, index) => (
-              <article
-                className={plan.featured ? "featured" : ""}
-                key={plan.id}
-              >
-                <div className="product-plan-topline">
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <small>{plan.eyebrow}</small>
-                </div>
-                <h3>{plan.name}</h3>
-                <p>{plan.body}</p>
-                <div className="product-plan-price">
-                  <small>Prototype from</small>
-                  <strong>{formatCHF(plan.price)}</strong>
-                  <span>/ month</span>
-                </div>
-                <FeatureList items={plan.features} />
-                <Action
-                  href={`/platform?module=${module.id}&mode=single&duration=annual#plan-builder`}
-                  tone={plan.featured ? "light" : undefined}
-                >
-                  Configure {plan.name}
-                </Action>
-              </article>
-            ))}
-          </div>
-          <PreviewNote>
-            Prototype pricing only · No checkout, payment, or live subscription
-            is connected.
-          </PreviewNote>
-        </div>
-      </section>
+      <SaaSConfigurator path={path} search={planSearch} />
       <Testimonials
         items={module.testimonials}
         heading={`What ${module.formal} could`}
@@ -1509,12 +1432,12 @@ function ModulePage({ module, navigate, path }) {
         id={`${module.id}-testimonials`}
       />
       <section
-        className="page-section paper-section related-section"
+        className="page-section paper-section related-section related-product-section"
         id="related-products"
       >
         <div className="wrap">
           <SectionIntro
-            number="04"
+            number="05"
             eyebrow="Works better together"
             title="Connect the modules around the work."
             body="Choose only the systems the team needs now, then explore the adjacent parts of the workspace."
@@ -2745,7 +2668,7 @@ export function RoutePage({ path, search, navigate }) {
   } else if (path.startsWith("/platform/")) {
     const module = matchModule(path.split("/")[2]);
     if (module) {
-      page = <ModulePage {...{ module, navigate, path }} />;
+      page = <ModulePage {...{ module, navigate, path, search }} />;
       title = module.formal;
     }
   } else if (path === "/pricing/plans") {

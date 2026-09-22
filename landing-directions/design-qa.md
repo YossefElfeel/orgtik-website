@@ -1,5 +1,17 @@
 # OrgTik cinematic website design QA
 
+## Shared service process and related-card direction — 2026-09-22
+
+The service-detail “A practical path” section now reuses the homepage Process selector instead of four flat text rows. Understand, Design, Deliver, and Evolve switch the supplied image and narrative on hover, focus, keyboard arrows, or tap. The same flat process treatment on project-detail pages now uses the shared interaction on a dark section, keeping the service, work, and homepage flows in one visual language. Selecting Design updates the visible narrative to “Make the way forward clear.”
+
+Related services now use supplied-image cinematic cards with dark image gradients, capability tags, visible action rows, contextual cursors, and restrained hover movement. At 1440 px the Social media marketing detail uses two 648 × 430 px cards; Development detail uses one intentional 1313 × 470 px card. At 390 px the two related-service cards stack to 335 × 390 px, while the process selector uses four 335 × 76 px controls and a 335 × 210 px image stage. Neither viewport introduces horizontal overflow.
+
+The route-level card audit covered Services overview, a service family, a service detail, SaaS overview, a SaaS detail, Work, Insights, About, and Roadmap. All image-led marketing and related-content card systems use supplied imagery; the Roadmap remains the intentional data-card exception for project status and community suggestions. No image-free EditorialLink call sites remain, and no console warnings or errors were reported.
+
+`npm run format:check`, `git diff --check`, and the production build pass.
+
+final result: passed
+
 ## About story, Roadmap direction and dark Insights cards — 2026-09-22
 
 `/about` now explains why OrgTik exists through an explicit mission, three goals, a four-chapter journey map, and four routed capability paths covering brand and demand, digital experiences, business systems, and continuity and care. The desktop mission bento measures 440 px high, the journey cards share a 330 px height, and the four capability cards share a 430 px height. The purpose heading uses a spaced en dash, and the journey replaces the former line-and-dot progress treatment with discrete arrow connectors between the four numbered cards. “Explore the roadmap” is aligned with the supporting introduction above the cards, links to `/roadmap`, and replaces the redundant action row below. At the narrow 319 px in-app viewport, all card groups stack into a 280 px content column without clipped copy; the mission, goal, journey, and capability cards remain content-complete.

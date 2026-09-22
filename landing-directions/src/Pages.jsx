@@ -47,25 +47,6 @@ import {
   SiteLayout,
 } from "./pageComponents";
 
-const processSteps = [
-  {
-    title: "Understand",
-    body: "Clarify the business need, the audience, and what a useful outcome must change.",
-  },
-  {
-    title: "Design",
-    body: "Turn the right questions into a shared direction, system, and practical delivery plan.",
-  },
-  {
-    title: "Deliver",
-    body: "Bring design and technology together into something people can use with confidence.",
-  },
-  {
-    title: "Evolve",
-    body: "Learn from the work, improve the system, and keep the next decision connected.",
-  },
-];
-
 const serviceTestimonialPreviews = [
   {
     focus: "Marketing · Campaign direction",
@@ -726,7 +707,7 @@ function ServiceDetailPage({ family, service, navigate, path }) {
             title="From the current problem to a stronger system."
             body="Each phase has a visible output, so the work stays understandable and decisions stay connected."
           />
-          <NumberedSteps items={processSteps} />
+          <Process />
         </div>
       </section>
       <ServicePlans family={family} service={service} />
@@ -765,21 +746,51 @@ function ServiceDetailPage({ family, service, navigate, path }) {
         </section>
       )}
       {related.length > 0 && (
-        <section className="page-section paper-section related-section">
+        <section
+          className="page-section paper-section related-section"
+          id="related-services"
+        >
           <div className="wrap">
             <SectionIntro
+              number="05"
               eyebrow="Related services"
               title="Keep the next capability connected."
+              body="Continue with the adjacent expertise that strengthens the same outcome without breaking the direction of the work."
             />
-            <div className="related-links">
-              {related.map((item) => (
-                <EditorialLink
+            <div
+              className={`related-service-grid related-service-grid-${related.length}`}
+            >
+              {related.map((item, index) => (
+                <CursorTarget
+                  as="a"
+                  label={`Explore ${item.name}`}
+                  className="related-service-card"
                   key={item.slug}
                   href={`/services/${family.slug}/${item.slug}`}
-                  eyebrow={family.name}
-                  title={item.name}
-                  body={item.outcome}
-                />
+                >
+                  <span className="related-service-media" aria-hidden="true">
+                    <img
+                      src={`/assets/${index === 0 ? family.image : serviceCardVisuals[(index + 1) % serviceCardVisuals.length]}`}
+                      alt=""
+                      loading="lazy"
+                    />
+                  </span>
+                  <span className="related-service-copy">
+                    <small>
+                      {String(index + 1).padStart(2, "0")} · {family.name}
+                    </small>
+                    <strong>{item.name}</strong>
+                    <span>{item.outcome}</span>
+                    <span className="related-service-features">
+                      {item.capabilities.slice(0, 2).map((capability) => (
+                        <em key={capability}>{capability}</em>
+                      ))}
+                    </span>
+                    <span className="related-service-action">
+                      Explore the service <ArrowRight size={17} />
+                    </span>
+                  </span>
+                </CursorTarget>
               ))}
             </div>
           </div>
@@ -2570,7 +2581,7 @@ function CaseStudyPage({ project, navigate, path }) {
           </div>
         </div>
       </section>
-      <section className="page-section paper-section">
+      <section className="page-section deep-section project-process-section">
         <div className="wrap">
           <SectionIntro
             number="03"
@@ -2578,7 +2589,7 @@ function CaseStudyPage({ project, navigate, path }) {
             title="One direction, expressed across the system."
             body="Strategy, design, technology, and ongoing care are sequenced around a shared definition of success."
           />
-          <NumberedSteps items={processSteps} />
+          <Process />
         </div>
       </section>
       <section className="page-section deep-section">

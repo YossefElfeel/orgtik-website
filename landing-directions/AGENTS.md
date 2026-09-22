@@ -66,6 +66,7 @@
 - Service detail capability highlights reuse the same asymmetric bento, with each of the chosen service's three capabilities attached to one story card. Keep section padding compact and use the shared process and plan components so service and SaaS detail pages remain visibly related.
 - Product detail routes no longer repeat the full multi-product configurator. Section 03 compares Essential, Connected, and Partnership for the already-selected product, with Monthly, 12-month, and 24-month duration switching and product-specific capabilities. Keep the bundle configurator on `/platform` only.
 - SaaS “What happens next” uses three horizontal cards on desktop with restrained hover motion, violet edge emphasis, and a reduced-motion fallback; stack the cards on tablet and mobile.
+- Insights indexes use compact editorial cards for comfortable scanning at volume: two columns on desktop, one column below 920px, restrained 164px imagery, smaller titles, two-line summaries, quiet metadata, and a subtle lift/action treatment. Preserve the same anatomy on category-filtered views and avoid returning to oversized cinematic article rows.
 
 Run the local server yourself and open the preview in the browser available to this environment. Do not give the user server-start instructions when you can run it.
 

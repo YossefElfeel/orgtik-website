@@ -1,5 +1,15 @@
 # OrgTik cinematic website design QA
 
+## Insights editorial card density — 2026-09-22
+
+The `/insights` article index now uses a compact editorial card system that follows the OrgTik direction without making a long list visually heavy. Six articles form a two-column grid of consistent 568 × 228 px cards at 1280 px, with restrained 164 px imagery, 20–26 px titles, two-line summaries, quiet date metadata, and a small lilac action button. The grid occupies 715 px instead of the previous 897 px while preserving readable hierarchy and supplied imagery.
+
+Below 920 px the layout becomes one column. At 439 px, all six cards measure 384 × 206–207 px with 112 px thumbnails and no horizontal overflow. Search was verified with “brand,” returning one matching article, and the Design category route returns two articles using the same anatomy.
+
+The desktop and mobile states retain accessible links, visible metadata, and motion limited to a subtle four-pixel card lift and image scale. Reduced-motion behavior inherits the shared no-transform fallback.
+
+final result: passed
+
 ## Service-family bento and unified service plans — 2026-09-22
 
 `/services/marketing` now replaces the three equal 371 × 440 px cards with an asymmetric supplied-asset bento: one 666 × 522 px lead card and two 471 px supporting cards at 264/242 px. Every card contains two service-specific capability tags and retains the contextual cursor and visible action. At 439 px, the same cards stack into three 384 × 390 px cards with no horizontal overflow.

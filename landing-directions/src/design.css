@@ -7054,36 +7054,44 @@ svg {
   }
 }
 
+.product-demo-section {
+  padding-block: 88px 96px;
+}
 .product-demo-layout {
   display: grid;
   grid-template-columns: minmax(280px, 0.58fr) minmax(0, 1.42fr);
-  gap: 44px 64px;
+  gap: 34px 64px;
 }
 .product-demo-intro {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(310px, 0.62fr);
   align-items: end;
-  gap: 64px;
+  gap: 24px 64px;
 }
 .product-demo-intro .eyebrow {
   grid-column: 1 / -1;
 }
 .product-demo-intro h2 {
-  max-width: 680px;
-  font-size: clamp(38px, 4.2vw, 60px);
+  max-width: 620px;
+  font-size: clamp(34px, 3.6vw, 52px);
   line-height: 1.12;
   letter-spacing: -0.04em;
   font-weight: 500;
 }
-.product-demo-intro > p {
-  color: #c4b7cc;
-  font-size: 16px;
-  line-height: 1.7;
+.product-demo-intro h2 span {
+  display: block;
+  color: #c9a0f3;
 }
-.product-demo-intro .preview-note {
-  grid-column: 2;
-  margin-top: -38px;
+.product-demo-side {
+  display: grid;
+  gap: 18px;
+  align-self: end;
+}
+.product-demo-side > p {
+  color: #c4b7cc;
+  font-size: 15px;
+  line-height: 1.7;
 }
 .product-demo {
   grid-column: 1 / -1;
@@ -7485,9 +7493,8 @@ svg {
     grid-template-columns: 1fr;
   }
   .product-demo-intro .eyebrow,
-  .product-demo-intro .preview-note {
+  .product-demo-side {
     grid-column: 1;
-    margin-top: 0;
   }
   .product-demo {
     grid-template-columns: 1fr;
@@ -7580,7 +7587,7 @@ svg {
     gap: 38px;
   }
   .product-demo-intro h2 {
-    font-size: 39px;
+    font-size: 36px;
   }
   .product-demo {
     gap: 24px;

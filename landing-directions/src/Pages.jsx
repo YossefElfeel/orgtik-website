@@ -1669,19 +1669,27 @@ function ModulePage({ module, navigate, path, search }) {
           </div>
         </div>
       </section>
-      <section className="page-section deep-section" id="product-demo">
+      <section
+        className="page-section deep-section product-demo-section"
+        id="product-demo"
+      >
         <div className="wrap product-demo-layout">
           <div className="product-demo-intro">
             <Eyebrow number="02">Ways to use {module.formal}</Eyebrow>
-            <h2>See the work move, one scenario at a time.</h2>
-            <p>
-              Choose a common {module.formal} moment to preview how context,
-              ownership, and the next action stay connected.
-            </p>
-            <PreviewNote>
-              Interactive frontend demo · Interface and workflow details remain
-              prototype content until product captures are approved.
-            </PreviewNote>
+            <h2>
+              See the work move.
+              <span>One scenario at a time.</span>
+            </h2>
+            <div className="product-demo-side">
+              <p>
+                Choose a common {module.formal} moment to preview how context,
+                ownership, and the next action stay connected.
+              </p>
+              <PreviewNote>
+                Interactive frontend demo · Interface and workflow details
+                remain prototype content until product captures are approved.
+              </PreviewNote>
+            </div>
           </div>
           <ProductDemo module={module} />
         </div>

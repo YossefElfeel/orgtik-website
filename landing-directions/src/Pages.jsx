@@ -836,38 +836,47 @@ function InsightsPage({ category, navigate, path }) {
       </PageHero>
       <section className="page-section paper-section" id="page-content">
         <div className="wrap">
-          <div className="filter-bar">
-            <div className="filter-links" aria-label="Insight categories">
-              <a className={!category ? "active" : ""} href="/insights">
-                All
-              </a>
-              {insightCategories.map((item) => (
-                <a
-                  className={
-                    category?.toLowerCase() === item.toLowerCase()
-                      ? "active"
-                      : ""
-                  }
-                  href={`/insights/category/${item.toLowerCase().replaceAll(" ", "-")}`}
-                  key={item}
-                >
-                  {item}
-                </a>
-              ))}
+          <div className="insights-filter-panel">
+            <div className="insights-filter-heading">
+              <div>
+                <small>Explore the thinking</small>
+                <strong>Browse by topic.</strong>
+              </div>
+              <p className="result-count" aria-live="polite">
+                {filtered.length}{" "}
+                {filtered.length === 1 ? "article" : "articles"}
+              </p>
             </div>
-            <label className="search-field">
-              <MagnifyingGlass size={18} aria-hidden="true" />
-              <span className="sr-only">Search insights</span>
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search insights"
-              />
-            </label>
+            <div className="filter-bar insights-filter-bar">
+              <div className="filter-links" aria-label="Insight categories">
+                <a className={!category ? "active" : ""} href="/insights">
+                  All
+                </a>
+                {insightCategories.map((item) => (
+                  <a
+                    className={
+                      category?.toLowerCase() === item.toLowerCase()
+                        ? "active"
+                        : ""
+                    }
+                    href={`/insights/category/${item.toLowerCase().replaceAll(" ", "-")}`}
+                    key={item}
+                  >
+                    {item}
+                  </a>
+                ))}
+              </div>
+              <label className="search-field">
+                <MagnifyingGlass size={18} aria-hidden="true" />
+                <span className="sr-only">Search insights</span>
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search insights"
+                />
+              </label>
+            </div>
           </div>
-          <p className="result-count" aria-live="polite">
-            {filtered.length} {filtered.length === 1 ? "article" : "articles"}
-          </p>
           {filtered.length ? (
             <div className="insights-grid">
               {filtered.map((article, index) => (
@@ -1005,112 +1014,222 @@ function ArticlePage({ article, navigate, path }) {
 }
 
 function AboutPage({ navigate, path }) {
+  const journey = [
+    {
+      number: "01",
+      title: "Start with the real need",
+      body: "Listen before defining the work. The first step is understanding what the business, its people, and its customers need to do better.",
+      outcome: "Shared context",
+    },
+    {
+      number: "02",
+      title: "Connect the disciplines",
+      body: "Bring strategy, brand, technology, and operations into one conversation so decisions reinforce each other.",
+      outcome: "One direction",
+    },
+    {
+      number: "03",
+      title: "Build the useful system",
+      body: "Turn the direction into experiences, software, and services that people can understand, use, and maintain.",
+      outcome: "Working value",
+    },
+    {
+      number: "04",
+      title: "Stay for what follows",
+      body: "Support the work after launch, learn from it, and keep the next improvement connected to the bigger picture.",
+      outcome: "Lasting progress",
+    },
+  ];
+
+  const capabilities = [
+    {
+      eyebrow: "Brand & demand",
+      title: "Shape how the business is understood.",
+      body: "Positioning, identity, campaigns, and content systems that give every customer touchpoint a clearer role.",
+      tags: ["Strategy", "Design", "Marketing"],
+      href: "/services/marketing",
+      label: "Explore brand and marketing",
+      image: "brand-cards.webp",
+      icon: Megaphone,
+    },
+    {
+      eyebrow: "Digital experiences",
+      title: "Make the next interaction useful.",
+      body: "Websites and digital products designed around the decisions people need to make and the actions they need to complete.",
+      tags: ["UX & UI", "Web development", "Content"],
+      href: "/services/development",
+      label: "Explore digital development",
+      image: "brand-glass.webp",
+      icon: Code,
+    },
+    {
+      eyebrow: "Business systems",
+      title: "Connect the work behind the experience.",
+      body: "Focused SaaS products for people, relationships, files, tasks, marketing, and website operations in one familiar system.",
+      tags: ["SaaS products", "Workflows", "Operations"],
+      href: "/platform",
+      label: "Explore SaaS products",
+      image: "brand-phone.webp",
+      icon: CirclesThreePlus,
+    },
+    {
+      eyebrow: "Continuity & care",
+      title: "Keep the system dependable.",
+      body: "Hosting, IT support, monitoring, and ongoing improvement shaped around the technology the business depends on.",
+      tags: ["Hosting", "IT support", "Ongoing care"],
+      href: "/services/hosting",
+      label: "Explore hosting and support",
+      image: "brand-tablet.webp",
+      icon: Lifebuoy,
+    },
+  ];
+
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
-        eyebrow="About OrgTik"
-        title="We build what businesses"
-        accent="depend on."
-        body="OrgTik connects strategy, technology, and operations so companies can move with fewer gaps."
-        primary={{ label: "See the journey", href: "#journey" }}
+        eyebrow="About OrgTik / One connected direction"
+        title="We connect the work"
+        accent="behind progress."
+        body="OrgTik brings strategy, design, technology, and operations together so businesses can make clearer decisions and build with confidence."
+        primary={{ label: "Explore our journey", href: "#journey-map" }}
         secondary={{ label: "Talk to us", href: "/contact" }}
         video
       />
-      <section className="page-section paper-section" id="page-content">
-        <div className="wrap manifesto-grid">
-          <Eyebrow number="01">What we believe</Eyebrow>
-          <h2>
-            Better work begins when the parts stop competing for attention.
-          </h2>
-          <div>
-            <p>
-              Brand, product, website, infrastructure, and everyday operations
-              should feel like parts of the same direction. We bring the right
-              disciplines together around the problem the business actually
-              needs to solve.
-            </p>
-            <p>
-              That means fewer hand-offs without context, clearer decisions, and
-              work designed to keep creating value after launch.
-            </p>
+      <section
+        className="page-section paper-section about-purpose"
+        id="page-content"
+      >
+        <div className="wrap">
+          <SectionIntro
+            number="01"
+            eyebrow="Why OrgTik exists"
+            title="One direction for the business people see – and the work behind it."
+            body="Businesses rarely experience brand, technology, and operations as separate problems. We connect them around one useful outcome, then build the system that can carry it forward."
+            action={{ label: "View the journey map", href: "#journey-map" }}
+          />
+          <div className="about-purpose-bento">
+            <article className="about-mission-card">
+              <img src="/assets/brand-glass.webp" alt="" aria-hidden="true" />
+              <div>
+                <span>Mission</span>
+                <h3>
+                  Make every part of the business easier to understand and use.
+                </h3>
+                <p>
+                  We unite the customer experience, the tools teams rely on, and
+                  the support around both—so the next decision starts with more
+                  context and less friction.
+                </p>
+              </div>
+            </article>
+            <article className="about-goal-card about-goal-lead">
+              <span>Goal 01</span>
+              <h3>Create clarity before complexity.</h3>
+              <p>
+                Find the most useful starting point, make the priorities
+                visible, and give every decision a clear reason.
+              </p>
+            </article>
+            <article className="about-goal-card">
+              <span>Goal 02</span>
+              <h3>Build connected value.</h3>
+              <p>
+                Design every service, experience, and system to strengthen the
+                work around it.
+              </p>
+            </article>
+            <article className="about-goal-card">
+              <span>Goal 03</span>
+              <h3>Leave teams stronger.</h3>
+              <p>
+                Create practical tools and shared understanding that continue to
+                work after delivery.
+              </p>
+            </article>
           </div>
         </div>
       </section>
-      <section className="page-section deep-section" id="journey">
+      <section
+        className="page-section deep-section about-journey"
+        id="journey-map"
+      >
         <div className="wrap">
           <SectionIntro
             number="02"
-            eyebrow="Our journey"
-            title="A practice built by connecting the work."
-            body="A concise company narrative awaiting owner-approved milestones and team detail."
+            eyebrow="Our journey map"
+            title="From one useful question to a system that keeps improving."
+            body="Our journey is a way of working: understand what matters, connect the right disciplines, deliver something useful, and stay close enough to help it evolve."
+            action={{ label: "Explore the roadmap", href: "/roadmap" }}
+            inverse
           />
-          <div className="journey-line">
-            {[
-              [
-                "01",
-                "A clearer idea",
-                "Connect design and technology around the same business outcome.",
-              ],
-              [
-                "02",
-                "A broader system",
-                "Bring operations, software, and ongoing support into the relationship.",
-              ],
-              [
-                "03",
-                "A shared direction",
-                "Create one team rhythm from first question to continuous improvement.",
-              ],
-              [
-                "04",
-                "What comes next",
-                "Keep building useful systems for businesses in Switzerland and beyond.",
-              ],
-            ].map(([number, title, body]) => (
-              <article key={number}>
-                <span>{number}</span>
-                <h3>{title}</h3>
-                <p>{body}</p>
+          <div className="about-journey-map">
+            {journey.map((step) => (
+              <article key={step.number}>
+                <div className="about-journey-marker">
+                  <span>{step.number}</span>
+                  <i aria-hidden="true" />
+                </div>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+                <small>{step.outcome}</small>
               </article>
             ))}
           </div>
-          <PreviewNote>
-            Company milestones and people details require owner approval before
-            publication.
-          </PreviewNote>
         </div>
       </section>
-      <section className="page-section paper-section">
-        <div className="wrap principles-grid">
+      <section className="page-section paper-section about-capabilities">
+        <div className="wrap">
           <SectionIntro
             number="03"
-            eyebrow="Working principles"
-            title="How we protect the quality of the outcome."
+            eyebrow="What we can do"
+            title="Build the experience. Connect the business behind it."
+            body="Start with one capability or bring several together. Every path stays connected to the same business direction."
           />
-          {[
-            [
-              "Ask before assuming",
-              "Understand the people, constraints, and operating reality before drawing the solution.",
-            ],
-            [
-              "Make decisions visible",
-              "Give teams enough context to judge the work and carry it forward.",
-            ],
-            [
-              "Design for what follows",
-              "Build the system around change, ownership, and ongoing care.",
-            ],
-          ].map(([title, body]) => (
-            <article key={title}>
-              <h3>{title}</h3>
-              <p>{body}</p>
-            </article>
-          ))}
+          <div className="about-capability-grid">
+            {capabilities.map((capability) => {
+              const CapabilityIcon = capability.icon;
+              return (
+                <CursorTarget
+                  as="a"
+                  className="about-capability-card"
+                  href={capability.href}
+                  key={capability.title}
+                  label={capability.label}
+                >
+                  <img
+                    src={`/assets/${capability.image}`}
+                    alt=""
+                    loading="lazy"
+                  />
+                  <span className="about-capability-scrim" aria-hidden="true" />
+                  <span className="about-capability-copy">
+                    <span className="about-capability-icon">
+                      <CapabilityIcon size={22} weight="fill" />
+                    </span>
+                    <small>{capability.eyebrow}</small>
+                    <h3>{capability.title}</h3>
+                    <p>{capability.body}</p>
+                    <span className="about-capability-tags">
+                      {capability.tags.map((tag) => (
+                        <em key={tag}>{tag}</em>
+                      ))}
+                    </span>
+                    <span className="about-capability-action">
+                      {capability.label} <ArrowRight size={17} />
+                    </span>
+                  </span>
+                </CursorTarget>
+              );
+            })}
+          </div>
         </div>
       </section>
       <PageCTA
+        eyebrow="Start with what matters now"
         title="Bring the whole problem."
-        body="We’ll help find the most useful place to start and keep the wider system in view."
+        body="We’ll help find the most useful place to start, connect the right capabilities, and keep the wider system in view."
+        href="/contact"
+        label="Talk to us"
       />
     </SiteLayout>
   );
@@ -2575,15 +2694,45 @@ function RoadmapDialog({ item, onClose }) {
 
 function RoadmapPage({ navigate, path }) {
   const [status, setStatus] = useState("All");
+  const [theme, setTheme] = useState("All themes");
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(null);
+  const themes = [
+    "All themes",
+    ...new Set(roadmapItems.map((item) => item.theme)),
+  ];
   const visible = roadmapItems.filter(
     (item) =>
       (status === "All" || item.status === status) &&
+      (theme === "All themes" || item.theme === theme) &&
       `${item.title} ${item.theme} ${item.body}`
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
+  const years = [...new Set(visible.map((item) => item.year))].sort();
+  const progress = { Shipped: "100%", Now: "62%", Next: "24%" };
+  const communityIdeas = [
+    {
+      theme: "SaaS products",
+      title: "A clearer workspace setup guide",
+      body: "Help a new team understand which modules to begin with and how their first workflow connects.",
+    },
+    {
+      theme: "Accessibility",
+      title: "Accessible review built into delivery",
+      body: "Make keyboard, contrast, motion, and content checks visible throughout a digital project.",
+    },
+    {
+      theme: "Support",
+      title: "One place to understand service requests",
+      body: "Give clients a clearer view of context, ownership, progress, and the next useful action.",
+    },
+    {
+      theme: "Hosting",
+      title: "Simpler continuity and recovery views",
+      body: "Explain monitoring, backups, maintenance, and recovery readiness in language a business can use.",
+    },
+  ];
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -2595,15 +2744,19 @@ function RoadmapPage({ navigate, path }) {
         secondary={{ label: "Submit an idea", href: "#submit-idea" }}
         video
       />
-      <section className="page-section paper-section" id="page-content">
+      <section
+        className="page-section deep-section roadmap-timeline-section"
+        id="page-content"
+      >
         <div className="wrap" id="timeline">
           <SectionIntro
             number="01"
             eyebrow="Every milestone, mapped"
-            title="See the work as a connected journey."
-            body="All dates and roadmap statements below are synthetic preview content until historical sources and product ownership are confirmed."
+            title="See what moved—and what is moving next."
+            body="Filter the journey by stage or theme. Every milestone below is clearly labelled preview content until historical sources and product ownership are confirmed."
+            inverse
           />
-          <div className="filter-bar">
+          <div className="roadmap-filter-panel">
             <div className="filter-links" aria-label="Roadmap status">
               {["All", "Shipped", "Now", "Next"].map((item) => (
                 <button
@@ -2616,38 +2769,77 @@ function RoadmapPage({ navigate, path }) {
                 </button>
               ))}
             </div>
-            <label className="search-field">
-              <MagnifyingGlass size={18} />
-              <span className="sr-only">Search roadmap</span>
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search roadmap"
-              />
-            </label>
+            <div className="roadmap-filter-fields">
+              <label className="roadmap-theme-field">
+                <span className="sr-only">Filter roadmap by theme</span>
+                <select
+                  value={theme}
+                  onChange={(event) => setTheme(event.target.value)}
+                >
+                  {themes.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="search-field">
+                <MagnifyingGlass size={18} />
+                <span className="sr-only">Search roadmap</span>
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search milestones"
+                />
+              </label>
+            </div>
           </div>
-          <div className="timeline-list">
-            {visible.map((item) => (
-              <button
-                className="timeline-item"
-                key={`${item.year}-${item.title}`}
-                onClick={(event) => {
-                  setActive(item);
-                  event.currentTarget.dataset.dialogTrigger = "true";
-                }}
-              >
-                <span className="timeline-year">{item.year}</span>
-                <span className="timeline-node" aria-hidden="true" />
-                <span className="timeline-copy">
-                  <small>
-                    {item.status} · {item.theme} · Demo
-                  </small>
-                  <strong>{item.title}</strong>
-                  <span>{item.body}</span>
-                </span>
-                <ArrowRight size={20} />
-              </button>
-            ))}
+          <p className="roadmap-result-count" aria-live="polite">
+            {visible.length} preview{" "}
+            {visible.length === 1 ? "milestone" : "milestones"}
+          </p>
+          <div className="roadmap-years">
+            {years.map((year) => {
+              const items = visible.filter((item) => item.year === year);
+              return (
+                <section className="roadmap-year-group" key={year}>
+                  <header>
+                    <span>Year</span>
+                    <h3>{year}</h3>
+                    <p>
+                      {items.length}{" "}
+                      {items.length === 1 ? "milestone" : "milestones"}
+                    </p>
+                  </header>
+                  <div className="roadmap-milestone-grid">
+                    {items.map((item) => (
+                      <button
+                        className="roadmap-milestone-card"
+                        key={`${item.year}-${item.title}`}
+                        onClick={(event) => {
+                          setActive(item);
+                          event.currentTarget.dataset.dialogTrigger = "true";
+                        }}
+                        style={{ "--roadmap-progress": progress[item.status] }}
+                      >
+                        <span className="roadmap-milestone-meta">
+                          <small>{item.status}</small>
+                          <em>{item.theme}</em>
+                        </span>
+                        <strong>{item.title}</strong>
+                        <span className="roadmap-milestone-body">
+                          {item.body}
+                        </span>
+                        <span className="roadmap-progress" aria-hidden="true">
+                          <i />
+                        </span>
+                        <span className="roadmap-milestone-action">
+                          View milestone <ArrowRight size={16} />
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </div>
           {!visible.length && (
             <EmptyState
@@ -2657,6 +2849,7 @@ function RoadmapPage({ navigate, path }) {
                 <Action
                   onClick={() => {
                     setStatus("All");
+                    setTheme("All themes");
                     setQuery("");
                   }}
                 >
@@ -2667,28 +2860,32 @@ function RoadmapPage({ navigate, path }) {
           )}
         </div>
       </section>
-      <section className="page-section deep-section" id="submit-idea">
+      <section
+        className="page-section paper-section roadmap-idea-section"
+        id="submit-idea"
+      >
         <div className="wrap idea-layout">
           <div>
             <Eyebrow number="02">Shape what comes next</Eyebrow>
-            <h2>Submit an idea.</h2>
+            <h2>Bring the problem into view.</h2>
             <p>
-              Tell us what would make digital work simpler, safer, or faster.
-              This interaction demonstrates the future participation journey.
+              Tell us what would make the experience or the work behind it
+              clearer, safer, or more useful. This interaction demonstrates the
+              future participation journey.
             </p>
             <NumberedSteps
               items={[
                 {
-                  title: "Tell us the idea",
-                  body: "One sentence is enough when the problem is clear.",
+                  title: "Tell us the need",
+                  body: "Start with the problem, the people it affects, and why it matters.",
                 },
                 {
-                  title: "We review it",
-                  body: "A future connected service would categorize and evaluate the suggestion.",
+                  title: "We connect the context",
+                  body: "A future connected service would categorize the idea and relate it to the wider roadmap.",
                 },
                 {
-                  title: "Useful ideas move forward",
-                  body: "Approved items can become visible roadmap entries with clear status.",
+                  title: "The best next step becomes visible",
+                  body: "Approved ideas can move into the roadmap with a clear owner and stage.",
                 },
               ]}
             />
@@ -2745,9 +2942,55 @@ function RoadmapPage({ navigate, path }) {
           </form>
         </div>
       </section>
+      <section className="page-section deep-section roadmap-community-section">
+        <div className="wrap">
+          <SectionIntro
+            number="03"
+            eyebrow="Shaped by useful questions"
+            title="A community roadmap for what deserves attention next."
+            body="These sample ideas show how client and partner input could be organized. Voting, comments, and submission are frontend previews only."
+            inverse
+          />
+          <div className="roadmap-community-grid">
+            {communityIdeas.map((idea, index) => (
+              <button
+                className="roadmap-community-card"
+                key={idea.title}
+                onClick={(event) => {
+                  setActive({
+                    year: "Community preview",
+                    status: "Open",
+                    theme: idea.theme,
+                    title: idea.title,
+                    body: `${idea.body} No vote, comment, or submission is recorded in this frontend preview.`,
+                  });
+                  event.currentTarget.dataset.dialogTrigger = "true";
+                }}
+              >
+                <span className="roadmap-community-topline">
+                  <small>{String(index + 1).padStart(2, "0")}</small>
+                  <em>{idea.theme}</em>
+                </span>
+                <strong>{idea.title}</strong>
+                <span>{idea.body}</span>
+                <span className="roadmap-community-action">
+                  Open idea preview <ArrowRight size={16} />
+                </span>
+              </button>
+            ))}
+          </div>
+          <PreviewNote>
+            Community ideas, votes, and comments are demonstration content. No
+            participation data is sent or stored.
+          </PreviewNote>
+        </div>
+      </section>
       <PageCTA
+        eyebrow="The journey stays open"
         title="The line keeps drawing."
         body="Every project adds a node. Bring us the next useful milestone."
+        href="/contact"
+        label="Start a project"
       />
       {active && (
         <RoadmapDialog item={active} onClose={() => setActive(null)} />

@@ -1,5 +1,19 @@
 # OrgTik cinematic website design QA
 
+## SaaS card balance, bento capabilities and product-only plans — 2026-09-22
+
+The `/platform` builder now balances its two-column composition: the six product selectors divide the review panel's 526 px desktop height into two equal 221 px rows. Each card uses that space for the product description, three included capabilities, category, and starting monthly prototype estimate. The four bundle cards were tightened from 148 px to 124 px and the Custom row from 92 px to 80 px. At 439 px mobile width, cards return to content-driven 165 px heights and one 384 px column.
+
+Every `/platform/:product` “Built for the everyday work” section now uses an asymmetric bento layout. At 1280 px the lead story is 666 × 509 px and the two supporting stories are 471 × 247 px; each story contains the relevant capability previously shown in the detached checklist. The standalone checklist is removed. Mobile stacks the same stories at 384 px wide with 320/280/280 px heights.
+
+Product detail routes now treat the product as already chosen. The full bundle configurator is removed from all six detail routes and replaced with product-specific Essential, Connected, and Partnership cards, plus Monthly, 12-month, and 24-month duration switching. Browser checks confirmed three plans, three bento capabilities, no duplicate configurator, and no horizontal overflow for HR, CRM, Files, Tasks, Marketing, and Website Manager. Switching Website Manager from 12 months to Monthly updated the prototype estimate and URL state.
+
+“Choose. Review. Discuss.” now renders as three equal 374 × 253 px horizontal cards at desktop with violet edge, lift, number, and arrow hover treatments; mobile stacks them to the standard 384 px content width. Reduced-motion styles remove the transforms.
+
+`npm run format:check`, `git diff --check`, and the production build pass.
+
+final result: passed
+
 ## Homepage gallery regression repair — 2026-09-22
 
 The homepage “Our identity, in the world” gallery is restored to its compact staggered two-image composition. The routed project-detail gallery now uses an isolated `project-detail-gallery` class, preventing its 860 px masonry lead image and absolute positioning from overriding the homepage cards through the older shared `project-gallery` class.

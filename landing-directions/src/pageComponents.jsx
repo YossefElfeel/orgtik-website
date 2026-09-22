@@ -168,9 +168,10 @@ export function FeatureList({ items }) {
   );
 }
 
-export function NumberedSteps({ items }) {
+export function NumberedSteps({ items, variant = "rows" }) {
+  const isCards = variant === "cards";
   return (
-    <ol className="numbered-steps">
+    <ol className={`numbered-steps${isCards ? " numbered-steps-cards" : ""}`}>
       {items.map((item, index) => (
         <li key={item.title}>
           <span>{String(index + 1).padStart(2, "0")}</span>
@@ -178,6 +179,13 @@ export function NumberedSteps({ items }) {
             <h3>{item.title}</h3>
             <p>{item.body}</p>
           </div>
+          {isCards && (
+            <ArrowUpRight
+              className="numbered-step-arrow"
+              size={22}
+              aria-hidden="true"
+            />
+          )}
         </li>
       ))}
     </ol>

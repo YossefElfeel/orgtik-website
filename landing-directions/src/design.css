@@ -4428,10 +4428,15 @@ svg {
 .filter-links a,
 .filter-links button {
   min-height: 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 10px 17px;
   border: 1px solid #190b2525;
   border-radius: 999px;
   font-size: 11px;
+  line-height: 1;
+  text-align: center;
 }
 .filter-links :is(a, button).active {
   background: var(--plum);
@@ -4458,56 +4463,52 @@ svg {
   color: #7c6d89;
   font-size: 11px;
 }
-.insights-filter-panel {
-  margin-bottom: 22px;
-  padding: 22px;
-  border: 1px solid #28123b16;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #f1eaf6 0%, #f8f4f9 100%);
+.content-filter-panel {
+  margin-bottom: 34px;
 }
-.insights-filter-heading {
+.content-filter-heading {
   display: flex;
   align-items: end;
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 18px;
 }
-.insights-filter-heading > div {
+.content-filter-heading > div {
   display: grid;
   gap: 4px;
 }
-.insights-filter-heading small {
+.content-filter-heading small {
   color: #806d8c;
   font-size: 9px;
   font-weight: 650;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.insights-filter-heading strong {
+.content-filter-heading strong {
   font-size: 22px;
   letter-spacing: -0.035em;
 }
-.insights-filter-heading .result-count {
+.content-filter-heading .result-count {
   margin: 0;
   color: #5f5168;
 }
-.insights-filter-bar {
+.content-filter-bar {
   margin: 0;
   padding-top: 18px;
   border-top: 1px solid #28123b13;
 }
-.insights-filter-bar .filter-links {
+.content-filter-bar .filter-links {
   gap: 7px;
 }
-.insights-filter-bar .filter-links a {
+.content-filter-bar .filter-links :is(a, button) {
   min-height: 39px;
   padding: 8px 15px;
   background: #ffffff91;
 }
-.insights-filter-bar .filter-links a.active {
+.content-filter-bar .filter-links :is(a, button).active {
   background: var(--plum);
 }
-.insights-filter-bar .search-field {
+.content-filter-bar .search-field {
   min-width: 230px;
   min-height: 42px;
   padding: 0 13px;
@@ -6008,10 +6009,8 @@ svg {
   justify-content: space-between;
   gap: 22px;
   margin: 52px 0 18px;
-  padding: 16px;
-  border: 1px solid #ffffff17;
-  border-radius: 18px;
-  background: #ffffff08;
+  padding: 18px 0 0;
+  border-top: 1px solid #ffffff17;
 }
 .roadmap-filter-panel .filter-links button {
   color: #cbbdd3;
@@ -8962,34 +8961,29 @@ svg {
 }
 
 @media (max-width: 600px) {
-  .insights-filter-panel {
-    padding: 16px;
-  }
-  .insights-filter-heading {
+  .content-filter-heading {
     align-items: start;
     margin-bottom: 15px;
   }
-  .insights-filter-heading strong {
+  .content-filter-heading strong {
     font-size: 19px;
   }
-  .insights-filter-bar {
+  .content-filter-bar {
     align-items: stretch;
     gap: 14px;
   }
-  .insights-filter-bar .filter-links {
+  .content-filter-bar .filter-links {
     flex-wrap: nowrap;
-    margin-right: -16px;
-    padding-right: 16px;
     overflow-x: auto;
     scrollbar-width: none;
   }
-  .insights-filter-bar .filter-links::-webkit-scrollbar {
+  .content-filter-bar .filter-links::-webkit-scrollbar {
     display: none;
   }
-  .insights-filter-bar .filter-links a {
+  .content-filter-bar .filter-links :is(a, button) {
     flex: 0 0 auto;
   }
-  .insights-filter-bar .search-field {
+  .content-filter-bar .search-field {
     min-width: 0;
     width: 100%;
   }

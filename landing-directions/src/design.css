@@ -5911,11 +5911,12 @@ svg {
 /* 2026 product-system refinement: image-led cards, pricing and live context. */
 .cinematic-card-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  align-items: start;
+  gap: 16px;
 }
 .module-card {
   position: relative;
-  min-height: 500px;
+  min-height: clamp(400px, 34vw, 448px);
   padding: 0;
   overflow: hidden;
   border: 0;
@@ -5959,12 +5960,12 @@ svg {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 34px;
+  padding: 28px;
 }
 .module-card .module-card-icon {
   position: absolute;
-  top: 26px;
-  left: 26px;
+  top: 22px;
+  left: 22px;
   z-index: 3;
   width: 48px;
   height: 48px;
@@ -5980,8 +5981,8 @@ svg {
 }
 .module-card h3,
 .family-card h3 {
-  margin: 12px 0 13px;
-  font-size: clamp(30px, 2.7vw, 40px);
+  margin: 9px 0 10px;
+  font-size: clamp(29px, 2.4vw, 36px);
   line-height: 1.02;
   color: #fff;
 }
@@ -5989,15 +5990,30 @@ svg {
 .family-card p {
   max-width: 520px;
   color: #d5c8dc;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.55;
 }
 .module-card-action,
 .family-card-action {
   width: fit-content;
-  margin-top: 24px;
-  padding-top: 17px;
+  margin-top: 17px;
+  padding-top: 14px;
   border-top: 1px solid #ffffff2b;
   color: #fff;
+}
+.module-card .context-cursor {
+  z-index: 7;
+}
+.module-card-copy {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+}
+.module-card .context-cursor > span {
+  background: #eee3f7;
+  color: #28123b;
+  border-color: #fff;
+  box-shadow: 0 12px 36px #0904114d;
 }
 .module-card:hover,
 .family-card:hover {
@@ -6556,7 +6572,7 @@ svg {
     grid-template-columns: 1fr;
   }
   .module-card {
-    min-height: 430px;
+    min-height: 390px;
   }
   .module-card-copy,
   .family-card-copy {

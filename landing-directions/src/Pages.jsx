@@ -15,6 +15,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { Action, Eyebrow, Logo } from "./shared";
+import { CursorTarget, Testimonials } from "./Experience";
 import { modules } from "./content";
 import {
   insightCategories,
@@ -1108,7 +1109,9 @@ function PlatformPage({ navigate, path }) {
             {modules.map((module, index) => {
               const Icon = module.icon;
               return (
-                <a
+                <CursorTarget
+                  as="a"
+                  label={`Explore ${module.formal}`}
                   className="module-card"
                   href={`/platform/${module.id}`}
                   key={module.id}
@@ -1133,7 +1136,7 @@ function PlatformPage({ navigate, path }) {
                       Explore product <ArrowRight size={17} />
                     </span>
                   </span>
-                </a>
+                </CursorTarget>
               );
             })}
           </div>
@@ -1190,6 +1193,7 @@ function PlatformPage({ navigate, path }) {
           </div>
         </div>
       </section>
+      <Testimonials />
       <PageCTA
         eyebrow="Your workspace"
         title="Choose what belongs in it."

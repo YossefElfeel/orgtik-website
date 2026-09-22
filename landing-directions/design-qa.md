@@ -1,5 +1,17 @@
 # OrgTik cinematic website design QA
 
+## SaaS card density, cursors and testimonials — 2026-09-22
+
+The `/platform` product grid now uses compact 448 px image cards at 1440 px and 390 px cards at 390 px. Copy is bottom-aligned inside a consistent 28 px desktop / 26 px mobile inset, with reduced heading, paragraph, and action spacing so each card hugs its useful content while preserving enough image area to communicate the brand. The grid uses a 16 px gap and no horizontal overflow at either checked viewport.
+
+All six product links reuse the homepage `CursorTarget` interaction with a pale-lavender “Explore [product]” cursor on mouse/fine-pointer devices. Touch, keyboard, and reduced-motion contexts retain the visible link action and normal pointer behavior.
+
+The shared six-item homepage testimonial carousel now appears on the SaaS overview after the product-path comparison. It covers brand, digital experiences, connected systems, development, marketing, and ongoing partnership; every quote and identity remains explicitly labelled as placeholder content. Desktop shows three cards, mobile shows one, and the existing autoplay, arrows, swipe, keyboard controls, pause rules, and reduced-motion behavior are preserved.
+
+Browser verification covered `/platform#modules` and `/platform#testimonials` at 1440 × 900 and 390 × 844. Six product cursors and six testimonial items are present, the mobile carousel uses 100% columns, and neither state introduces horizontal page overflow.
+
+final result: passed
+
 ## SaaS, service and project-system refinement — 2026-09-22
 
 The routed experience now follows the homepage’s cinematic language instead of the previous oversized white card grid. `/platform` uses two-column image-led product stories built from the supplied OrgTik assets; service details use the same dark-gradient anatomy; the “One workspace” section is now an interactive six-product constellation with Phosphor icons, automatic context changes, hover/focus selection, data pulses, and reduced-motion behavior.

@@ -5694,14 +5694,13 @@ svg {
 .product-plan-choice {
   margin: 0 0 18px;
   padding: 18px 20px;
-  border: 1px solid #7540bd2c;
+  border: 1px solid #7540bd30;
   border-radius: 16px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
-  background:
-    radial-gradient(circle at 90% 0, #9b61e61f, transparent 34%), #f6f0fa;
+  background: transparent;
 }
 .product-plan-choice-icon {
   width: 48px;

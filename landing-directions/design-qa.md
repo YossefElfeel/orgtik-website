@@ -1,5 +1,19 @@
 # OrgTik cinematic website design QA
 
+## Unfilled selected-item plan frame — 2026-09-22
+
+Source visual truth: `C:/Users/USER/AppData/Local/Temp/codex-clipboard-058eb88b-600b-4815-b3f7-e04c40a9036d.png` (1746 × 325 px) identifies the selected HR product lockup; the user's written direction overrides its lavender fill and requires a light outline with no background fill across all plan sections.
+
+Implementation evidence: browser-rendered `/platform/hr?mode=single&duration=annual&modules=hr#plan-builder` and `/services/marketing/social-media-marketing#plan-builder`, inspected in the in-app browser at its current narrow viewport and density 1. The provider displayed the rendered captures inline; no persistent screenshot file was produced. The HR and service variants share `.product-plan-choice`, so the same rule covers every SaaS product and service-plan lockup.
+
+Focused comparison verified the selected-item region because this request changes only that component. The revised frame keeps the existing Montserrat hierarchy, dark icon tile, content spacing, status badge, radius, and copy. Computed browser styles report `background-color: rgba(0, 0, 0, 0)`, `background-image: none`, and a solid light-violet border on both product and service pages. The HR mobile render has no horizontal overflow, and both checked pages report no browser warnings or errors.
+
+Comparison history: the source showed a pale-lilac gradient behind the whole selected-product lockup. The implementation removes that fill, preserves the paper section beneath it, and retains a quiet outline for grouping. No P0/P1/P2 differences remain for the requested state.
+
+`npm run format:check` and the production build pass.
+
+final result: passed
+
 ## Shared service process and related-card direction — 2026-09-22
 
 The service-detail “A practical path” section now reuses the homepage Process selector instead of four flat text rows. Understand, Design, Deliver, and Evolve switch the supplied image and narrative on hover, focus, keyboard arrows, or tap. The same flat process treatment on project-detail pages now uses the shared interaction on a dark section, keeping the service, work, and homepage flows in one visual language. Selecting Design updates the visible narrative to “Make the way forward clear.”

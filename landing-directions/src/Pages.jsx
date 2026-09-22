@@ -2123,7 +2123,7 @@ function CaseStudyPage({ project, navigate, path }) {
             title="The direction, seen across touchpoints."
             body="A visual gallery gives each project room to show the system, details, and real-world application instead of relying on a single hero image."
           />
-          <div className="project-gallery">
+          <div className="project-detail-gallery">
             {(project.gallery || [project.image]).map((image, index) => (
               <figure key={`${image}-${index}`}>
                 <img

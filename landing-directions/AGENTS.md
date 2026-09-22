@@ -23,6 +23,7 @@
 - Keep the navbar fixed and visible while scrolling, with an opaque plum surface after leaving the top. Account for its height in anchor offsets.
 - The scrolled navbar uses a compact floating rounded rail with subtly translucent plum glass, 16px backdrop blur, a fine highlight/shadow, and active-section indication. Retain the full-width top state, compact mobile rail, and opaque fallback for unsupported/reduced-transparency environments.
 - Include a shared “View all projects” CTA after the selected work imagery, opening the existing projects in an on-page gallery without adding routes or invented work.
+- Keep the homepage “Our identity, in the world” gallery as its compact staggered two-image composition. Project-detail galleries use the isolated `project-detail-gallery` class; never let their tall masonry dimensions or absolute image positioning cascade into the homepage gallery.
 - The standard OrgTik logo is horizontal: official icon to the left of the official wordmark.
 - Use restrained scroll reveals, smooth service/FAQ disclosures, contextual hover cursors, and an atmospheric closing section. Respect reduced motion and touch input.
 - Section entrances replay on viewport re-entry, with bounded stagger for grouped content and a cropped reveal for project imagery. Keep content visible without animation support; cancel entrances for keyboard focus and reduced motion.

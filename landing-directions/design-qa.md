@@ -1,5 +1,15 @@
 # OrgTik cinematic website design QA
 
+## Homepage gallery regression repair — 2026-09-22
+
+The homepage “Our identity, in the world” gallery is restored to its compact staggered two-image composition. The routed project-detail gallery now uses an isolated `project-detail-gallery` class, preventing its 860 px masonry lead image and absolute positioning from overriding the homepage cards through the older shared `project-gallery` class.
+
+Browser verification covered the homepage Work and SaaS sections at 1280 px desktop and 439 px mobile width. Both supplied project images load at their intended compact heights: 433/390 px on desktop and 265/260 px on mobile. The gallery measures 530 px tall on desktop and stacks to 657 px on mobile, with no horizontal overflow. The homepage SaaS explorer remains isolated from routed product-card styles, switches from HR to CRM correctly, retains all six tabs, and has no horizontal overflow at either viewport.
+
+`npm run format:check` and the production build pass.
+
+final result: passed
+
 ## Services overview cards, process and testimonials — 2026-09-22
 
 The `/services` overview now uses the same image-led cinematic card system as SaaS: five supplied-asset cards, family-specific Phosphor icons, visible action rows, restrained hover motion, and contextual “Explore” cursors on mouse/fine-pointer devices. Four cards form two balanced rows and the fifth OrgTik Hosting card spans the grid as a deliberate final pathway. Service-family child cards also receive contextual cursors without changing their routes.

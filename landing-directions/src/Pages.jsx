@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
+  ArrowUp,
   Broadcast,
+  ChatCircleText,
   CheckCircle,
   CirclesThreePlus,
   Code,
@@ -44,25 +46,6 @@ import {
   SectionIntro,
   SiteLayout,
 } from "./pageComponents";
-
-const processSteps = [
-  {
-    title: "Understand",
-    body: "Clarify the business need, the audience, and what a useful outcome must change.",
-  },
-  {
-    title: "Design",
-    body: "Turn the right questions into a shared direction, system, and practical delivery plan.",
-  },
-  {
-    title: "Deliver",
-    body: "Bring design and technology together into something people can use with confidence.",
-  },
-  {
-    title: "Evolve",
-    body: "Learn from the work, improve the system, and keep the next decision connected.",
-  },
-];
 
 const serviceTestimonialPreviews = [
   {
@@ -724,7 +707,7 @@ function ServiceDetailPage({ family, service, navigate, path }) {
             title="From the current problem to a stronger system."
             body="Each phase has a visible output, so the work stays understandable and decisions stay connected."
           />
-          <NumberedSteps items={processSteps} />
+          <Process />
         </div>
       </section>
       <ServicePlans family={family} service={service} />
@@ -763,21 +746,51 @@ function ServiceDetailPage({ family, service, navigate, path }) {
         </section>
       )}
       {related.length > 0 && (
-        <section className="page-section paper-section related-section">
+        <section
+          className="page-section paper-section related-section"
+          id="related-services"
+        >
           <div className="wrap">
             <SectionIntro
+              number="05"
               eyebrow="Related services"
               title="Keep the next capability connected."
+              body="Continue with the adjacent expertise that strengthens the same outcome without breaking the direction of the work."
             />
-            <div className="related-links">
-              {related.map((item) => (
-                <EditorialLink
+            <div
+              className={`related-service-grid related-service-grid-${related.length}`}
+            >
+              {related.map((item, index) => (
+                <CursorTarget
+                  as="a"
+                  label={`Explore ${item.name}`}
+                  className="related-service-card"
                   key={item.slug}
                   href={`/services/${family.slug}/${item.slug}`}
-                  eyebrow={family.name}
-                  title={item.name}
-                  body={item.outcome}
-                />
+                >
+                  <span className="related-service-media" aria-hidden="true">
+                    <img
+                      src={`/assets/${index === 0 ? family.image : serviceCardVisuals[(index + 1) % serviceCardVisuals.length]}`}
+                      alt=""
+                      loading="lazy"
+                    />
+                  </span>
+                  <span className="related-service-copy">
+                    <small>
+                      {String(index + 1).padStart(2, "0")} · {family.name}
+                    </small>
+                    <strong>{item.name}</strong>
+                    <span>{item.outcome}</span>
+                    <span className="related-service-features">
+                      {item.capabilities.slice(0, 2).map((capability) => (
+                        <em key={capability}>{capability}</em>
+                      ))}
+                    </span>
+                    <span className="related-service-action">
+                      Explore the service <ArrowRight size={17} />
+                    </span>
+                  </span>
+                </CursorTarget>
               ))}
             </div>
           </div>
@@ -2568,7 +2581,7 @@ function CaseStudyPage({ project, navigate, path }) {
           </div>
         </div>
       </section>
-      <section className="page-section paper-section">
+      <section className="page-section deep-section project-process-section">
         <div className="wrap">
           <SectionIntro
             number="03"
@@ -2576,7 +2589,7 @@ function CaseStudyPage({ project, navigate, path }) {
             title="One direction, expressed across the system."
             body="Strategy, design, technology, and ongoing care are sequenced around a shared definition of success."
           />
-          <NumberedSteps items={processSteps} />
+          <Process />
         </div>
       </section>
       <section className="page-section deep-section">
@@ -2665,10 +2678,20 @@ function RoadmapDialog({ item, onClose }) {
       <p>{item.body}</p>
       <div className="roadmap-status-line" aria-label="Example roadmap status">
         <span className="done">Open</span>
-        <span className={item.status !== "Next" ? "done" : ""}>Planned</span>
         <span
           className={
-            item.status === "Now" || item.status === "Shipped" ? "done" : ""
+            ["Planned", "In progress", "Shipped"].includes(item.status)
+              ? "done"
+              : ""
+          }
+        >
+          Planned
+        </span>
+        <span
+          className={
+            item.status === "In progress" || item.status === "Shipped"
+              ? "done"
+              : ""
           }
         >
           In progress
@@ -2693,46 +2716,113 @@ function RoadmapDialog({ item, onClose }) {
 }
 
 function RoadmapPage({ navigate, path }) {
-  const [status, setStatus] = useState("All");
+  const [period, setPeriod] = useState("All");
   const [theme, setTheme] = useState("All themes");
   const [query, setQuery] = useState("");
+  const [selectedYear, setSelectedYear] = useState("2026");
+  const [ideaQuery, setIdeaQuery] = useState("");
+  const [votedIdeas, setVotedIdeas] = useState(() => new Set());
   const [active, setActive] = useState(null);
   const themes = [
     "All themes",
     ...new Set(roadmapItems.map((item) => item.theme)),
   ];
-  const visible = roadmapItems.filter(
+  const matchingMilestones = roadmapItems.filter(
     (item) =>
-      (status === "All" || item.status === status) &&
+      (period === "All" || item.period === period) &&
       (theme === "All themes" || item.theme === theme) &&
       `${item.title} ${item.theme} ${item.body}`
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
-  const years = [...new Set(visible.map((item) => item.year))].sort();
-  const progress = { Shipped: "100%", Now: "62%", Next: "24%" };
+  const years = [
+    ...new Set(matchingMilestones.map((item) => item.year)),
+  ].sort();
+  const activeYear = years.includes(selectedYear)
+    ? selectedYear
+    : years.includes("2026")
+      ? "2026"
+      : years.at(-1);
+  const visible = matchingMilestones.filter((item) => item.year === activeYear);
+  const deliveryStatuses = ["Open", "Planned", "In progress", "Shipped"];
   const communityIdeas = [
     {
+      id: "workspace-guide",
+      status: "Open",
       theme: "SaaS products",
       title: "A clearer workspace setup guide",
       body: "Help a new team understand which modules to begin with and how their first workflow connects.",
+      votes: 53,
+      comments: 4,
     },
     {
+      id: "request-view",
+      status: "Open",
+      theme: "Support",
+      title: "A clearer view of every service request",
+      body: "Show context, ownership, priority, and the next useful action without asking clients to chase an update.",
+      votes: 47,
+      comments: 2,
+    },
+    {
+      id: "accessible-review",
+      status: "Planned",
       theme: "Accessibility",
       title: "Accessible review built into delivery",
       body: "Make keyboard, contrast, motion, and content checks visible throughout a digital project.",
+      votes: 98,
+      comments: 6,
     },
     {
-      theme: "Support",
-      title: "One place to understand service requests",
-      body: "Give clients a clearer view of context, ownership, progress, and the next useful action.",
+      id: "project-summary",
+      status: "Planned",
+      theme: "Projects",
+      title: "One shared project summary",
+      body: "Turn milestones, decisions, files, and responsibilities into one view that stays useful after handover.",
+      votes: 39,
+      comments: 3,
     },
     {
+      id: "continuity-view",
+      status: "In progress",
       theme: "Hosting",
       title: "Simpler continuity and recovery views",
       body: "Explain monitoring, backups, maintenance, and recovery readiness in language a business can use.",
+      votes: 142,
+      comments: 8,
+    },
+    {
+      id: "consent-view",
+      status: "Shipped",
+      theme: "Website",
+      title: "Privacy choices people can understand",
+      body: "Present consent, analytics, and preference controls as a clear part of the website experience.",
+      votes: 118,
+      comments: 5,
+    },
+    {
+      id: "delivery-checks",
+      status: "Shipped",
+      theme: "Accessibility",
+      title: "Accessibility checks in every delivery",
+      body: "Make the agreed accessibility review visible as part of the delivery record for every relevant project.",
+      votes: 64,
+      comments: 3,
     },
   ];
+  const visibleIdeas = communityIdeas.filter((idea) =>
+    `${idea.title} ${idea.theme} ${idea.body}`
+      .toLowerCase()
+      .includes(ideaQuery.toLowerCase()),
+  );
+  const toggleIdeaVote = (id) => {
+    setVotedIdeas((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -2753,17 +2843,17 @@ function RoadmapPage({ navigate, path }) {
             number="01"
             eyebrow="Every milestone, mapped"
             title="See what moved—and what is moving next."
-            body="Filter the journey by stage or theme. Every milestone below is clearly labelled preview content until historical sources and product ownership are confirmed."
+            body="Choose a period, switch the year, or narrow the projects by theme. Delivery status stays separate so Open, Planned, In progress, and Shipped remain easy to compare."
             inverse
           />
           <div className="roadmap-filter-panel">
-            <div className="filter-links" aria-label="Roadmap status">
-              {["All", "Shipped", "Now", "Next"].map((item) => (
+            <div className="filter-links" aria-label="Roadmap period">
+              {["All", "Past", "Now", "Next"].map((item) => (
                 <button
                   key={item}
-                  className={status === item ? "active" : ""}
-                  onClick={() => setStatus(item)}
-                  aria-pressed={status === item}
+                  className={period === item ? "active" : ""}
+                  onClick={() => setPeriod(item)}
+                  aria-pressed={period === item}
                 >
                   {item}
                 </button>
@@ -2793,62 +2883,103 @@ function RoadmapPage({ navigate, path }) {
             </div>
           </div>
           <p className="roadmap-result-count" aria-live="polite">
-            {visible.length} preview{" "}
-            {visible.length === 1 ? "milestone" : "milestones"}
+            {matchingMilestones.length} preview{" "}
+            {matchingMilestones.length === 1 ? "project" : "projects"}
           </p>
-          <div className="roadmap-years">
-            {years.map((year) => {
-              const items = visible.filter((item) => item.year === year);
-              return (
-                <section className="roadmap-year-group" key={year}>
-                  <header>
-                    <span>Year</span>
-                    <h3>{year}</h3>
-                    <p>
-                      {items.length}{" "}
-                      {items.length === 1 ? "milestone" : "milestones"}
-                    </p>
-                  </header>
-                  <div className="roadmap-milestone-grid">
-                    {items.map((item) => (
-                      <button
-                        className="roadmap-milestone-card"
-                        key={`${item.year}-${item.title}`}
-                        onClick={(event) => {
-                          setActive(item);
-                          event.currentTarget.dataset.dialogTrigger = "true";
-                        }}
-                        style={{ "--roadmap-progress": progress[item.status] }}
-                      >
-                        <span className="roadmap-milestone-meta">
-                          <small>{item.status}</small>
-                          <em>{item.theme}</em>
-                        </span>
-                        <strong>{item.title}</strong>
-                        <span className="roadmap-milestone-body">
-                          {item.body}
-                        </span>
-                        <span className="roadmap-progress" aria-hidden="true">
-                          <i />
-                        </span>
-                        <span className="roadmap-milestone-action">
-                          View milestone <ArrowRight size={16} />
-                        </span>
-                      </button>
-                    ))}
+          {!!visible.length && (
+            <div className="roadmap-browser">
+              <aside
+                className="roadmap-year-switcher"
+                aria-label="Roadmap years"
+              >
+                <small>Years</small>
+                {years.map((year) => {
+                  const yearCount = matchingMilestones.filter(
+                    (item) => item.year === year,
+                  ).length;
+                  return (
+                    <button
+                      key={year}
+                      className={activeYear === year ? "active" : ""}
+                      onClick={() => setSelectedYear(year)}
+                      aria-pressed={activeYear === year}
+                    >
+                      <span>{year}</span>
+                      <em>{yearCount}</em>
+                    </button>
+                  );
+                })}
+              </aside>
+              <section className="roadmap-year-view">
+                <header className="roadmap-year-head">
+                  <div>
+                    <small>Selected year</small>
+                    <h3>{activeYear}</h3>
                   </div>
-                </section>
-              );
-            })}
-          </div>
-          {!visible.length && (
+                  <div
+                    className="roadmap-status-summary"
+                    aria-label="Delivery status summary"
+                  >
+                    {deliveryStatuses.map((item) => {
+                      const count = visible.filter(
+                        (project) => project.status === item,
+                      ).length;
+                      return count ? (
+                        <span key={item}>
+                          <i /> {count} {item}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                </header>
+                <div className="roadmap-milestone-grid">
+                  {visible.map((item) => (
+                    <button
+                      className="roadmap-milestone-card"
+                      key={`${item.year}-${item.title}`}
+                      onClick={(event) => {
+                        setActive(item);
+                        event.currentTarget.dataset.dialogTrigger = "true";
+                      }}
+                      style={{ "--roadmap-progress": `${item.progress}%` }}
+                    >
+                      <span className="roadmap-milestone-meta">
+                        <small>{item.status}</small>
+                        <em>{item.theme}</em>
+                        <span>{item.timing}</span>
+                      </span>
+                      <strong>{item.title}</strong>
+                      <span className="roadmap-milestone-body">
+                        {item.body}
+                      </span>
+                      <span className="roadmap-progress-label">
+                        <small>
+                          {item.status === "Shipped"
+                            ? "Complete"
+                            : "Preview progress"}
+                        </small>
+                        <strong>{item.progress}%</strong>
+                      </span>
+                      <span className="roadmap-progress" aria-hidden="true">
+                        <i />
+                      </span>
+                      <span className="roadmap-milestone-action">
+                        View project <ArrowRight size={16} />
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            </div>
+          )}
+          {!matchingMilestones.length && (
             <EmptyState
-              title="No roadmap items match"
-              body="Try another status or search phrase."
+              title="No projects match"
+              body="Try another period, theme, or search phrase."
               action={
                 <Action
                   onClick={() => {
-                    setStatus("All");
+                    setPeriod("All");
                     setTheme("All themes");
                     setQuery("");
                   }}
@@ -2861,31 +2992,148 @@ function RoadmapPage({ navigate, path }) {
         </div>
       </section>
       <section
+        className="page-section deep-section roadmap-community-section"
+        id="community"
+      >
+        <div className="wrap">
+          <SectionIntro
+            number="02"
+            eyebrow="Voted by you"
+            title="The community roadmap."
+            body="Suggestions are grouped by delivery status so clients and partners can vote, comment, and see how useful questions move through the journey."
+            inverse
+          />
+          <div className="roadmap-community-tools">
+            <label className="search-field">
+              <MagnifyingGlass size={18} />
+              <span className="sr-only">Search community suggestions</span>
+              <input
+                value={ideaQuery}
+                onChange={(event) => setIdeaQuery(event.target.value)}
+                placeholder="Search suggestions"
+              />
+            </label>
+            <div
+              className="community-status-path"
+              aria-label="Suggestion journey"
+            >
+              {deliveryStatuses.map((item, index) => (
+                <span key={item}>
+                  {item}
+                  {index < deliveryStatuses.length - 1 && (
+                    <ArrowRight size={13} aria-hidden="true" />
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="roadmap-community-board">
+            {deliveryStatuses.map((columnStatus) => {
+              const ideas = visibleIdeas.filter(
+                (idea) => idea.status === columnStatus,
+              );
+              return (
+                <section
+                  className="roadmap-community-column"
+                  key={columnStatus}
+                >
+                  <header>
+                    <span>{columnStatus}</span>
+                    <em>{ideas.length}</em>
+                  </header>
+                  <p>
+                    {
+                      {
+                        Open: "Ideas ready for your vote.",
+                        Planned: "Accepted into the journey.",
+                        "In progress": "Being shaped right now.",
+                        Shipped: "Delivered in the preview.",
+                      }[columnStatus]
+                    }
+                  </p>
+                  <div>
+                    {ideas.map((idea) => {
+                      const hasVoted = votedIdeas.has(idea.id);
+                      return (
+                        <article
+                          className="roadmap-community-card"
+                          key={idea.id}
+                        >
+                          <button
+                            className={`community-vote${hasVoted ? " active" : ""}`}
+                            onClick={() => toggleIdeaVote(idea.id)}
+                            aria-pressed={hasVoted}
+                            aria-label={`${hasVoted ? "Remove vote from" : "Vote for"} ${idea.title}`}
+                          >
+                            <ArrowUp size={14} />
+                            <strong>{idea.votes + (hasVoted ? 1 : 0)}</strong>
+                          </button>
+                          <div>
+                            <span className="roadmap-community-topline">
+                              <small>{idea.status}</small>
+                              <em>{idea.theme}</em>
+                            </span>
+                            <strong>{idea.title}</strong>
+                            <span>{idea.body}</span>
+                            <button
+                              className="community-comment-action"
+                              onClick={(event) => {
+                                setActive({
+                                  year: "Community preview",
+                                  status: idea.status,
+                                  theme: idea.theme,
+                                  title: idea.title,
+                                  body: `${idea.body} Commenting remains a local frontend preview; no information is transmitted or stored.`,
+                                });
+                                event.currentTarget.dataset.dialogTrigger =
+                                  "true";
+                              }}
+                            >
+                              <ChatCircleText size={15} />
+                              {idea.comments}{" "}
+                              {idea.comments === 1 ? "comment" : "comments"}
+                            </button>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+          <PreviewNote>
+            Votes update only in this browser session. Comments and suggestions
+            are demonstration content; nothing is sent or stored.
+          </PreviewNote>
+        </div>
+      </section>
+      <section
         className="page-section paper-section roadmap-idea-section"
         id="submit-idea"
       >
         <div className="wrap idea-layout">
           <div>
-            <Eyebrow number="02">Shape what comes next</Eyebrow>
-            <h2>Bring the problem into view.</h2>
+            <Eyebrow number="03">Contact us</Eyebrow>
+            <h2>Put the useful question on the map.</h2>
             <p>
-              Tell us what would make the experience or the work behind it
-              clearer, safer, or more useful. This interaction demonstrates the
-              future participation journey.
+              Share the need, the people it affects, and what a better outcome
+              would change. We can connect it to the right service, product, or
+              roadmap conversation.
             </p>
             <NumberedSteps
               items={[
                 {
                   title: "Tell us the need",
-                  body: "Start with the problem, the people it affects, and why it matters.",
+                  body: "Start with the problem and the people it affects.",
                 },
                 {
                   title: "We connect the context",
-                  body: "A future connected service would categorize the idea and relate it to the wider roadmap.",
+                  body: "We relate the question to the right discipline and current direction.",
                 },
                 {
-                  title: "The best next step becomes visible",
-                  body: "Approved ideas can move into the roadmap with a clear owner and stage.",
+                  title: "The next step becomes visible",
+                  body: "A useful idea can become a project, a planned improvement, or a future conversation.",
                 },
               ]}
             />
@@ -2895,7 +3143,7 @@ function RoadmapPage({ navigate, path }) {
             onSubmit={(event) => event.preventDefault()}
           >
             <PreviewNote>
-              No idea is transmitted in this frontend preview.
+              No message is transmitted in this frontend preview.
             </PreviewNote>
             <label>
               Your name
@@ -2910,79 +3158,36 @@ function RoadmapPage({ navigate, path }) {
               />
             </label>
             <label>
-              Idea category
+              What should we discuss?
               <select defaultValue="">
                 <option value="" disabled>
-                  Choose a category
+                  Choose a starting point
                 </option>
-                <option>Platform</option>
-                <option>Services</option>
-                <option>Hosting</option>
-                <option>Accessibility</option>
+                <option>A new project</option>
+                <option>A product idea</option>
+                <option>A service improvement</option>
+                <option>Hosting and support</option>
               </select>
             </label>
             <label>
-              Describe the idea
-              <textarea rows="5" placeholder="What problem would this solve?" />
+              Message
+              <textarea rows="5" placeholder="What needs to work better?" />
             </label>
             <Action
               type="button"
               onClick={() =>
                 setActive({
-                  year: "Preview",
+                  year: "Contact preview",
                   status: "Open",
-                  theme: "Submitted idea",
-                  title: "Your idea preview is ready",
-                  body: "No information was sent. This demonstrates the confirmation state for a future connected roadmap.",
+                  theme: "New conversation",
+                  title: "Your contact preview is ready",
+                  body: "No information was sent. This demonstrates the confirmation state for a future connected contact journey.",
                 })
               }
             >
-              Preview submission
+              Preview message
             </Action>
           </form>
-        </div>
-      </section>
-      <section className="page-section deep-section roadmap-community-section">
-        <div className="wrap">
-          <SectionIntro
-            number="03"
-            eyebrow="Shaped by useful questions"
-            title="A community roadmap for what deserves attention next."
-            body="These sample ideas show how client and partner input could be organized. Voting, comments, and submission are frontend previews only."
-            inverse
-          />
-          <div className="roadmap-community-grid">
-            {communityIdeas.map((idea, index) => (
-              <button
-                className="roadmap-community-card"
-                key={idea.title}
-                onClick={(event) => {
-                  setActive({
-                    year: "Community preview",
-                    status: "Open",
-                    theme: idea.theme,
-                    title: idea.title,
-                    body: `${idea.body} No vote, comment, or submission is recorded in this frontend preview.`,
-                  });
-                  event.currentTarget.dataset.dialogTrigger = "true";
-                }}
-              >
-                <span className="roadmap-community-topline">
-                  <small>{String(index + 1).padStart(2, "0")}</small>
-                  <em>{idea.theme}</em>
-                </span>
-                <strong>{idea.title}</strong>
-                <span>{idea.body}</span>
-                <span className="roadmap-community-action">
-                  Open idea preview <ArrowRight size={16} />
-                </span>
-              </button>
-            ))}
-          </div>
-          <PreviewNote>
-            Community ideas, votes, and comments are demonstration content. No
-            participation data is sent or stored.
-          </PreviewNote>
         </div>
       </section>
       <PageCTA

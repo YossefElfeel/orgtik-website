@@ -1,5 +1,15 @@
 # OrgTik cinematic website design QA
 
+## SaaS product-detail stories, demos and plans — 2026-09-22
+
+All six `/platform/:product` routes now share a product-specific detail system. “Built for the everyday work” adds three compact cinematic capability stories and a direct demo action. The workflow area follows the homepage’s stage-selector pattern: three practical usage scenarios switch an adjacent screenshot-style product preview on hover, keyboard focus, or tap; the active preview shows the relevant feature, example workflow state, and “How to use it” explanation. The supplied asset library does not contain approved product screenshots, so these visuals remain explicitly labelled interactive frontend previews.
+
+Each product now has Essential, Team, and Scale plan cards calculated from that product’s configurable frontend base price, followed by three testimonial placeholders written for that product’s workflows. The related-product section replaces plain editorial rows with two homepage-aligned image cards, contextual cursors, and product pairings chosen for operational relevance.
+
+Production build and responsive browser verification passed at 1280 px desktop and a 439 px mobile-width in-app-browser viewport. The Files route contains three highlights, three demo scenarios, three Files plans, three Files testimonial placeholders, and two related product cards with no horizontal overflow. Selecting “Find the current file” updates both the selected tab and the adjacent product preview. Shared-template checks covered HR, CRM, Files, Tasks, Marketing, and Website Manager; a clean desktop session reported no browser errors.
+
+final result: passed for the frontend prototype; approved product captures, client names, and testimonial quotes remain content dependencies
+
 ## Inline SaaS configurator and bundle hierarchy — 2026-09-22
 
 The product configuration and “What happens next” sections now live directly on `/platform`, so the SaaS story no longer sends visitors to a separate builder before they can understand bundle scope, duration, and price. The section label is “Choose how to start,” followed by the live product and duration configuration, the three-step explanation, testimonials, and the closing action. Existing `/pricing` deep links redirect to the equivalent `/platform?...#plan-builder` state; `/pricing/plans` remains the dedicated three-plan comparison.

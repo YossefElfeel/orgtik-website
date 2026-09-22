@@ -1184,22 +1184,198 @@ function PlatformPage({ navigate, path, search }) {
   );
 }
 
-function ModulePage({ module, navigate, path }) {
-  const related = modules.filter((item) => item.id !== module.id).slice(0, 3);
-  const workflow = [
+function ProductDemo({ module }) {
+  const [activeUseCase, setActiveUseCase] = useState(0);
+  const ActiveIcon = module.icon;
+  const active = module.useCases[activeUseCase];
+
+  return (
+    <div className="product-demo">
+      <div
+        className="product-demo-nav"
+        role="tablist"
+        aria-label={`${module.formal} demo scenarios`}
+      >
+        {module.useCases.map((useCase, index) => (
+          <button
+            type="button"
+            role="tab"
+            id={`${module.id}-demo-tab-${index}`}
+            aria-controls={`${module.id}-demo-panel`}
+            aria-selected={activeUseCase === index}
+            tabIndex={activeUseCase === index ? 0 : -1}
+            key={useCase.title}
+            onClick={() => setActiveUseCase(index)}
+            onMouseEnter={() => setActiveUseCase(index)}
+            onFocus={() => setActiveUseCase(index)}
+            onKeyDown={(event) => {
+              if (
+                !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)
+              )
+                return;
+              event.preventDefault();
+              const next =
+                event.key === "Home"
+                  ? 0
+                  : event.key === "End"
+                    ? module.useCases.length - 1
+                    : (activeUseCase +
+                        (event.key === "ArrowRight" ? 1 : -1) +
+                        module.useCases.length) %
+                      module.useCases.length;
+              setActiveUseCase(next);
+              requestAnimationFrame(() =>
+                document
+                  .getElementById(`${module.id}-demo-tab-${next}`)
+                  ?.focus(),
+              );
+            }}
+          >
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            {useCase.title}
+          </button>
+        ))}
+      </div>
+      <div
+        className="product-demo-stage"
+        id={`${module.id}-demo-panel`}
+        role="tabpanel"
+        aria-labelledby={`${module.id}-demo-tab-${activeUseCase}`}
+      >
+        <div className="product-demo-status">
+          <span>
+            <i /> Live prototype
+          </span>
+          <span>
+            {module.formal} · Scenario {activeUseCase + 1}
+          </span>
+        </div>
+        <div className="product-screen" key={`${module.id}-${activeUseCase}`}>
+          <div className="product-screen-chrome" aria-hidden="true">
+            <span>
+              <i />
+              <i />
+              <i />
+            </span>
+            <strong>OrgTik / {module.formal}</strong>
+            <em>Preview</em>
+          </div>
+          <div className="product-screen-body">
+            <aside aria-label={`${module.formal} preview navigation`}>
+              <span className="product-screen-logo">
+                <ActiveIcon size={22} weight="light" />
+              </span>
+              {module.tasks.map((task, index) => (
+                <span
+                  className={index === activeUseCase ? "active" : ""}
+                  key={task}
+                >
+                  <i /> {task}
+                </span>
+              ))}
+            </aside>
+            <div className="product-screen-main">
+              <div className="product-screen-heading">
+                <span>
+                  <small>Example {activeUseCase + 1}</small>
+                  <strong>{active.title}</strong>
+                </span>
+                <span className="product-screen-new" aria-hidden="true">
+                  New item <Plus size={14} />
+                </span>
+              </div>
+              <div className="product-screen-metrics" aria-hidden="true">
+                <span>
+                  <small>Ready</small>
+                  <strong>{8 + activeUseCase * 3}</strong>
+                </span>
+                <span>
+                  <small>In progress</small>
+                  <strong>{4 + activeUseCase}</strong>
+                </span>
+                <span>
+                  <small>Completed</small>
+                  <strong>{18 + activeUseCase * 7}</strong>
+                </span>
+              </div>
+              <div className="product-screen-list" aria-hidden="true">
+                {module.highlights.map((highlight, index) => (
+                  <span
+                    className={index === activeUseCase ? "active" : ""}
+                    key={highlight.title}
+                  >
+                    <i>{String(index + 1).padStart(2, "0")}</i>
+                    <strong>{highlight.title}</strong>
+                    <em>{index === activeUseCase ? "Active" : "Ready"}</em>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <aside className="product-screen-detail">
+              <small>How to use it</small>
+              <strong>{active.title}</strong>
+              <p>{active.body}</p>
+              <div>
+                <span>Feature</span>
+                <b>{module.highlights[activeUseCase].title}</b>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getModulePlans(module) {
+  return [
     {
-      title: "Bring the context in",
-      body: `Organize the information ${module.formal} needs around a clear team structure.`,
+      id: "essential",
+      name: `${module.formal} Essential`,
+      eyebrow: "Start focused",
+      price: module.monthlyPrice,
+      body: `A clear ${module.formal} foundation for a small team and its everyday work.`,
+      features: [module.tasks[0], module.tasks[1], "Core setup guidance"],
     },
     {
-      title: "Move the work forward",
-      body: `Use a focused view of ${module.tasks[0].toLowerCase()}, ownership, and the next useful action.`,
+      id: "team",
+      name: `${module.formal} Team`,
+      eyebrow: "Most adaptable",
+      price: Math.round(module.monthlyPrice * 1.55),
+      body: `Shared ${module.formal} workflows for a growing team that needs more coordination.`,
+      features: [...module.tasks, "Shared workflow setup", "Priority support"],
+      featured: true,
     },
     {
-      title: "Keep the picture visible",
-      body: "Review progress and connect the outcome to the modules that need it next.",
+      id: "scale",
+      name: `${module.formal} Scale`,
+      eyebrow: "Connect the work",
+      price: Math.round(module.monthlyPrice * 2.3),
+      body: `More control, guidance, and connection for ${module.formal} across the wider business.`,
+      features: [
+        ...module.tasks.slice(0, 2),
+        "Advanced roles & governance",
+        "Cross-product connection planning",
+        "Ongoing optimization review",
+      ],
     },
   ];
+}
+
+const moduleConnections = {
+  hr: ["tasks", "files"],
+  crm: ["marketing", "website"],
+  files: ["tasks", "hr"],
+  tasks: ["files", "hr"],
+  marketing: ["crm", "website"],
+  website: ["marketing", "crm"],
+};
+
+function ModulePage({ module, navigate, path }) {
+  const related = moduleConnections[module.id].map((id) =>
+    modules.find((item) => item.id === id),
+  );
+  const plans = getModulePlans(module);
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -1214,7 +1390,7 @@ function ModulePage({ module, navigate, path }) {
           label: "Add to a custom plan",
           href: `/platform?module=${module.id}&mode=custom#plan-builder`,
         }}
-        image="brand-tablet.webp"
+        image={module.image}
       >
         <Breadcrumbs
           items={[
@@ -1224,54 +1400,155 @@ function ModulePage({ module, navigate, path }) {
         />
       </PageHero>
       <section className="page-section paper-section" id="page-content">
-        <div className="wrap outcome-grid">
-          <div>
-            <Eyebrow number="01">Built for the everyday work</Eyebrow>
-            <h2>{module.short}</h2>
+        <div className="wrap product-outcome">
+          <div className="outcome-grid">
+            <div>
+              <Eyebrow number="01">Built for the everyday work</Eyebrow>
+              <h2>{module.short}</h2>
+              <Action href="#product-demo" className="product-demo-action">
+                View {module.formal} demo
+              </Action>
+            </div>
+            <div>
+              <p className="lead-copy">{module.description}</p>
+              <FeatureList items={module.tasks} />
+            </div>
           </div>
-          <div>
-            <p className="lead-copy">{module.description}</p>
-            <FeatureList items={module.tasks} />
+          <div className="product-highlight-grid" data-reveal="stagger">
+            {module.highlights.map((highlight, index) => (
+              <article key={highlight.title}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <div className="product-highlight-icon" aria-hidden="true">
+                  {index === 0 ? (
+                    <Lightning size={23} />
+                  ) : index === 1 ? (
+                    <CirclesThreePlus size={23} />
+                  ) : (
+                    <Sparkle size={23} />
+                  )}
+                </div>
+                <h3>{highlight.title}</h3>
+                <p>{highlight.body}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
-      <section className="page-section deep-section">
-        <div className="wrap media-story-grid">
-          <BrandMedia
-            image="brand-tablet.webp"
-            alt="OrgTik platform concept shown on a tablet"
-            label="Platform concept · Not a production dashboard"
-            tall
-          />
-          <div className="media-story-copy">
-            <Eyebrow number="02">Example workflow</Eyebrow>
-            <h2>Three steps. One clearer path.</h2>
-            <NumberedSteps items={workflow} />
+      <section className="page-section deep-section" id="product-demo">
+        <div className="wrap product-demo-layout">
+          <div className="product-demo-intro">
+            <Eyebrow number="02">Ways to use {module.formal}</Eyebrow>
+            <h2>See the work move, one scenario at a time.</h2>
+            <p>
+              Choose a common {module.formal} moment to preview how context,
+              ownership, and the next action stay connected.
+            </p>
             <PreviewNote>
-              Interface visuals are brand concepts until approved product
-              captures are supplied.
+              Interactive frontend demo · Interface and workflow details remain
+              prototype content until product captures are approved.
             </PreviewNote>
           </div>
+          <ProductDemo module={module} />
         </div>
       </section>
-      <section className="page-section paper-section">
+      <section
+        className="page-section paper-section product-plans-section"
+        id="product-plans"
+      >
         <div className="wrap">
           <SectionIntro
             number="03"
+            eyebrow={`${module.formal} plans`}
+            title={`Choose how ${module.formal} should start.`}
+            body={`Compare three ${module.formal}-specific starting levels. Prices are frontend prototype estimates and update to the full workspace builder when you continue.`}
+          />
+          <div className="product-plan-grid" data-reveal="stagger">
+            {plans.map((plan, index) => (
+              <article
+                className={plan.featured ? "featured" : ""}
+                key={plan.id}
+              >
+                <div className="product-plan-topline">
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <small>{plan.eyebrow}</small>
+                </div>
+                <h3>{plan.name}</h3>
+                <p>{plan.body}</p>
+                <div className="product-plan-price">
+                  <small>Prototype from</small>
+                  <strong>{formatCHF(plan.price)}</strong>
+                  <span>/ month</span>
+                </div>
+                <FeatureList items={plan.features} />
+                <Action
+                  href={`/platform?module=${module.id}&mode=single&duration=annual#plan-builder`}
+                  tone={plan.featured ? "light" : undefined}
+                >
+                  Configure {plan.name}
+                </Action>
+              </article>
+            ))}
+          </div>
+          <PreviewNote>
+            Prototype pricing only · No checkout, payment, or live subscription
+            is connected.
+          </PreviewNote>
+        </div>
+      </section>
+      <Testimonials
+        items={module.testimonials}
+        heading={`What ${module.formal} could`}
+        accent="change."
+        intro={
+          <>
+            Product-specific testimonial preview.
+            <br />
+            Approved client stories will appear here.
+          </>
+        }
+        id={`${module.id}-testimonials`}
+      />
+      <section
+        className="page-section paper-section related-section"
+        id="related-products"
+      >
+        <div className="wrap">
+          <SectionIntro
+            number="04"
             eyebrow="Works better together"
             title="Connect the modules around the work."
             body="Choose only the systems the team needs now, then explore the adjacent parts of the workspace."
           />
-          <div className="related-links">
-            {related.map((item) => (
-              <EditorialLink
-                key={item.id}
-                href={`/platform/${item.id}`}
-                eyebrow={item.category}
-                title={item.formal}
-                body={item.short}
-              />
-            ))}
+          <div className="module-card-grid cinematic-card-grid related-product-grid">
+            {related.map((item) => {
+              const RelatedIcon = item.icon;
+              return (
+                <CursorTarget
+                  as="a"
+                  label={`Explore ${item.formal}`}
+                  className="module-card"
+                  href={`/platform/${item.id}`}
+                  key={item.id}
+                >
+                  <span className="module-card-media" aria-hidden="true">
+                    <img src={`/assets/${item.image}`} alt="" loading="lazy" />
+                    <span className="module-card-icon">
+                      <RelatedIcon size={23} weight="fill" />
+                    </span>
+                  </span>
+                  <span className="module-card-copy">
+                    <small>
+                      {item.category} · Works with {module.formal}
+                    </small>
+                    <h3>{item.formal}</h3>
+                    <p>{item.description}</p>
+                    <span className="module-card-action">
+                      Explore product <ArrowRight size={17} />
+                    </span>
+                  </span>
+                </CursorTarget>
+              );
+            })}
           </div>
         </div>
       </section>

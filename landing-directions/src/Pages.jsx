@@ -4,17 +4,22 @@ import {
   Broadcast,
   CheckCircle,
   CirclesThreePlus,
+  Code,
   Copy,
   Eye,
   EyeSlash,
+  HardDrives,
+  Lifebuoy,
   Lightning,
   MagnifyingGlass,
+  Megaphone,
   Minus,
+  Palette,
   Plus,
   Sparkle,
   X,
 } from "@phosphor-icons/react";
-import { Action, Eyebrow, Logo } from "./shared";
+import { Action, Eyebrow, Logo, Process } from "./shared";
 import { CursorTarget, Testimonials } from "./Experience";
 import { modules } from "./content";
 import {
@@ -56,6 +61,34 @@ const processSteps = [
   {
     title: "Evolve",
     body: "Learn from the work, improve the system, and keep the next decision connected.",
+  },
+];
+
+const serviceTestimonialPreviews = [
+  {
+    focus: "Marketing · Campaign direction",
+    quote:
+      "A future client story about turning scattered activity into one campaign direction the team could follow.",
+  },
+  {
+    focus: "IT support · Continuity",
+    quote:
+      "A future client perspective on having a responsive partner who already understood the systems behind the work.",
+  },
+  {
+    focus: "Development · Delivery",
+    quote:
+      "A future client story about moving from a complex idea to a clear, dependable digital product.",
+  },
+  {
+    focus: "Design · Identity",
+    quote:
+      "A future client perspective on building a visual system that made the next decision easier.",
+  },
+  {
+    focus: "Hosting · Ongoing care",
+    quote:
+      "A future client story about connecting hosting, maintenance, and support around one accountable relationship.",
   },
 ];
 
@@ -251,6 +284,14 @@ const matchService = (family, slug) =>
   family?.children.find((service) => service.slug === slug);
 const matchModule = (slug) => modules.find((module) => module.id === slug);
 
+const serviceFamilyIcons = {
+  marketing: Megaphone,
+  "it-support": Lifebuoy,
+  development: Code,
+  design: Palette,
+  hosting: HardDrives,
+};
+
 function ServicesOverview({ navigate, path }) {
   return (
     <SiteLayout navigate={navigate} path={path}>
@@ -267,37 +308,81 @@ function ServicesOverview({ navigate, path }) {
         video
       />
       <section className="page-section paper-section" id="page-content">
-        <div className="wrap">
+        <div className="wrap" id="service-families">
           <SectionIntro
             number="01"
             eyebrow="Where should we begin?"
             title="Five paths. One connected team."
             body="Start with the problem in front of you. Each pathway can stand alone or connect to the others as the work grows."
           />
-          <div className="service-family-list" id="service-families">
-            {serviceFamilies.map((family, index) => (
-              <EditorialLink
-                key={family.slug}
-                href={`/services/${family.slug}`}
-                eyebrow={`${String(index + 1).padStart(2, "0")} · ${family.kicker}`}
-                title={family.name}
-                body={family.intro}
-                meta={`${family.children.length} ${family.children.length === 1 ? "specialist service" : "specialist services"}`}
-                image={family.image}
-              />
-            ))}
+          <div className="module-card-grid cinematic-card-grid service-overview-grid">
+            {serviceFamilies.map((family, index) => {
+              const FamilyIcon = serviceFamilyIcons[family.slug];
+              return (
+                <CursorTarget
+                  as="a"
+                  label={`Explore ${family.name}`}
+                  className="module-card service-overview-card"
+                  href={`/services/${family.slug}`}
+                  key={family.slug}
+                >
+                  <span className="module-card-media" aria-hidden="true">
+                    <img
+                      src={`/assets/${family.image}`}
+                      alt=""
+                      loading={index > 1 ? "lazy" : "eager"}
+                    />
+                    <span className="module-card-icon">
+                      <FamilyIcon size={23} weight="fill" />
+                    </span>
+                  </span>
+                  <span className="module-card-copy">
+                    <small>
+                      {String(index + 1).padStart(2, "0")} · {family.kicker}
+                    </small>
+                    <h3>{family.name}</h3>
+                    <p>{family.intro}</p>
+                    <span className="module-card-action">
+                      Explore services <ArrowRight size={17} />
+                    </span>
+                  </span>
+                </CursorTarget>
+              );
+            })}
           </div>
         </div>
       </section>
-      <section className="page-section deep-section">
-        <div className="wrap split-story">
-          <div>
+      <section className="page-section deep-section services-process-section">
+        <div className="wrap">
+          <div className="process-heading" data-reveal="stagger">
             <Eyebrow number="02">One engagement, clearly shaped</Eyebrow>
-            <h2>Use the expertise you need. Keep the direction connected.</h2>
+            <h2>
+              One engagement.
+              <br />
+              <span>Clearly shaped.</span>
+            </h2>
+            <p>
+              Understand the need. Design the direction.
+              <br />
+              Deliver the work. Keep it evolving.
+            </p>
           </div>
-          <NumberedSteps items={processSteps} />
+          <Process />
         </div>
       </section>
+      <Testimonials
+        items={serviceTestimonialPreviews}
+        heading="What the right expertise"
+        accent="could change."
+        intro={
+          <>
+            Service testimonial preview.
+            <br />
+            Approved client stories will appear here.
+          </>
+        }
+        id="service-testimonials"
+      />
       <PageCTA
         title="Not sure which service fits?"
         body="Bring us the business problem. We’ll help shape the right starting point without forcing the work into a predefined package."
@@ -340,7 +425,9 @@ function ServiceFamilyPage({ family, navigate, path }) {
           />
           <div className="family-card-grid" id="family-services">
             {family.children.map((service, index) => (
-              <a
+              <CursorTarget
+                as="a"
+                label={`Explore ${service.name}`}
                 className="family-card"
                 href={`/services/${family.slug}/${service.slug}`}
                 key={service.slug}
@@ -358,7 +445,7 @@ function ServiceFamilyPage({ family, navigate, path }) {
                     Explore the service <ArrowRight size={18} />
                   </span>
                 </span>
-              </a>
+              </CursorTarget>
             ))}
           </div>
         </div>

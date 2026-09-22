@@ -1,5 +1,15 @@
 # OrgTik cinematic website design QA
 
+## Services overview cards, process and testimonials — 2026-09-22
+
+The `/services` overview now uses the same image-led cinematic card system as SaaS: five supplied-asset cards, family-specific Phosphor icons, visible action rows, restrained hover motion, and contextual “Explore” cursors on mouse/fine-pointer devices. Four cards form two balanced rows and the fifth OrgTik Hosting card spans the grid as a deliberate final pathway. Service-family child cards also receive contextual cursors without changing their routes.
+
+“One engagement, clearly shaped” now reuses the homepage’s accessible Process selector. Understand, Design, Deliver, and Evolve switch the adjacent supplied image and supporting narrative on hover, focus, keyboard arrows, or tap. A five-story Services testimonial carousel follows, with every quote and identity explicitly labelled as placeholder content.
+
+Browser verification covered `/services` at 1280 px desktop and 439 px mobile width. Five service cards, five contextual cursors, four process tabs, and five testimonials are present; selecting Design updates the narrative to “Make the way forward clear.” Cards stack to one 384 px column at mobile, and neither viewport has horizontal overflow. The production build and formatting check pass.
+
+final result: passed for the frontend prototype; approved client quotes remain a content dependency
+
 ## SaaS product-detail stories, demos and plans — 2026-09-22
 
 All six `/platform/:product` routes now share a product-specific detail system. “Built for the everyday work” adds three compact cinematic capability stories and a direct demo action. The workflow area follows the homepage’s stage-selector pattern: three practical usage scenarios switch an adjacent screenshot-style product preview on hover, keyboard focus, or tap; the active preview shows the relevant feature, example workflow state, and “How to use it” explanation. The supplied asset library does not contain approved product screenshots, so these visuals remain explicitly labelled interactive frontend previews.

@@ -7126,6 +7126,29 @@ svg {
 .related-product-grid .module-card {
   min-height: 420px;
 }
+.service-overview-grid .module-card:last-child {
+  grid-column: 1 / -1;
+  min-height: 410px;
+}
+.service-overview-grid .module-card:last-child .module-card-copy {
+  max-width: 760px;
+}
+.services-process-section .process-heading {
+  max-width: 820px;
+}
+.services-process-section .process-heading .eyebrow {
+  margin-bottom: 24px;
+  color: #c7b5d4;
+}
+.family-card .context-cursor {
+  z-index: 7;
+}
+.family-card .context-cursor > span {
+  background: #eee3f7;
+  color: #28123b;
+  border-color: #fff;
+  box-shadow: 0 12px 36px #0904114d;
+}
 
 @keyframes product-screen-enter {
   from {
@@ -7284,6 +7307,13 @@ svg {
   }
   .related-product-section {
     padding-top: 68px;
+  }
+  .service-overview-grid .module-card:last-child {
+    grid-column: 1;
+    min-height: 390px;
+  }
+  .services-process-section .process-heading .eyebrow {
+    margin-bottom: 20px;
   }
 }
 

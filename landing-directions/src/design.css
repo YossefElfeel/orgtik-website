@@ -6928,6 +6928,138 @@ svg {
 }
 
 /* Product detail system: compact highlights, interactive use cases and product plans. */
+.service-family-services,
+.service-family-story,
+.service-approach-section,
+.service-detail-outcome-section,
+.service-detail-plans {
+  padding-block: 96px;
+}
+.service-family-services .page-section-intro,
+.service-approach-section .page-section-intro,
+.service-detail-plans .page-section-intro {
+  margin-bottom: 44px;
+}
+.family-card-bento {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: minmax(242px, auto);
+  gap: 16px;
+}
+.family-card-bento .family-card {
+  min-height: 242px;
+  height: 100%;
+}
+.family-card-bento-3 .family-card:first-child {
+  grid-column: span 7;
+  grid-row: span 2;
+  min-height: 500px;
+}
+.family-card-bento-3 .family-card:nth-child(2),
+.family-card-bento-3 .family-card:nth-child(3) {
+  grid-column: span 5;
+}
+.family-card-bento-2 .family-card:first-child {
+  grid-column: span 7;
+  min-height: 460px;
+}
+.family-card-bento-2 .family-card:nth-child(2) {
+  grid-column: span 5;
+  min-height: 460px;
+}
+.family-card-bento-1 .family-card {
+  grid-column: 1 / -1;
+  min-height: 420px;
+}
+.family-card-bento .family-card-copy {
+  min-height: 100%;
+}
+.family-card-bento-3 .family-card:first-child h3 {
+  max-width: 12ch;
+  font-size: clamp(36px, 4vw, 54px);
+}
+.family-card-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+}
+.family-card-features > span {
+  padding: 7px 10px;
+  border: 1px solid #ffffff2b;
+  border-radius: 999px;
+  color: #e7daed;
+  background: #ffffff0b;
+  font-size: 9px;
+  font-weight: 650;
+}
+.service-family-story .media-story-grid {
+  gap: 64px;
+}
+.service-family-story .brand-media-tall {
+  min-height: 520px;
+}
+.service-plan-choice {
+  margin-bottom: 18px;
+}
+.service-detail-plans .wrap > .preview-note {
+  margin-bottom: 28px;
+}
+.service-plan-grid .recommendation-card {
+  min-height: 0;
+  padding: 26px;
+}
+.service-plan-grid .recommendation-body {
+  min-height: 66px;
+}
+.service-plan-grid .recommendation-commercial strong {
+  line-height: 1.35;
+}
+.service-detail-outcome .product-highlight-grid {
+  margin-top: 48px;
+}
+@media (max-width: 860px) {
+  .family-card-bento {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+  .family-card-bento-3 .family-card:first-child,
+  .family-card-bento-3 .family-card:nth-child(2),
+  .family-card-bento-3 .family-card:nth-child(3),
+  .family-card-bento-2 .family-card:first-child,
+  .family-card-bento-2 .family-card:nth-child(2),
+  .family-card-bento-1 .family-card {
+    grid-column: 1;
+    grid-row: auto;
+    min-height: 390px;
+  }
+  .family-card-bento-3 .family-card:first-child h3 {
+    max-width: none;
+    font-size: clamp(29px, 7vw, 38px);
+  }
+}
+@media (max-width: 700px) {
+  .service-family-services,
+  .service-family-story,
+  .service-approach-section,
+  .service-detail-outcome-section,
+  .service-detail-plans {
+    padding-block: 76px;
+  }
+  .service-family-services .page-section-intro,
+  .service-approach-section .page-section-intro,
+  .service-detail-plans .page-section-intro {
+    margin-bottom: 36px;
+  }
+  .family-card-features {
+    gap: 6px;
+  }
+  .service-family-story .brand-media-tall {
+    min-height: 390px;
+  }
+  .service-detail-outcome .product-highlight-grid {
+    margin-top: 44px;
+  }
+}
 .product-outcome .outcome-grid {
   align-items: start;
 }

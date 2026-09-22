@@ -1,5 +1,19 @@
 # OrgTik cinematic website design QA
 
+## Unified Work project cards — 2026-09-22
+
+Source visual truth: `https://orgtik-website.vercel.app/work`, captured in the in-app browser before implementation. The live layout separated each rounded image from unframed title, summary, and CTA copy below it, which made the project action feel detached from the visual card.
+
+Implementation evidence: browser-rendered `http://127.0.0.1:4173/work#work-list`, inspected at the default 1265 × 708 viewport and at 390 × 844 CSS px, density 1. The provider displayed the source and implementation captures inline; no persistent screenshot files were produced. Focused comparison covered the project grid because the hero, filter, closing CTA, and footer were outside the requested change.
+
+Each project now uses one clipped dark cinematic frame containing the supplied image, status/category label, title, summary, divider, and CTA row. The desktop asymmetric grid remains intact with a 675 px lead column and 450 px supporting column; mobile stacks five 335 px cards. The unified cards preserve Montserrat hierarchy, use the established plum/lilac tokens, retain the original supplied imagery and copy, and add visible keyboard focus plus restrained hover lift, image scale, and arrow movement.
+
+Comparison history: the initial live capture showed two independent visual regions per project—the image card and loose paper-section copy. The revised desktop and mobile captures show a continuous framed surface with the CTA anchored inside the card. Five cards render, Platform filtering reduces the grid to one card and restoring All returns five, no horizontal overflow appears at either checked width, and browser warning/error logs are empty. No actionable P0/P1/P2 differences remain for the requested layout.
+
+`npm run format:check`, `git diff --check`, and the production build pass.
+
+final result: passed
+
 ## Unfilled selected-item plan frame — 2026-09-22
 
 Source visual truth: `C:/Users/USER/AppData/Local/Temp/codex-clipboard-058eb88b-600b-4815-b3f7-e04c40a9036d.png` (1746 × 325 px) identifies the selected HR product lockup; the user's written direction overrides its lavender fill and requires a light outline with no background fill across all plan sections.

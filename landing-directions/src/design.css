@@ -5777,7 +5777,18 @@ svg {
 }
 .work-card {
   display: grid;
-  gap: 20px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid #ffffff14;
+  border-radius: 20px;
+  color: #fff;
+  background: linear-gradient(145deg, #13091b, #24112f);
+  box-shadow: 0 22px 55px #26113218;
+  transition:
+    transform 360ms var(--ease),
+    border-color 280ms,
+    box-shadow 360ms var(--ease);
 }
 .work-card-lead {
   grid-row: span 2;
@@ -5785,7 +5796,6 @@ svg {
 .work-card-media {
   min-height: 310px;
   overflow: hidden;
-  border-radius: 18px;
   background: var(--plum);
 }
 .work-card-lead .work-card-media {
@@ -5802,24 +5812,55 @@ svg {
 }
 .work-card-copy {
   display: grid;
-  gap: 9px;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 11px;
+  min-height: 230px;
+  padding: 25px 27px 27px;
+  border-top: 1px solid #ffffff12;
+}
+.work-card-copy small {
+  color: #c5add6;
 }
 .work-card-copy strong {
   font-size: clamp(25px, 2.4vw, 37px);
   letter-spacing: -0.045em;
+  line-height: 1.05;
 }
 .work-card-copy > span {
-  color: #746a7d;
+  color: #cbbfd1;
   font-family: Arial, sans-serif;
+  line-height: 1.55;
 }
 .work-card-copy em {
   display: flex;
   align-items: center;
-  gap: 9px;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 9px;
+  padding-top: 17px;
+  border-top: 1px solid #ffffff1a;
+  color: #f2e9f7;
   font-size: 11px;
   font-style: normal;
   font-weight: 650;
-  margin-top: 5px;
+  letter-spacing: 0.01em;
+}
+.work-card-copy em svg {
+  transition: transform 280ms var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .work-card:hover {
+    transform: translateY(-5px);
+    border-color: #b979ed55;
+    box-shadow: 0 28px 70px #26113228;
+  }
+  .work-card:hover .work-card-copy em svg {
+    transform: translateX(5px);
+  }
+}
+.work-card:focus-visible {
+  outline: 2px solid #9458f4;
+  outline-offset: 5px;
 }
 .project-facts {
   display: grid;

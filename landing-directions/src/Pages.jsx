@@ -1103,7 +1103,7 @@ function AboutPage({ navigate, path }) {
           <SectionIntro
             number="01"
             eyebrow="Why OrgTik exists"
-            title="One direction for the business people see—and the work behind it."
+            title="One direction for the business people see – and the work behind it."
             body="Businesses rarely experience brand, technology, and operations as separate problems. We connect them around one useful outcome, then build the system that can carry it forward."
             action={{ label: "View the journey map", href: "#journey-map" }}
           />
@@ -1159,6 +1159,7 @@ function AboutPage({ navigate, path }) {
             eyebrow="Our journey map"
             title="From one useful question to a system that keeps improving."
             body="Our journey is a way of working: understand what matters, connect the right disciplines, deliver something useful, and stay close enough to help it evolve."
+            action={{ label: "Explore the roadmap", href: "/roadmap" }}
             inverse
           />
           <div className="about-journey-map">
@@ -1173,13 +1174,6 @@ function AboutPage({ navigate, path }) {
                 <small>{step.outcome}</small>
               </article>
             ))}
-          </div>
-          <div className="about-journey-end">
-            <p>
-              The path is consistent. The starting point changes with each
-              business.
-            </p>
-            <Action href="/contact">Find your starting point</Action>
           </div>
         </div>
       </section>

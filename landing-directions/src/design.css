@@ -4723,17 +4723,8 @@ svg {
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 28px;
   margin-top: 58px;
-}
-.about-journey-map::before {
-  content: "";
-  position: absolute;
-  top: 43px;
-  right: 8%;
-  left: 8%;
-  height: 1px;
-  background: linear-gradient(90deg, #9d65d6, #c99bf2 52%, #ffffff24);
 }
 .about-journey-map article {
   position: relative;
@@ -4749,6 +4740,23 @@ svg {
     border-color 250ms,
     background 250ms;
 }
+.about-journey-map article:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  z-index: 3;
+  top: 30px;
+  right: -42px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #b67de84a;
+  border-radius: 50%;
+  color: #d2a6f1;
+  background: #160a20;
+  font-size: 13px;
+  box-shadow: 0 0 0 7px #160a20;
+}
 .about-journey-map article:hover {
   transform: translateY(-5px);
   border-color: #bb83ee66;
@@ -4759,7 +4767,7 @@ svg {
   z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 .about-journey-marker span {
   display: grid;
@@ -4773,11 +4781,7 @@ svg {
   font-weight: 700;
 }
 .about-journey-marker i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #b57ce6;
-  box-shadow: 0 0 0 7px #ae70e41a;
+  display: none;
 }
 .about-journey-map h3 {
   margin: 62px 0 13px;
@@ -4800,18 +4804,6 @@ svg {
   font-size: 9px;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-}
-.about-journey-end {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 28px;
-  margin-top: 28px;
-  padding-top: 28px;
-  border-top: 1px solid #ffffff1c;
-}
-.about-journey-end p {
-  color: #c8b9d0;
 }
 .about-capability-grid {
   display: grid;
@@ -8506,7 +8498,7 @@ svg {
   .about-journey-map {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .about-journey-map::before {
+  .about-journey-map article:not(:last-child)::after {
     display: none;
   }
   .about-journey-map article {
@@ -8627,10 +8619,6 @@ svg {
   }
   .about-journey-map h3 {
     margin-top: 38px;
-  }
-  .about-journey-end {
-    align-items: flex-start;
-    flex-direction: column;
   }
   .about-capability-grid {
     margin-top: 38px;

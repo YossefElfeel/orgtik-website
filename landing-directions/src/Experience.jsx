@@ -367,9 +367,22 @@ const testimonialPreviews = [
   },
 ];
 
-export function Testimonials() {
+export function Testimonials({
+  items = testimonialPreviews,
+  heading = "In our clients’",
+  accent = "words.",
+  intro = (
+    <>
+      Testimonial preview.
+      <br />
+      Approved client stories will appear here.
+    </>
+  ),
+  id = "testimonials",
+}) {
   const track = useRef(null);
   const trackId = useId();
+  const headingId = `${trackId}-title`;
   const [range, setRange] = useState({ first: 0, visible: 3 });
   const [autoEligible, setAutoEligible] = useState(false);
   const [keyboardFocused, setKeyboardFocused] = useState(false);
@@ -407,7 +420,7 @@ export function Testimonials() {
       const gap = parseFloat(getComputedStyle(element).columnGap) || 0;
       const step =
         element.firstElementChild.getBoundingClientRect().width + gap;
-      const last = Math.max(0, testimonialPreviews.length - range.visible);
+      const last = Math.max(0, items.length - range.visible);
       const current = Math.round(element.scrollLeft / step);
       element.scrollTo({
         left: (current >= last ? 0 : current + 1) * step,
@@ -415,7 +428,7 @@ export function Testimonials() {
       });
     }, 3000);
     return () => window.clearInterval(timer);
-  }, [autoplay, autoplayRevision, range.visible]);
+  }, [autoplay, autoplayRevision, range.visible, items.length]);
 
   function measure() {
     const element = track.current;
@@ -425,10 +438,7 @@ export function Testimonials() {
     const visible = Math.max(1, Math.round((element.clientWidth + gap) / step));
     const first = Math.max(
       0,
-      Math.min(
-        testimonialPreviews.length - visible,
-        Math.round(element.scrollLeft / step),
-      ),
+      Math.min(items.length - visible, Math.round(element.scrollLeft / step)),
     );
     setRange((previous) =>
       previous.first === first && previous.visible === visible
@@ -441,14 +451,14 @@ export function Testimonials() {
     const observer = new ResizeObserver(measure);
     observer.observe(track.current);
     return () => observer.disconnect();
-  }, []);
+  }, [items.length]);
 
   function navigate(direction) {
     setAutoplayRevision((revision) => revision + 1);
     const element = track.current;
     const gap = parseFloat(getComputedStyle(element).columnGap) || 0;
     const step = element.firstElementChild.getBoundingClientRect().width + gap;
-    const last = testimonialPreviews.length - range.visible;
+    const last = Math.max(0, items.length - range.visible);
     const next =
       direction === "first"
         ? 0
@@ -476,8 +486,8 @@ export function Testimonials() {
   return (
     <section
       className="testimonials-section section-pad"
-      id="testimonials"
-      aria-labelledby="testimonials-title"
+      id={id}
+      aria-labelledby={headingId}
       data-autoplay={autoplay}
       onPointerDownCapture={() => {
         setKeyboardFocused(false);
@@ -494,14 +504,10 @@ export function Testimonials() {
     >
       <div className="wrap">
         <div className="testimonials-heading" data-reveal="stagger">
-          <h2 id="testimonials-title">
-            In our clients’ <span>words.</span>
+          <h2 id={headingId}>
+            {heading} <span>{accent}</span>
           </h2>
-          <p>
-            Testimonial preview.
-            <br />
-            Approved client stories will appear here.
-          </p>
+          <p>{intro}</p>
         </div>
         <ul
           className="testimonial-grid"
@@ -513,7 +519,7 @@ export function Testimonials() {
           onScroll={measure}
           onKeyDown={onKeyDown}
         >
-          {testimonialPreviews.map((testimonial) => (
+          {items.map((testimonial) => (
             <li className="testimonial-card" key={testimonial.focus}>
               <figure>
                 <div className="testimonial-meta">
@@ -547,12 +553,9 @@ export function Testimonials() {
             <span>
               {String(range.first + 1).padStart(2, "0")}
               {range.visible > 1 &&
-                `–${String(Math.min(range.first + range.visible, testimonialPreviews.length)).padStart(2, "0")}`}
+                `–${String(Math.min(range.first + range.visible, items.length)).padStart(2, "0")}`}
             </span>
-            <span>
-              {" "}
-              of {String(testimonialPreviews.length).padStart(2, "0")}
-            </span>
+            <span> of {String(items.length).padStart(2, "0")}</span>
           </p>
           <div
             className="testimonial-arrows"
@@ -574,9 +577,7 @@ export function Testimonials() {
               className="icon-button"
               aria-label="Next testimonials"
               aria-controls={trackId}
-              disabled={
-                range.first + range.visible >= testimonialPreviews.length
-              }
+              disabled={range.first + range.visible >= items.length}
               onClick={() => navigate(1)}
             >
               <ArrowRight size={21} aria-hidden="true" />

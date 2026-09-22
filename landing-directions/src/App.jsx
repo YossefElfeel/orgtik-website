@@ -89,8 +89,8 @@ export function App() {
           onPlan={(module) =>
             navigate(
               typeof module === "string"
-                ? `/pricing?module=${module}&mode=single`
-                : "/pricing",
+                ? `/platform?module=${module}&mode=single#plan-builder`
+                : "/platform#plan-builder",
             )
           }
         />

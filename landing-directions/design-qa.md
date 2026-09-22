@@ -1,5 +1,39 @@
 # OrgTik cinematic website design QA
 
+## SaaS product-detail stories, demos and plans — 2026-09-22
+
+All six `/platform/:product` routes now share a product-specific detail system. “Built for the everyday work” adds three compact cinematic capability stories and a direct demo action. The workflow area follows the homepage’s stage-selector pattern: three practical usage scenarios switch an adjacent screenshot-style product preview on hover, keyboard focus, or tap; the active preview shows the relevant feature, example workflow state, and “How to use it” explanation. The supplied asset library does not contain approved product screenshots, so these visuals remain explicitly labelled interactive frontend previews.
+
+Each product now carries the real section 03 product/bundle configurator and section 04 “What happens next” sequence directly in its detail flow, preselected for that product and the annual duration. This replaces the temporary Essential, Team, and Scale cards, removes a navigation jump back to the SaaS overview, and keeps the product, bundle, duration, saving, estimate, and recommendation handoff in one continuous page. Three testimonial placeholders remain specific to each product’s workflows. The related-product section uses two homepage-aligned image cards, contextual cursors, and product pairings chosen for operational relevance.
+
+Production build and responsive browser verification passed at 1280 px desktop and a 439 px mobile-width in-app-browser viewport. The Website Manager route restores the exact section 03/04 planning flow with Single module and Website Manager already selected. The Files route contains three highlights, three demo scenarios, three Files testimonial placeholders, and two related product cards. Selecting “Find the current file” updates both the selected tab and the adjacent product preview. Shared-template checks covered HR, CRM, Files, Tasks, Marketing, and Website Manager; a clean desktop session reported no browser errors.
+
+The related-product section received its own responsive top inset after the image-card redesign: 112 px desktop, 84 px tablet, and 68 px mobile. This prevents the eyebrow from touching the preceding dark testimonial boundary. A spacing audit across Home, SaaS products, Services, Work, Insights, About, Roadmap, Contact, and the recommendation flow confirmed consistent 112 px routed-section insets at desktop and no horizontal overflow in the checked states.
+
+final result: passed for the frontend prototype; approved product captures, client names, and testimonial quotes remain content dependencies
+
+## Inline SaaS configurator and bundle hierarchy — 2026-09-22
+
+The product configuration and “What happens next” sections now live directly on `/platform`, so the SaaS story no longer sends visitors to a separate builder before they can understand bundle scope, duration, and price. The section label is “Choose how to start,” followed by the live product and duration configuration, the three-step explanation, testimonials, and the closing action. Existing `/pricing` deep links redirect to the equivalent `/platform?...#plan-builder` state; `/pricing/plans` remains the dedicated three-plan comparison.
+
+The bundle selector now uses four aligned starting options plus a full-width Custom workspace row. Each option states its product count and prototype saving: one flexible product, two three-product bundles at 15%, the six-product suite at 25%, and a custom 2–5 product path at 10%. This removes the earlier orphaned fourth card and makes the commercial difference visible before product selection.
+
+Browser verification covered the configurator and relocated next-step section at 1440 × 900, the legacy `/pricing?mode=growth&duration=annual` redirect, and the one-column mobile bundle selector at 390 × 844. URL state, selected mode, five starting paths, and responsive overflow all passed.
+
+final result: passed
+
+## SaaS card density, cursors and testimonials — 2026-09-22
+
+The `/platform` product grid now uses compact 448 px image cards at 1440 px and 390 px cards at 390 px. Copy is bottom-aligned inside a consistent 28 px desktop / 26 px mobile inset, with reduced heading, paragraph, and action spacing so each card hugs its useful content while preserving enough image area to communicate the brand. The grid uses a 16 px gap and no horizontal overflow at either checked viewport.
+
+All six product links reuse the homepage `CursorTarget` interaction with a pale-lavender “Explore [product]” cursor on mouse/fine-pointer devices. Touch, keyboard, and reduced-motion contexts retain the visible link action and normal pointer behavior.
+
+The shared six-item homepage testimonial carousel now appears on the SaaS overview after the product-path comparison. It covers brand, digital experiences, connected systems, development, marketing, and ongoing partnership; every quote and identity remains explicitly labelled as placeholder content. Desktop shows three cards, mobile shows one, and the existing autoplay, arrows, swipe, keyboard controls, pause rules, and reduced-motion behavior are preserved.
+
+Browser verification covered `/platform#modules` and `/platform#testimonials` at 1440 × 900 and 390 × 844. Six product cursors and six testimonial items are present, the mobile carousel uses 100% columns, and neither state introduces horizontal page overflow.
+
+final result: passed
+
 ## SaaS, service and project-system refinement — 2026-09-22
 
 The routed experience now follows the homepage’s cinematic language instead of the previous oversized white card grid. `/platform` uses two-column image-led product stories built from the supplied OrgTik assets; service details use the same dark-gradient anatomy; the “One workspace” section is now an interactive six-product constellation with Phosphor icons, automatic context changes, hover/focus selection, data pulses, and reduced-motion behavior.

@@ -15,6 +15,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { Action, Eyebrow, Logo } from "./shared";
+import { CursorTarget, Testimonials } from "./Experience";
 import { modules } from "./content";
 import {
   insightCategories,
@@ -111,6 +112,14 @@ const durationOptions = [
   { id: "annual", label: "12 months", months: 12, discount: 0.15 },
   { id: "biennial", label: "24 months", months: 24, discount: 0.22 },
 ];
+
+const planModeMeta = {
+  single: "1 product · Maximum flexibility",
+  operations: "3 products · 15% bundle saving",
+  growth: "3 products · 15% bundle saving",
+  complete: "6 products · 25% bundle saving",
+  custom: "Choose 2–5 · 10% bundle saving",
+};
 
 const servicePackages = [
   {
@@ -1084,7 +1093,7 @@ function ContactPage({ navigate, path, search }) {
   );
 }
 
-function PlatformPage({ navigate, path }) {
+function PlatformPage({ navigate, path, search }) {
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -1092,7 +1101,7 @@ function PlatformPage({ navigate, path }) {
         title="One workspace. Six systems."
         accent="Built to work together."
         body="Start with one module and expand when the business is ready. Every step stays connected to the same clearer operating picture."
-        primary={{ label: "Build your plan", href: "/pricing" }}
+        primary={{ label: "Build your plan", href: "#plan-builder" }}
         secondary={{ label: "Explore the modules", href: "#modules" }}
         video
       />
@@ -1108,7 +1117,9 @@ function PlatformPage({ navigate, path }) {
             {modules.map((module, index) => {
               const Icon = module.icon;
               return (
-                <a
+                <CursorTarget
+                  as="a"
+                  label={`Explore ${module.formal}`}
                   className="module-card"
                   href={`/platform/${module.id}`}
                   key={module.id}
@@ -1133,7 +1144,7 @@ function PlatformPage({ navigate, path }) {
                       Explore product <ArrowRight size={17} />
                     </span>
                   </span>
-                </a>
+                </CursorTarget>
               );
             })}
           </div>
@@ -1160,63 +1171,177 @@ function PlatformPage({ navigate, path }) {
           <WorkspaceConstellation />
         </div>
       </section>
-      <section className="page-section paper-section">
-        <div className="wrap">
-          <SectionIntro
-            number="03"
-            eyebrow="Choose how to begin"
-            title="Focused, bundled, or fully connected."
-            body="Compare a single product, a ready-made bundle, or a custom workspace. Prototype prices update with the products and subscription duration you select."
-          />
-          <div className="path-grid">
-            {planOptions.slice(0, 4).map((option) => (
-              <article key={option.id}>
-                <small>
-                  {option.id === "single"
-                    ? "01"
-                    : option.id === "operations"
-                      ? "02"
-                      : option.id === "growth"
-                        ? "03"
-                        : "04"}
-                </small>
-                <h3>{option.name}</h3>
-                <p>{option.note}</p>
-                <a href={`/pricing?mode=${option.id}`}>
-                  Compare this path <ArrowRight size={17} />
-                </a>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SaaSConfigurator path={path} search={search} />
+      <Testimonials />
       <PageCTA
         eyebrow="Your workspace"
         title="Choose what belongs in it."
         body="Build a local configuration, review the modules, and carry the selection into the enquiry preview."
-        href="/pricing"
+        href="#plan-builder"
         label="Build your plan"
       />
     </SiteLayout>
   );
 }
 
-function ModulePage({ module, navigate, path }) {
-  const related = modules.filter((item) => item.id !== module.id).slice(0, 3);
-  const workflow = [
-    {
-      title: "Bring the context in",
-      body: `Organize the information ${module.formal} needs around a clear team structure.`,
-    },
-    {
-      title: "Move the work forward",
-      body: `Use a focused view of ${module.tasks[0].toLowerCase()}, ownership, and the next useful action.`,
-    },
-    {
-      title: "Keep the picture visible",
-      body: "Review progress and connect the outcome to the modules that need it next.",
-    },
-  ];
+function ProductDemo({ module }) {
+  const [activeUseCase, setActiveUseCase] = useState(0);
+  const ActiveIcon = module.icon;
+  const active = module.useCases[activeUseCase];
+
+  return (
+    <div className="product-demo">
+      <div
+        className="product-demo-nav"
+        role="tablist"
+        aria-label={`${module.formal} demo scenarios`}
+      >
+        {module.useCases.map((useCase, index) => (
+          <button
+            type="button"
+            role="tab"
+            id={`${module.id}-demo-tab-${index}`}
+            aria-controls={`${module.id}-demo-panel`}
+            aria-selected={activeUseCase === index}
+            tabIndex={activeUseCase === index ? 0 : -1}
+            key={useCase.title}
+            onClick={() => setActiveUseCase(index)}
+            onMouseEnter={() => setActiveUseCase(index)}
+            onFocus={() => setActiveUseCase(index)}
+            onKeyDown={(event) => {
+              if (
+                !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)
+              )
+                return;
+              event.preventDefault();
+              const next =
+                event.key === "Home"
+                  ? 0
+                  : event.key === "End"
+                    ? module.useCases.length - 1
+                    : (activeUseCase +
+                        (event.key === "ArrowRight" ? 1 : -1) +
+                        module.useCases.length) %
+                      module.useCases.length;
+              setActiveUseCase(next);
+              requestAnimationFrame(() =>
+                document
+                  .getElementById(`${module.id}-demo-tab-${next}`)
+                  ?.focus(),
+              );
+            }}
+          >
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            {useCase.title}
+          </button>
+        ))}
+      </div>
+      <div
+        className="product-demo-stage"
+        id={`${module.id}-demo-panel`}
+        role="tabpanel"
+        aria-labelledby={`${module.id}-demo-tab-${activeUseCase}`}
+      >
+        <div className="product-demo-status">
+          <span>
+            <i /> Live prototype
+          </span>
+          <span>
+            {module.formal} · Scenario {activeUseCase + 1}
+          </span>
+        </div>
+        <div className="product-screen" key={`${module.id}-${activeUseCase}`}>
+          <div className="product-screen-chrome" aria-hidden="true">
+            <span>
+              <i />
+              <i />
+              <i />
+            </span>
+            <strong>OrgTik / {module.formal}</strong>
+            <em>Preview</em>
+          </div>
+          <div className="product-screen-body">
+            <aside aria-label={`${module.formal} preview navigation`}>
+              <span className="product-screen-logo">
+                <ActiveIcon size={22} weight="light" />
+              </span>
+              {module.tasks.map((task, index) => (
+                <span
+                  className={index === activeUseCase ? "active" : ""}
+                  key={task}
+                >
+                  <i /> {task}
+                </span>
+              ))}
+            </aside>
+            <div className="product-screen-main">
+              <div className="product-screen-heading">
+                <span>
+                  <small>Example {activeUseCase + 1}</small>
+                  <strong>{active.title}</strong>
+                </span>
+                <span className="product-screen-new" aria-hidden="true">
+                  New item <Plus size={14} />
+                </span>
+              </div>
+              <div className="product-screen-metrics" aria-hidden="true">
+                <span>
+                  <small>Ready</small>
+                  <strong>{8 + activeUseCase * 3}</strong>
+                </span>
+                <span>
+                  <small>In progress</small>
+                  <strong>{4 + activeUseCase}</strong>
+                </span>
+                <span>
+                  <small>Completed</small>
+                  <strong>{18 + activeUseCase * 7}</strong>
+                </span>
+              </div>
+              <div className="product-screen-list" aria-hidden="true">
+                {module.highlights.map((highlight, index) => (
+                  <span
+                    className={index === activeUseCase ? "active" : ""}
+                    key={highlight.title}
+                  >
+                    <i>{String(index + 1).padStart(2, "0")}</i>
+                    <strong>{highlight.title}</strong>
+                    <em>{index === activeUseCase ? "Active" : "Ready"}</em>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <aside className="product-screen-detail">
+              <small>How to use it</small>
+              <strong>{active.title}</strong>
+              <p>{active.body}</p>
+              <div>
+                <span>Feature</span>
+                <b>{module.highlights[activeUseCase].title}</b>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const moduleConnections = {
+  hr: ["tasks", "files"],
+  crm: ["marketing", "website"],
+  files: ["tasks", "hr"],
+  tasks: ["files", "hr"],
+  marketing: ["crm", "website"],
+  website: ["marketing", "crm"],
+};
+
+function ModulePage({ module, navigate, path, search }) {
+  const related = moduleConnections[module.id].map((id) =>
+    modules.find((item) => item.id === id),
+  );
+  const planSearch =
+    search || `?mode=single&duration=annual&modules=${module.id}`;
   return (
     <SiteLayout navigate={navigate} path={path}>
       <PageHero
@@ -1225,13 +1350,13 @@ function ModulePage({ module, navigate, path }) {
         body={module.description}
         primary={{
           label: "Choose this module",
-          href: `/pricing?module=${module.id}&mode=single`,
+          href: `/platform?module=${module.id}&mode=single#plan-builder`,
         }}
         secondary={{
           label: "Add to a custom plan",
-          href: `/pricing?module=${module.id}&mode=custom`,
+          href: `/platform?module=${module.id}&mode=custom#plan-builder`,
         }}
-        image="brand-tablet.webp"
+        image={module.image}
       >
         <Breadcrumbs
           items={[
@@ -1241,68 +1366,126 @@ function ModulePage({ module, navigate, path }) {
         />
       </PageHero>
       <section className="page-section paper-section" id="page-content">
-        <div className="wrap outcome-grid">
-          <div>
-            <Eyebrow number="01">Built for the everyday work</Eyebrow>
-            <h2>{module.short}</h2>
+        <div className="wrap product-outcome">
+          <div className="outcome-grid">
+            <div>
+              <Eyebrow number="01">Built for the everyday work</Eyebrow>
+              <h2>{module.short}</h2>
+              <Action href="#product-demo" className="product-demo-action">
+                View {module.formal} demo
+              </Action>
+            </div>
+            <div>
+              <p className="lead-copy">{module.description}</p>
+              <FeatureList items={module.tasks} />
+            </div>
           </div>
-          <div>
-            <p className="lead-copy">{module.description}</p>
-            <FeatureList items={module.tasks} />
+          <div className="product-highlight-grid" data-reveal="stagger">
+            {module.highlights.map((highlight, index) => (
+              <article key={highlight.title}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <div className="product-highlight-icon" aria-hidden="true">
+                  {index === 0 ? (
+                    <Lightning size={23} />
+                  ) : index === 1 ? (
+                    <CirclesThreePlus size={23} />
+                  ) : (
+                    <Sparkle size={23} />
+                  )}
+                </div>
+                <h3>{highlight.title}</h3>
+                <p>{highlight.body}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
-      <section className="page-section deep-section">
-        <div className="wrap media-story-grid">
-          <BrandMedia
-            image="brand-tablet.webp"
-            alt="OrgTik platform concept shown on a tablet"
-            label="Platform concept · Not a production dashboard"
-            tall
-          />
-          <div className="media-story-copy">
-            <Eyebrow number="02">Example workflow</Eyebrow>
-            <h2>Three steps. One clearer path.</h2>
-            <NumberedSteps items={workflow} />
+      <section className="page-section deep-section" id="product-demo">
+        <div className="wrap product-demo-layout">
+          <div className="product-demo-intro">
+            <Eyebrow number="02">Ways to use {module.formal}</Eyebrow>
+            <h2>See the work move, one scenario at a time.</h2>
+            <p>
+              Choose a common {module.formal} moment to preview how context,
+              ownership, and the next action stay connected.
+            </p>
             <PreviewNote>
-              Interface visuals are brand concepts until approved product
-              captures are supplied.
+              Interactive frontend demo · Interface and workflow details remain
+              prototype content until product captures are approved.
             </PreviewNote>
           </div>
+          <ProductDemo module={module} />
         </div>
       </section>
-      <section className="page-section paper-section">
+      <SaaSConfigurator path={path} search={planSearch} />
+      <Testimonials
+        items={module.testimonials}
+        heading={`What ${module.formal} could`}
+        accent="change."
+        intro={
+          <>
+            Product-specific testimonial preview.
+            <br />
+            Approved client stories will appear here.
+          </>
+        }
+        id={`${module.id}-testimonials`}
+      />
+      <section
+        className="page-section paper-section related-section related-product-section"
+        id="related-products"
+      >
         <div className="wrap">
           <SectionIntro
-            number="03"
+            number="05"
             eyebrow="Works better together"
             title="Connect the modules around the work."
             body="Choose only the systems the team needs now, then explore the adjacent parts of the workspace."
           />
-          <div className="related-links">
-            {related.map((item) => (
-              <EditorialLink
-                key={item.id}
-                href={`/platform/${item.id}`}
-                eyebrow={item.category}
-                title={item.formal}
-                body={item.short}
-              />
-            ))}
+          <div className="module-card-grid cinematic-card-grid related-product-grid">
+            {related.map((item) => {
+              const RelatedIcon = item.icon;
+              return (
+                <CursorTarget
+                  as="a"
+                  label={`Explore ${item.formal}`}
+                  className="module-card"
+                  href={`/platform/${item.id}`}
+                  key={item.id}
+                >
+                  <span className="module-card-media" aria-hidden="true">
+                    <img src={`/assets/${item.image}`} alt="" loading="lazy" />
+                    <span className="module-card-icon">
+                      <RelatedIcon size={23} weight="fill" />
+                    </span>
+                  </span>
+                  <span className="module-card-copy">
+                    <small>
+                      {item.category} · Works with {module.formal}
+                    </small>
+                    <h3>{item.formal}</h3>
+                    <p>{item.description}</p>
+                    <span className="module-card-action">
+                      Explore product <ArrowRight size={17} />
+                    </span>
+                  </span>
+                </CursorTarget>
+              );
+            })}
           </div>
         </div>
       </section>
       <PageCTA
         title={`Put ${module.formal} in your workspace.`}
         body="Preserve this module in the local plan builder and compare the available starting paths."
-        href={`/pricing?module=${module.id}&mode=single`}
+        href={`/platform?module=${module.id}&mode=single#plan-builder`}
         label="Choose this module"
       />
     </SiteLayout>
   );
 }
 
-function PlansPage({ navigate, path, search }) {
+function SaaSConfigurator({ path, search }) {
   const params = new URLSearchParams(search);
   const initialModule = params.get("module");
   const initialModules = (params.get("modules") || initialModule || "")
@@ -1337,7 +1520,7 @@ function PlansPage({ navigate, path, search }) {
     next.set("mode", mode);
     next.set("duration", duration);
     if (selected.length) next.set("modules", selected.join(","));
-    window.history.replaceState({}, "", `${path}?${next}`);
+    window.history.replaceState({}, "", `${path}?${next}#plan-builder`);
     try {
       sessionStorage.setItem(
         "orgtik-plan-preview",
@@ -1352,23 +1535,14 @@ function PlansPage({ navigate, path, search }) {
     .map((module) => module.formal);
   const price = getWorkspacePrice(selected, mode, duration);
   return (
-    <SiteLayout navigate={navigate} path={path}>
-      <PageHero
-        eyebrow="SaaS products / Plans"
-        title="Build the workspace."
-        accent="See the price change live."
-        body="Choose a single product, a ready-made bundle, or your own combination. Then select the subscription duration that fits."
-        primary={{ label: "Build your plan", href: "#plan-builder" }}
-        secondary={{ label: "Explore modules", href: "/platform" }}
-        image="brand-glass.webp"
-      />
-      <section className="page-section paper-section" id="page-content">
+    <>
+      <section className="page-section paper-section plan-configurator-section">
         <div className="wrap plan-builder" id="plan-builder">
           <SectionIntro
-            number="01"
+            number="03"
             eyebrow="Choose how to start"
-            title="A configuration you can understand before a conversation."
-            body="Products, bundle savings, and duration work together in one clear SaaS journey. Prices are prototype values in CHF until commercial approval."
+            title="Choose the products. See how the bundle changes."
+            body="Start with one product, choose a ready-made bundle, take the complete suite, or shape a custom workspace. Duration and savings update in the same view."
           />
           <div className="plan-mode-grid">
             {planOptions.map((option) => (
@@ -1390,6 +1564,7 @@ function PlansPage({ navigate, path, search }) {
               >
                 <small>{option.name}</small>
                 <span>{option.note}</span>
+                <em>{planModeMeta[option.id]}</em>
               </button>
             ))}
           </div>
@@ -1503,7 +1678,7 @@ function PlansPage({ navigate, path, search }) {
       <section className="page-section deep-section">
         <div className="wrap">
           <SectionIntro
-            number="02"
+            number="04"
             eyebrow="What happens next"
             title="Choose. Review. Discuss."
             body="The frontend makes the product, bundle, duration, and estimate easy to compare before the final commercial conversation."
@@ -1526,14 +1701,15 @@ function PlansPage({ navigate, path, search }) {
           />
         </div>
       </section>
-      <PageCTA
-        title="Need help shaping the workspace?"
-        body="Bring the team’s priorities and current tools. We’ll help identify a focused starting point."
-        href="/contact?intent=platform"
-        label="Talk through the options"
-      />
-    </SiteLayout>
+    </>
   );
+}
+
+function PricingRedirect({ navigate, search }) {
+  useEffect(() => {
+    navigate(`/platform${search || ""}#plan-builder`);
+  }, [navigate, search]);
+  return null;
 }
 
 function PlanOptionsPage({ navigate, path, search }) {
@@ -1557,7 +1733,7 @@ function PlanOptionsPage({ navigate, path, search }) {
     : "annual";
   const workspacePrice = getWorkspacePrice(selectedIds, mode, duration);
   const modulesValue = selectedIds.join(",");
-  const editHref = `/pricing?mode=${mode}&duration=${duration}${modulesValue ? `&modules=${modulesValue}` : ""}`;
+  const editHref = `/platform?mode=${mode}&duration=${duration}${modulesValue ? `&modules=${modulesValue}` : ""}#plan-builder`;
 
   return (
     <SiteLayout navigate={navigate} path={path}>
@@ -1673,7 +1849,11 @@ function PlanOptionsPage({ navigate, path, search }) {
             <EmptyState
               title="No systems selected"
               body="Build a workspace first, then return here to compare the three launch plans."
-              action={<Action href="/pricing">Build your workspace</Action>}
+              action={
+                <Action href="/platform#plan-builder">
+                  Build your workspace
+                </Action>
+              }
             />
           )}
         </div>
@@ -2244,7 +2424,7 @@ function SitemapPage({ navigate, path }) {
       [
         ["Overview", "/platform"],
         ...modules.map((module) => [module.formal, `/platform/${module.id}`]),
-        ["SaaS plan builder", "/pricing"],
+        ["SaaS plan builder", "/platform#plan-builder"],
         ["Sign in", "/sign-in"],
       ],
     ],
@@ -2417,7 +2597,9 @@ function SignInPage({ recovery = false, navigate, path }) {
                 ) : (
                   <a href="/sign-in/recovery">Forgot password?</a>
                 )}
-                <a href="/pricing">Need an account? Choose a plan</a>
+                <a href="/platform#plan-builder">
+                  Need an account? Choose a plan
+                </a>
                 <a href="/contact?intent=support">Contact support</a>
               </div>
             </>
@@ -2481,19 +2663,19 @@ export function RoutePage({ path, search, navigate }) {
       title = family.name;
     }
   } else if (path === "/platform") {
-    page = <PlatformPage {...{ navigate, path }} />;
+    page = <PlatformPage {...{ navigate, path, search }} />;
     title = "Platform";
   } else if (path.startsWith("/platform/")) {
     const module = matchModule(path.split("/")[2]);
     if (module) {
-      page = <ModulePage {...{ module, navigate, path }} />;
+      page = <ModulePage {...{ module, navigate, path, search }} />;
       title = module.formal;
     }
   } else if (path === "/pricing/plans") {
     page = <PlanOptionsPage {...{ navigate, path, search }} />;
     title = "Plan recommendations";
   } else if (path === "/pricing") {
-    page = <PlansPage {...{ navigate, path, search }} />;
+    page = <PricingRedirect {...{ navigate, search }} />;
     title = "Plans";
   } else if (path === "/work") {
     page = <WorkPage {...{ navigate, path, search }} />;

@@ -2444,7 +2444,14 @@ function WorkPage({ navigate, path, search }) {
           <div className="work-editorial-grid">
             {visible.map((project, index) => (
               <a
-                className={`work-card ${index === 0 ? "work-card-lead" : ""}`}
+                className={[
+                  "work-card",
+                  index === 0 ? "work-card-lead" : "",
+                  index === 4 ? "work-card-wide" : "",
+                  visible.length === 1 ? "work-card-solo" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 href={`/work/${project.slug}`}
                 key={project.slug}
               >

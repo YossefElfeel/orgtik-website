@@ -2257,7 +2257,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(30px,4vw,56px)",
+                        fontSize: "var(--section-title-size)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -3044,7 +3044,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(30px,4vw,56px)",
+                        fontSize: "var(--section-title-size)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -3872,7 +3872,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(30px,4vw,56px)",
+                        fontSize: "var(--section-title-size)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -4402,7 +4402,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(30px,4vw,56px)",
+                        fontSize: "var(--section-title-size)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -4838,7 +4838,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(30px,4vw,56px)",
+                        fontSize: "var(--section-title-size)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -5078,7 +5078,7 @@ export default class Home extends ReferencePage {
                   data-hw={""}
                   style={{
                     marginTop: "34px",
-                    fontSize: "clamp(46px,7.6vw,118px)",
+                    fontSize: "var(--section-title-size)",
                     lineHeight: ".95",
                     fontWeight: "500",
                     letterSpacing: "-.05em",
@@ -5289,7 +5289,7 @@ export default class Home extends ReferencePage {
                 <h2
                   style={{
                     maxWidth: "520px",
-                    fontSize: "clamp(32px,3vw,44px)",
+                    fontSize: "var(--section-title-size)",
                     lineHeight: "1.12",
                     letterSpacing: "-.04em",
                     fontWeight: "500",

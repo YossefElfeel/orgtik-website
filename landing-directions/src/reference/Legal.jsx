@@ -1280,7 +1280,7 @@ export default class Legal extends ReferencePage {
                     data-hw={""}
                     style={{
                       marginTop: "24px",
-                      fontSize: "clamp(26px,2.5vw,36px)",
+                      fontSize: "var(--section-title-size)",
                       lineHeight: "1.02",
                       fontWeight: "500",
                       letterSpacing: "-.045em",
@@ -1549,7 +1549,7 @@ export default class Legal extends ReferencePage {
                 <h2
                   style={{
                     maxWidth: "520px",
-                    fontSize: "clamp(32px,3vw,44px)",
+                    fontSize: "var(--section-title-size)",
                     lineHeight: "1.12",
                     letterSpacing: "-.04em",
                     fontWeight: "500",

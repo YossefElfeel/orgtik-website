@@ -105,3 +105,16 @@ final result: passed
 Build and git diff checks passed. This is a layout and interaction review, not a full accessibility certification. Remaining long sections are intentional content-driven exceptions.
 
 final result: passed
+
+## Heading hierarchy — 2026-09-28
+
+- Secondary H2 titles now share a responsive 24–40px scale across page sections, testimonials, related service work, and closing sections. Compact page H1 titles use 34–62px to stay visually dominant.
+- Built successfully with npm run build; git diff --check passed.
+- Browser verification covered 39 routes at 1440px, 768px, and 390px (117 cases). Every visible main-content H2 was smaller than its page H1, with no horizontal overflow or JavaScript errors.
+- Reviewed service-category and project-detail screenshots at desktop and mobile sizes. Measurements: qa/heading-hierarchy.json; screenshots: qa/heading-services-{1440,390}.png and qa/heading-project-{1440,390}.png.
+
+## Two-card related work — 2026-09-28
+
+- Service detail sections show two distinct existing project cards in one row on desktop and a single column on mobile. Each card preserves its own category and project status.
+- Verified all 11 service detail pages at 1440px and 390px (22 route/viewport checks): card count, distinct destinations, column placement, and absence of horizontal overflow.
+- Build and git diff --check passed. Final screenshots: qa/service-work-two-1440.png and qa/service-work-two-390.png.

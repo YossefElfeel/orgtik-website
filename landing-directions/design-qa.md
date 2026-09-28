@@ -47,3 +47,10 @@ Forms, account actions, votes, estimates, and plan choices remain clearly labell
 - Software footer now supplies explicit labels and destinations for all nine navigation links.
 - Verified all 13 primary/detail routes at 1440px and 390px: no horizontal overflow, console warnings, or page errors. Checked hero presence on those routes, project/article details, and returning from service/product details to the mobile overview video.
 - Visually reviewed desktop/mobile sign-in and Software footer captures. Production build passed.
+
+## Tagged testimonials — 2026-09-28
+
+- Added a shared section before each closing CTA: mixed/filterable entries on Home and About, scoped categories on Services and Software overviews, and project-specific entries on all five project details.
+- Content remains explicitly labelled as placeholders awaiting approved feedback; no client endorsements or names were invented.
+- Production build and git diff checks passed. Verified nine routes at 1440px and 390px, category filters, card counts, keyboard Home/End controls, disabled carousel boundaries, no document overflow, and no page errors.
+- Reviewed screenshots: qa/testimonials-1440.png and qa/testimonials-390.png.

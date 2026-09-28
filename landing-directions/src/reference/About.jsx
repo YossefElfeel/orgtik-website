@@ -1,3 +1,4 @@
+import { Testimonials } from "./Testimonials";
 import React from "react";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
@@ -3044,6 +3045,7 @@ export default class About extends ReferencePage {
                 </div>
               </div>
             </section>
+            <Testimonials />
             <section
               id={"closing"}
               ref={v.closingRef}

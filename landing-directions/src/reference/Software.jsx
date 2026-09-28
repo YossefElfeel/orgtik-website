@@ -1,3 +1,4 @@
+import { Testimonials } from "./Testimonials";
 import { ContentHeading } from "./ContentHeading";
 import React from "react";
 import { ReferencePage } from "./ReferencePage";
@@ -6320,6 +6321,7 @@ export default class Software extends ReferencePage {
                 </section>
               </>
             )}
+            {v.isOverview && <Testimonials scope="Software" />}
             <section
               id={"closing"}
               ref={v.closingRef}

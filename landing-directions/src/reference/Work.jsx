@@ -1,3 +1,4 @@
+import { Testimonials } from "./Testimonials";
 import { ContentHeading } from "./ContentHeading";
 import React from "react";
 import { ReferencePage } from "./ReferencePage";
@@ -2776,6 +2777,12 @@ export default class Work extends ReferencePage {
                   </div>
                 </section>
               </>
+            )}
+            {v.isProject && (
+              <Testimonials
+                key={this.state.route.slug}
+                project={this.P.find((p) => p.slug === this.state.route.slug)}
+              />
             )}
             <section
               id={"closing"}

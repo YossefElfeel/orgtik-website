@@ -163,3 +163,60 @@ textarea:focus-visible,
   letter-spacing: -0.04em;
   text-wrap: balance;
 }
+
+.contact-intro {
+  max-width: 1440px;
+  margin: 0 auto clamp(34px, 3.6vw, 52px);
+  padding: 0 clamp(20px, 4.4vw, 64px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px 64px;
+}
+.contact-intro__title {
+  flex: 1 1 560px;
+  min-width: 0;
+}
+.contact-intro__eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #6e6178;
+  margin: 0;
+  line-height: 1.5;
+}
+.contact-intro h1 {
+  font-size: clamp(34px, 4.4vw, 66px);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  margin: 22px 0 0;
+  text-wrap: balance;
+}
+.contact-intro h1 span {
+  display: block;
+  color: #6c3caa;
+}
+.contact-intro__subtitle {
+  flex: 0 1 400px;
+  max-width: 400px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  color: #4a3a57;
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .contact-intro {
+    gap: 24px;
+  }
+  .contact-intro__title {
+    flex-basis: 100%;
+  }
+  .contact-intro__subtitle {
+    flex-basis: 100%;
+    max-width: none;
+  }
+}

@@ -91,3 +91,11 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 ## Tagged testimonials — 2026-09-28
 
 Home and About show a mixed Services/Software testimonial section with category filters and visible category tags. Services and Software overview pages show only their category. Every project detail has project-specific feedback. Use explicitly labelled placeholders until approved quotes and attribution are supplied.
+
+## Restored heroes and testimonial reference — 2026-09-28
+
+Restore full heroes on About and Roadmap in addition to Home, Services overview, and Software overview. Testimonial sections follow the supplied plum quote-card screenshot, retaining category filters/tags and project scope. Include quote icons, client placeholder rows, bottom navigation, and five-star rating previews clearly labelled as previews until approved feedback is supplied.
+
+## Contact introduction — 2026-09-28
+
+Contact uses the Software “Choose how to start” section heading layout: eyebrow and H1 on the left, supporting subtitle on the right, above the existing form. Stack the introduction on mobile; do not restore a full hero.

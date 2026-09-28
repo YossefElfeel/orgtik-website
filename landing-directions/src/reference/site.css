@@ -135,3 +135,31 @@ textarea:focus-visible,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Only the three overview pages use full-screen heroes. */
+.content-page {
+  padding-top: 112px;
+}
+.content-page > section:first-of-type {
+  padding-top: 32px !important;
+}
+.content-heading {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px clamp(20px, 4.4vw, 64px) 16px;
+}
+.content-heading p {
+  margin-bottom: 16px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c9a0f3;
+}
+.content-heading h1 {
+  max-width: 1040px;
+  font-size: clamp(28px, 3.6vw, 48px);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}

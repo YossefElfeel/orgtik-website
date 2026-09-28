@@ -40,3 +40,10 @@ Corrected malformed navigation attributes inherited from the export, removed dup
 ## Scope
 
 Forms, account actions, votes, estimates, and plan choices remain clearly labelled local previews. Backend delivery, authentication, payments, production legal approval, deployment, and cross-browser certification were not part of this update. Verification used local Chromium/Edge because the in-app browser automation was unavailable.
+
+## Hero scope and Software footer — 2026-09-28
+
+- Full-screen heroes appear only on Home, Services overview, and Software overview. Other pages open with content; service, product, project, and article details retain compact headings. Sign-in opens directly to its form.
+- Software footer now supplies explicit labels and destinations for all nine navigation links.
+- Verified all 13 primary/detail routes at 1440px and 390px: no horizontal overflow, console warnings, or page errors. Checked hero presence on those routes, project/article details, and returning from service/product details to the mobile overview video.
+- Visually reviewed desktop/mobile sign-in and Software footer captures. Production build passed.

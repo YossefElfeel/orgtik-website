@@ -99,3 +99,11 @@ Restore full heroes on About and Roadmap in addition to Home, Services overview,
 ## Contact introduction — 2026-09-28
 
 Contact uses the Software “Choose how to start” section heading layout: eyebrow and H1 on the left, supporting subtitle on the right, above the existing form. Stack the introduction on mobile; do not restore a full hero.
+
+## Viewport rhythm and service work — 2026-09-28
+
+Keep section spacing responsive to viewport height. Prefer compact padding, heading gaps, and media heights over reducing body text or clipping content. Content-heavy grids, forms, plan builders, and articles must retain natural scrolling. Each individual service detail includes related work from the shared projects catalog, with explicit project status and working project-detail links; do not invent client evidence for concept/mock projects.
+
+Project testimonial sections use three project-specific preview cards with the same desktop three-column carousel and previous/next controls as Services; show one card at a time on mobile.
+
+Legal and Sitemap share a two-column introduction: eyebrow and primary H1 on the left, supporting copy on the right; stack on mobile. Imprint, Privacy policy, Terms and conditions, and All pages use smaller H2 headings beneath this introduction.

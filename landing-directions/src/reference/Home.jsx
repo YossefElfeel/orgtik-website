@@ -1035,7 +1035,7 @@ export default class Home extends ReferencePage {
       workCols: s.narrow ? "minmax(0,1fr)" : "repeat(12,minmax(0,1fr))",
       workRows: s.narrow
         ? "none"
-        : "clamp(250px,21vw,310px) clamp(250px,21vw,310px) clamp(320px,30vw,440px)",
+        : "clamp(180px,22svh,240px) clamp(180px,22svh,240px) clamp(200px,24svh,260px)",
       w1: work(0, "1 / span 7", "1 / span 2"),
       w2: work(1, "8 / span 5", "1"),
       w3: work(2, "8 / span 5", "2"),
@@ -2202,7 +2202,7 @@ export default class Home extends ReferencePage {
             <section
               id={"two-sides"}
               style={{
-                padding: "clamp(72px,7vw,108px) 0 clamp(64px,6vw,96px)",
+                padding: "var(--section-space) 0 var(--section-space)",
               }}
             >
               <div
@@ -2219,7 +2219,7 @@ export default class Home extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "32px 64px",
-                    marginBottom: "clamp(34px,3.6vw,52px)",
+                    marginBottom: "clamp(24px,3vh,32px)",
                   }}
                 >
                   <div>
@@ -2257,7 +2257,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -2311,7 +2311,7 @@ export default class Home extends ReferencePage {
                       display: "flex",
                       flexDirection: "column",
                       flex: v.sideA.grow + " 1 440px",
-                      minHeight: "calc(clamp(200px,20vw,300px) + 440px)",
+                      minHeight: "auto",
                       containerType: "inline-size",
                       borderRadius: "28px",
                       overflow: "hidden",
@@ -2575,7 +2575,7 @@ export default class Home extends ReferencePage {
                       display: "flex",
                       flexDirection: "column",
                       flex: v.sideB.grow + " 1 440px",
-                      minHeight: "calc(clamp(200px,20vw,300px) + 440px)",
+                      minHeight: "auto",
                       containerType: "inline-size",
                       borderRadius: "28px",
                       overflow: "hidden",
@@ -2847,7 +2847,7 @@ export default class Home extends ReferencePage {
                 </div>
               </div>
             </section>
-            <section style={{ padding: "0 0 clamp(72px,7vw,108px)" }}>
+            <section style={{ padding: "0 0 var(--section-space)" }}>
               <div
                 style={{
                   maxWidth: "1440px",
@@ -2990,7 +2990,7 @@ export default class Home extends ReferencePage {
             </section>
             <section
               id={"work"}
-              style={{ padding: "0 0 clamp(72px,7vw,108px)" }}
+              style={{ padding: "0 0 var(--section-space)" }}
             >
               <div
                 style={{
@@ -3006,7 +3006,7 @@ export default class Home extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "32px 64px",
-                    marginBottom: "clamp(34px,3.6vw,52px)",
+                    marginBottom: "clamp(24px,3vh,32px)",
                   }}
                 >
                   <div>
@@ -3044,7 +3044,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -3801,7 +3801,7 @@ export default class Home extends ReferencePage {
                 isolation: "isolate",
                 background: "#190B25",
                 color: "#F4EEF8",
-                padding: "clamp(72px,7vw,108px) 0",
+                padding: "var(--section-space) 0",
                 borderTop: "1px solid #ffffff12",
                 borderBottom: "1px solid #ffffff12",
               }}
@@ -3834,7 +3834,7 @@ export default class Home extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "32px 64px",
-                    marginBottom: "clamp(34px,3.6vw,52px)",
+                    marginBottom: "clamp(24px,3vh,32px)",
                   }}
                 >
                   <div>
@@ -3872,7 +3872,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -4164,7 +4164,7 @@ export default class Home extends ReferencePage {
                                   style={{
                                     position: "relative",
                                     flex: "1 1 auto",
-                                    minHeight: "clamp(260px,26vw,380px)",
+                                    minHeight: "clamp(200px,28svh,300px)",
                                     background: "#2A1542",
                                     color: "#D4B7EC",
                                   }}
@@ -4347,7 +4347,7 @@ export default class Home extends ReferencePage {
                 overflow: "clip",
                 background:
                   "radial-gradient(80% 70% at 88% 34%,#3B1E59b3,transparent 62%),#0D0814",
-                padding: "clamp(72px,7vw,108px) 0",
+                padding: "var(--section-space) 0",
               }}
             >
               <div
@@ -4364,7 +4364,7 @@ export default class Home extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "32px 64px",
-                    marginBottom: "clamp(34px,3.6vw,52px)",
+                    marginBottom: "clamp(24px,3vh,32px)",
                   }}
                 >
                   <div>
@@ -4402,7 +4402,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -4782,7 +4782,7 @@ export default class Home extends ReferencePage {
               id={"approach"}
               ref={v.procRef}
               style={{
-                padding: "clamp(72px,7vw,108px) 0",
+                padding: "var(--section-space) 0",
                 borderTop: "1px solid #ffffff12",
               }}
             >
@@ -4800,7 +4800,7 @@ export default class Home extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "32px 64px",
-                    marginBottom: "clamp(34px,3.6vw,52px)",
+                    marginBottom: "clamp(24px,3vh,32px)",
                   }}
                 >
                   <div>
@@ -4838,7 +4838,7 @@ export default class Home extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -5014,7 +5014,7 @@ export default class Home extends ReferencePage {
                 position: "relative",
                 overflow: "clip",
                 isolation: "isolate",
-                padding: "clamp(84px,8.4vw,128px) 0",
+                padding: "var(--section-space) 0",
                 textAlign: "center",
                 background: "#0B0612",
               }}

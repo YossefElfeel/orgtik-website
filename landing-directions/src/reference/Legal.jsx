@@ -1166,10 +1166,21 @@ export default class Legal extends ReferencePage {
             </>
           )}
           <main id={"top"} className="content-page">
-            <section
-              id={"legal"}
-              style={{ padding: "clamp(72px,7vw,108px) 0" }}
-            >
+            <section id={"legal"} style={{ padding: "var(--section-space) 0" }}>
+              <header className="contact-intro legal-intro">
+                <div className="contact-intro__title">
+                  <p className="contact-intro__eyebrow">
+                    Legal &amp; site information
+                  </p>
+                  <h1>
+                    Clear information.<span>One place to find it.</span>
+                  </h1>
+                </div>
+                <p className="contact-intro__subtitle">
+                  Find company details, privacy information and terms, or use
+                  the sitemap to explore every part of OrgTik.
+                </p>
+              </header>
               <div
                 style={{
                   maxWidth: "1440px",
@@ -1265,18 +1276,18 @@ export default class Legal extends ReferencePage {
                     ></span>
                     <span style={{ whiteSpace: "nowrap" }}>{v.doc.kicker}</span>
                   </div>
-                  <h1
+                  <h2
                     data-hw={""}
                     style={{
                       marginTop: "24px",
-                      fontSize: "clamp(32px,3.6vw,52px)",
+                      fontSize: "clamp(26px,2.5vw,36px)",
                       lineHeight: "1.02",
                       fontWeight: "500",
                       letterSpacing: "-.045em",
                     }}
                   >
                     {v.doc.title}
-                  </h1>
+                  </h2>
                   <p
                     style={{
                       fontFamily: "Arial,Helvetica,sans-serif",

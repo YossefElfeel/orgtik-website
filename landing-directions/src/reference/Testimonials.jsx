@@ -54,19 +54,32 @@ export function Testimonials({ scope = "All", project }) {
   const id = useId();
   const items = project
     ? [
-        {
-          id: project.slug,
-          category:
-            project.slug === "connected-platform-concept"
-              ? "Software"
-              : "Services",
-          topic: project.name,
-          detail:
-            "A client’s perspective on " +
+        [
+          "direction",
+          "Project direction",
+          "A client’s perspective on the direction behind " +
             project.name +
-            ". A project story awaiting approval.",
-        },
-      ]
+            ".",
+        ],
+        [
+          "collaboration",
+          "Working together",
+          "A client’s story of collaborating on " + project.name + ".",
+        ],
+        [
+          "experience",
+          "The project experience",
+          "A client’s experience of bringing " + project.name + " to life.",
+        ],
+      ].map(([key, topic, detail]) => ({
+        id: project.slug + "-" + key,
+        category:
+          project.slug === "connected-platform-concept"
+            ? "Software"
+            : "Services",
+        topic,
+        detail,
+      }))
     : entries.filter(
         (item) =>
           (scope === "All" || item.category === scope) &&

@@ -1836,7 +1836,7 @@ export default class Roadmap extends ReferencePage {
             </section>
             <section
               id={"timeline"}
-              style={{ padding: "clamp(72px,7vw,108px) 0" }}
+              style={{ padding: "var(--section-space) 0" }}
             >
               <div
                 style={{
@@ -1885,7 +1885,7 @@ export default class Roadmap extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1.02",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -2595,7 +2595,7 @@ export default class Roadmap extends ReferencePage {
             <section
               id={"community"}
               style={{
-                padding: "clamp(72px,7vw,108px) 0",
+                padding: "var(--section-space) 0",
                 background: "#190B25",
                 borderTop: "1px solid #ffffff12",
                 borderBottom: "1px solid #ffffff12",
@@ -2648,7 +2648,7 @@ export default class Roadmap extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1.02",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -3034,7 +3034,7 @@ export default class Roadmap extends ReferencePage {
                 background:
                   "radial-gradient(70% 60% at 100% 0%,#9458F424,transparent 70%),#EEE8F7",
                 color: "#190B25",
-                padding: "clamp(72px,7vw,108px) 0",
+                padding: "var(--section-space) 0",
               }}
             >
               <div

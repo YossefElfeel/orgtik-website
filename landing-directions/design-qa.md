@@ -91,3 +91,17 @@ final result: passed
 - These screenshots supersede the earlier testimonial reference captures for final spacing and copy.
 
 final result: passed
+
+## Viewport layout review and service-related work — 2026-09-28
+
+1. Reviewed 39 routes across all ten page groups, all service families and 11 individual services, six software products, five projects, and representative plan/article views. Baseline: 1440 × 900 and 390 × 844. Final checks: those viewports plus 1366 × 768 (117 route/view combinations). Measurements are in qa/viewport-before.json and qa/viewport-after.json.
+2. Reduced oversized content-section padding, heading gaps, and media minimum heights. Retained full-screen heroes and natural content height. At 1440 × 900, Home selected work reduced from 1397px to 873px; About purpose from 1185px to 794px; Services families from 973px to 817px; Software workspace from 1177px to 927px.
+3. Added related work to every individual service detail, using shared projects.js data. Project status labels distinguish owned work, concepts, and mock samples. Verified actual navigation to project detail for design, development, marketing, IT support, and hosting.
+4. Final route checks: no page exceptions or horizontal document overflow. Existing interaction checks passed: navigation/Back, software bundle and billing/comparison, product detail, service/contact handoff, contact validation/success, password recovery preview, Insights search/article, roadmap voting, legacy routes, mobile navigation/Escape/focus.
+5. Visually inspected Home, Software, About and the new service work cards. Desktop/mobile related-work captures: qa/service-work-desktop.png and qa/service-work-mobile.png. Full-page overview captures document overall rhythm; lazy offscreen images may not be loaded in those captures.
+6. A further attempt to compress the Home work grid caused card scrollHeight to exceed clientHeight. Reverted it to the tested minimum-safe sizing; final card heights equal their content heights (418/198/198/216px at 1440 × 900). Section height 873px excludes the fixed navbar, so some scrolling remains.
+7. Dense service lists, builders, capability grids, roadmap boards, articles, and mobile stacks intentionally remain taller than one viewport. No fixed-height clipping, hidden content, or reduced body font sizes were introduced to force a fit. The new service work section is approximately 661px high on desktop.
+
+Build and git diff checks passed. This is a layout and interaction review, not a full accessibility certification. Remaining long sections are intentional content-driven exceptions.
+
+final result: passed

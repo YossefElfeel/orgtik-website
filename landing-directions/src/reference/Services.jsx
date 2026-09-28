@@ -1,3 +1,4 @@
+import { ServiceWork } from "./ServiceWork";
 import { Testimonials } from "./Testimonials";
 import { ContentHeading } from "./ContentHeading";
 import React from "react";
@@ -2766,7 +2767,7 @@ export default class Services extends ReferencePage {
                 <section
                   id={"families"}
                   data-screen-label={"Services — Disciplines"}
-                  style={{ padding: "clamp(72px,7vw,108px) 0" }}
+                  style={{ padding: "var(--section-space) 0" }}
                 >
                   <div
                     style={{
@@ -2782,7 +2783,7 @@ export default class Services extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(32px,3.4vw,48px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -2822,7 +2823,7 @@ export default class Services extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -3301,7 +3302,7 @@ export default class Services extends ReferencePage {
                 <section
                   id={"all-services"}
                   data-screen-label={"Services — All services"}
-                  style={{ padding: "clamp(72px,7vw,108px) 0" }}
+                  style={{ padding: "var(--section-space) 0" }}
                 >
                   <div
                     style={{
@@ -3317,7 +3318,7 @@ export default class Services extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "24px 64px",
-                        marginBottom: "clamp(32px,3.4vw,48px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -3357,7 +3358,7 @@ export default class Services extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1.02",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -4075,7 +4076,7 @@ export default class Services extends ReferencePage {
                     background:
                       "radial-gradient(70% 60% at 100% 0%,#9458F424,transparent 70%),#EEE8F7",
                     color: "#190B25",
-                    padding: "clamp(72px,7vw,108px) 0",
+                    padding: "var(--section-space) 0",
                   }}
                 >
                   <div
@@ -4092,7 +4093,7 @@ export default class Services extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(34px,3.6vw,52px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -4132,7 +4133,7 @@ export default class Services extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -4982,7 +4983,7 @@ export default class Services extends ReferencePage {
                     isolation: "isolate",
                     background: "#190B25",
                     color: "#F4EEF8",
-                    padding: "clamp(72px,7vw,108px) 0",
+                    padding: "var(--section-space) 0",
                     borderTop: "1px solid #ffffff12",
                     borderBottom: "1px solid #ffffff12",
                   }}
@@ -5015,7 +5016,7 @@ export default class Services extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(34px,3.6vw,52px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div>
@@ -5055,7 +5056,7 @@ export default class Services extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -5350,7 +5351,7 @@ export default class Services extends ReferencePage {
                                       style={{
                                         position: "relative",
                                         flex: "1 1 auto",
-                                        minHeight: "clamp(260px,26vw,380px)",
+                                        minHeight: "clamp(200px,28svh,300px)",
                                         background: "#2A1542",
                                         color: "#D4B7EC",
                                       }}
@@ -5537,7 +5538,7 @@ export default class Services extends ReferencePage {
                 <section
                   id={"services-list"}
                   data-screen-label={"Services — Detail"}
-                  style={{ padding: "clamp(72px,7vw,108px) 0" }}
+                  style={{ padding: "var(--section-space) 0" }}
                 >
                   <div
                     style={{
@@ -5553,7 +5554,7 @@ export default class Services extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(32px,3.4vw,48px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -5593,7 +5594,7 @@ export default class Services extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -5875,7 +5876,7 @@ export default class Services extends ReferencePage {
                     background:
                       "radial-gradient(70% 60% at 100% 0%,#9458F424,transparent 70%),#EEE8F7",
                     color: "#190B25",
-                    padding: "clamp(72px,7vw,108px) 0",
+                    padding: "var(--section-space) 0",
                   }}
                 >
                   <div
@@ -5892,7 +5893,7 @@ export default class Services extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(34px,3.6vw,52px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -5932,7 +5933,7 @@ export default class Services extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -6603,7 +6604,7 @@ export default class Services extends ReferencePage {
               id={"approach"}
               ref={v.procRef}
               style={{
-                padding: "clamp(72px,7vw,108px) 0",
+                padding: "var(--section-space) 0",
                 borderTop: "1px solid #ffffff12",
               }}
             >
@@ -6621,7 +6622,7 @@ export default class Services extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "32px 64px",
-                    marginBottom: "clamp(34px,3.6vw,52px)",
+                    marginBottom: "clamp(24px,3vh,32px)",
                   }}
                 >
                   <div>
@@ -6661,7 +6662,7 @@ export default class Services extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -6832,7 +6833,7 @@ export default class Services extends ReferencePage {
                 <section
                   data-screen-label={"Services — Related"}
                   style={{
-                    padding: "clamp(72px,7vw,108px) 0",
+                    padding: "var(--section-space) 0",
                     borderTop: "1px solid #ffffff12",
                   }}
                 >
@@ -6850,7 +6851,7 @@ export default class Services extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(32px,3.4vw,48px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -6890,7 +6891,7 @@ export default class Services extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -7029,6 +7030,14 @@ export default class Services extends ReferencePage {
               </>
             )}
             {v.isOverview && <Testimonials scope="Services" />}
+            {v.isService && (
+              <ServiceWork
+                family={this.FAM.find((f) => f.slug === this.state.route.fam)}
+                service={this.FAM.find(
+                  (f) => f.slug === this.state.route.fam,
+                ).children.find((c) => c.slug === this.state.route.svc)}
+              />
+            )}
             <section
               id={"closing"}
               ref={v.closingRef}
@@ -7038,7 +7047,7 @@ export default class Services extends ReferencePage {
                 position: "relative",
                 overflow: "clip",
                 isolation: "isolate",
-                padding: "clamp(84px,8.4vw,128px) 0",
+                padding: "var(--section-space) 0",
                 textAlign: "center",
                 background: "#0B0612",
                 borderTop: "1px solid #ffffff12",

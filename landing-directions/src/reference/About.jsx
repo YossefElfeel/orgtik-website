@@ -3465,12 +3465,11 @@ export default class About extends ReferencePage {
                 overflow: "clip",
                 isolation: "isolate",
                 padding: "var(--section-space) 0",
-                minHeight: "min(840px,90svh)",
+                minHeight: "var(--closing-cta-height)",
                 display: "grid",
                 alignItems: "center",
                 textAlign: "center",
                 background: "#0B0612",
-                borderTop: "1px solid #ffffff12",
               }}
             >
               <div
@@ -3498,7 +3497,7 @@ export default class About extends ReferencePage {
                   position: "absolute",
                   left: "50%",
                   top: "50%",
-                  width: "min(760px,90vw,calc(90svh - 40px))",
+                  width: "var(--closing-cta-mark-width)",
                   height: "auto",
                   transform: "translate(-50%,-50%)",
                   opacity: ".04",
@@ -3530,8 +3529,8 @@ export default class About extends ReferencePage {
                   data-hw={""}
                   style={{
                     marginTop: "34px",
-                    fontSize: "var(--section-title-size)",
-                    lineHeight: "1.04",
+                    fontSize: "var(--closing-cta-title-size)",
+                    lineHeight: ".95",
                     fontWeight: "500",
                     letterSpacing: "-.05em",
                     textWrap: "balance",

@@ -127,3 +127,5 @@ On every service detail page, Related work is section (04) and appears before th
 ## Closing CTA reference and testimonials — 2026-09-28
 
 Use the supplied large-type closing CTA reference on Home, with its latest CTA button unchanged. Keep the official background mark centered and fully visible at each viewport. Testimonial sections no longer show All/Services/Software filter tabs; retain the category tags on cards and the existing page/project content scopes and carousel controls.
+
+Apply Home's closing CTA proportions across every page that uses that section: one shared responsive section height, large heading scale and line height, and centered full background mark. Keep each page's contextual copy and current CTA actions.

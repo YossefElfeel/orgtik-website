@@ -1140,6 +1140,16 @@ export default class Contact extends ReferencePage {
                 padding: "clamp(128px,11vw,156px) 0 clamp(72px,7vw,108px)",
               }}
             >
+              <header className="contact-intro">
+                <div className="contact-intro__title">
+                  <p className="contact-intro__eyebrow">Contact · Talk to us</p>
+                  <h1>
+                    {v.hero.l1}
+                    <span>{v.hero.acc}</span>
+                  </h1>
+                </div>
+                <p className="contact-intro__subtitle">{v.hero.body}</p>
+              </header>
               <div
                 style={{
                   maxWidth: "1440px",

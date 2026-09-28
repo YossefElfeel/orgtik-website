@@ -54,3 +54,40 @@ Forms, account actions, votes, estimates, and plan choices remain clearly labell
 - Content remains explicitly labelled as placeholders awaiting approved feedback; no client endorsements or names were invented.
 - Production build and git diff checks passed. Verified nine routes at 1440px and 390px, category filters, card counts, keyboard Home/End controls, disabled carousel boundaries, no document overflow, and no page errors.
 - Reviewed screenshots: qa/testimonials-1440.png and qa/testimonials-390.png.
+
+## Testimonial reference and restored heroes — 2026-09-28
+
+Source visual: C:/Users/HP/AppData/Local/Temp/codex-clipboard-ce30635c-923b-46f4-b2aa-e697bc6b04b9.png (2255 × 960).
+Implementation: qa/testimonials-reference-2255.png (2255 × 1101), qa/testimonials-reference-390.png, and qa/hero-{about,roadmap}-{2255,390}.png.
+CSS viewports: 2255 × 1000 and 390 × 1000; device scale 1. Desktop element capture includes the full section. Source and implementation were opened together at the same pixel width; extra height accounts for retained filters/tags and newly requested stars. The source shows a middle carousel range; implementation shows the first range so its previous button is disabled.
+
+Findings and comparison history:
+- First pass: [P2] About and Roadmap eyebrow text clipped on mobile. Restored text wrapping and prevented the decorative dot shrinking. Final mobile hero captures show complete text.
+- First pass: [P2] Quote text wrapped more densely than the reference. Reduced desktop quote size from 1.9vw to 1.7vw; recaptured and compared the first and third cards.
+- Removed the duplicate About H1 introduced by restoring its hero; both restored pages have one H1.
+
+Required fidelity surfaces:
+- Typography: existing local Montserrat, large light quote text, lavender heading emphasis, smaller category/client metadata. Quote wrapping reviewed in the desktop comparison.
+- Layout: three plum cards on desktop, one on mobile, quote/category row, client divider and avatar row, bottom count/arrows. Retained filters, category tags, and added star previews are intentional extensions.
+- Colors: dark plum section, lighter plum cards, muted borders, lavender accents and text.
+- Assets: existing Phosphor quote, user, arrow, and star icons; existing supplied hero video/poster. No new raster assets required.
+- Content: placeholder stories and attribution remain labelled; stars are marked as rating previews, not verified client ratings. Existing category and project scope preserved.
+
+Verification:
+- Nine testimonial routes tested at both widths; category filters, counts, keyboard boundaries, five stars per card, and absence of horizontal page overflow passed.
+- About and Roadmap heroes verified at both widths.
+- No page errors. Production build and git diff --check passed.
+- In-app browser timed out; existing headless Edge verification workflow supplied rendered captures. Fixed navigation visible in desktop capture is existing site UI, not part of the source section.
+- Full-view and readable card-level comparison performed together; no additional focused crops needed. No remaining actionable P0/P1/P2 findings.
+
+final result: passed
+
+## Final card spacing and Contact introduction — 2026-09-28
+
+- Removed the standalone Placeholder testimonial text. Rating previews and placeholder client attribution remain visible.
+- Final card screenshots: qa/testimonials-spacing-1440.png and qa/testimonials-spacing-390.png. Browser measurements confirmed an 18px gap below each review and matching left edges for review, stars, and divider; removed excess minimum card heights.
+- Contact now follows the Software plan-builder introduction: eyebrow/H1 on the left, subtitle on the right, stacked on mobile. Screenshots: qa/contact-intro-1440.png and qa/contact-intro-390.png.
+- Verified Contact at both widths: one H1, correct two-column/stacked placement, no horizontal overflow, and empty-form validation. Production build passed after the final implementation.
+- These screenshots supersede the earlier testimonial reference captures for final spacing and copy.
+
+final result: passed

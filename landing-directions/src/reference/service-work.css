@@ -16,11 +16,25 @@
   margin-bottom: 28px;
 }
 .service-work__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   font-size: 12px;
+  font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: #bd9bd5;
   margin: 0 0 16px;
+}
+.service-work__eyebrow > span:first-child {
+  color: #c9a0f3;
+  font-variant-numeric: tabular-nums;
+}
+.service-work__eyebrow-rule {
+  width: 36px;
+  height: 1px;
+  flex: 0 0 36px;
+  background: #ffffff2e;
 }
 .service-work h2 {
   font-size: var(--section-title-size);

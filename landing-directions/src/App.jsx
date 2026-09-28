@@ -12,6 +12,7 @@ const pages = {
   "/roadmap": lazy(() => import("./reference/Roadmap")),
   "/legal": lazy(() => import("./reference/Legal")),
   "/sign-in": lazy(() => import("./reference/SignIn")),
+  "/sign-up": lazy(() => import("./reference/SignIn")),
 };
 normalizeLocation();
 

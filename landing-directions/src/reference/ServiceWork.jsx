@@ -26,7 +26,9 @@ export function ServiceWork({ family, service }) {
         <div className="service-work__heading">
           <div>
             <p className="service-work__eyebrow">
-              Related work · {family.short}
+              <span>(04)</span>
+              <span className="service-work__eyebrow-rule" aria-hidden="true" />
+              <span>Related work · {family.short}</span>
             </p>
             <h2 id="service-work-title">
               See the thinking.

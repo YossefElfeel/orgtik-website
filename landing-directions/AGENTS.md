@@ -113,3 +113,13 @@ Legal and Sitemap share a two-column introduction: eyebrow and primary H1 on the
 Keep secondary H2 section titles visibly smaller than the page H1 on all routes, including service categories/details, software details, projects, articles, testimonials, and closing sections. Use the shared responsive --section-title-size token; compact page H1 titles retain the larger primary scale.
 
 Service detail related-work sections show two distinct existing projects side by side, with images above their text. Show the direct service match first and a complementary project second, preserving each project’s actual category and preview status. Stack cards on mobile.
+
+## Closing mark and account preview — 2026-09-28
+
+Keep the full official mark visible inside every closing CTA section; scale it to fit the section rather than clipping it at the top or bottom. The account screen offers Sign in, Create account, and Reset password. Direct /sign-up links open the Create account preview. Validate name, work email, password length, and confirmation locally, while clearly stating that no account is created and no details are sent or stored.
+
+Keep the large closing mark fully visible by giving the closing CTA enough height; do not reduce it to the small logo size. Keep the Reset password mode label on one line.
+
+Keep the large closing mark centered and static. The former rotation clipped its corners even when the unrotated image fitted in the section. The Home closing headline uses a slightly larger responsive size.
+
+On every service detail page, Related work is section (04) and appears before the same-family recommendations, which are section (05). Preserve the existing service-specific wording (for example, “More in Design”) and links.

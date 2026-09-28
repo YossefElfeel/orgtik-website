@@ -6829,9 +6829,17 @@ export default class Services extends ReferencePage {
               </div>
             </section>
             {v.isService && (
+              <ServiceWork
+                family={this.FAM.find((f) => f.slug === this.state.route.fam)}
+                service={this.FAM.find(
+                  (f) => f.slug === this.state.route.fam,
+                ).children.find((c) => c.slug === this.state.route.svc)}
+              />
+            )}
+            {v.isService && (
               <>
                 <section
-                  data-screen-label={"Services — Related"}
+                  data-screen-label={"Services — More in family"}
                   style={{
                     padding: "var(--section-space) 0",
                     borderTop: "1px solid #ffffff12",
@@ -6874,7 +6882,7 @@ export default class Services extends ReferencePage {
                               fontVariantNumeric: "tabular-nums",
                             }}
                           >
-                            {"(04)"}
+                            {"(05)"}
                           </span>
                           <span
                             style={{
@@ -7030,16 +7038,9 @@ export default class Services extends ReferencePage {
               </>
             )}
             {v.isOverview && <Testimonials scope="Services" />}
-            {v.isService && (
-              <ServiceWork
-                family={this.FAM.find((f) => f.slug === this.state.route.fam)}
-                service={this.FAM.find(
-                  (f) => f.slug === this.state.route.fam,
-                ).children.find((c) => c.slug === this.state.route.svc)}
-              />
-            )}
             <section
               id={"closing"}
+              className="closing-cta"
               ref={v.closingRef}
               onMouseMove={v.closingMove}
               onMouseLeave={v.closingLeave}
@@ -7048,6 +7049,9 @@ export default class Services extends ReferencePage {
                 overflow: "clip",
                 isolation: "isolate",
                 padding: "var(--section-space) 0",
+                minHeight: "min(840px,90svh)",
+                display: "grid",
+                alignItems: "center",
                 textAlign: "center",
                 background: "#0B0612",
                 borderTop: "1px solid #ffffff12",
@@ -7072,17 +7076,15 @@ export default class Services extends ReferencePage {
                 }}
               ></div>
               <img
-                data-spin={"160000"}
                 src={"/assets/logo/orgtik-mark-white.svg"}
                 alt={""}
                 style={{
                   position: "absolute",
                   left: "50%",
                   top: "50%",
-                  width: "min(760px,90vw)",
+                  width: "min(760px,90vw,calc(90svh - 40px))",
                   height: "auto",
-                  marginLeft: "calc(min(760px,90vw) / -2)",
-                  marginTop: "calc(min(760px,90vw) / -2)",
+                  transform: "translate(-50%,-50%)",
                   opacity: ".04",
                   zIndex: "-1",
                   pointerEvents: "none",

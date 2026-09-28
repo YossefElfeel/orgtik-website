@@ -91,6 +91,7 @@ export default class Legal extends ReferencePage {
     ["Roadmap", "Roadmap.dc.html", []],
     ["Contact", "Contact.dc.html", []],
     ["Sign in", "SignIn.dc.html", []],
+    ["Create account", "/sign-up", []],
   ];
   SOCIALS = [
     ["Facebook", "ph-fill ph-facebook-logo"],

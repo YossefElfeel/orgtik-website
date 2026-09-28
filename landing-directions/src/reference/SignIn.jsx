@@ -19,7 +19,7 @@ export default class SignIn extends ReferencePage {
   CONTACT = "Contact.dc.html";
   state = {
     route: this.parseRoute(location.hash) || { view: "index" },
-    mode: "signin",
+    mode: window.location.pathname === "/sign-up" ? "signup" : "signin",
     done: false,
     error: "",
     hoverCard: null,
@@ -78,6 +78,13 @@ export default class SignIn extends ReferencePage {
       if (r) this.setState({ route: r, menuOpen: false });
     };
     window.addEventListener("hashchange", this.onHash);
+    this.onAccountPath = () => {
+      const mode =
+        window.location.pathname === "/sign-up" ? "signup" : "signin";
+      if (this.state.mode !== mode)
+        this.setState({ mode, done: false, error: "" });
+    };
+    window.addEventListener("popstate", this.onAccountPath);
     this.srcMO = new MutationObserver(() => this.applyDataSrc());
     this.srcMO.observe(root, { childList: true, subtree: true });
     this.afterView(true);
@@ -86,6 +93,12 @@ export default class SignIn extends ReferencePage {
     pp = pp || {};
     ps = ps || this._prev || this.state;
     this._prev = this.state;
+    const accountMode =
+      window.location.pathname === "/sign-up" ? "signup" : "signin";
+    if (this.state.mode !== "recover" && this.state.mode !== accountMode) {
+      this.setState({ mode: accountMode, done: false, error: "" });
+      return;
+    }
     if (this.routeKey(ps.route) !== this.routeKey(this.state.route)) {
       const c = this.cursorRef.current;
       if (c) c.style.opacity = "0";
@@ -101,6 +114,7 @@ export default class SignIn extends ReferencePage {
     window.removeEventListener("scroll", this.onScroll);
     window.removeEventListener("resize", this.measure);
     window.removeEventListener("hashchange", this.onHash);
+    window.removeEventListener("popstate", this.onAccountPath);
     document.removeEventListener("visibilitychange", this.onVis);
     [this.io, this.heroIO, this.srcMO].forEach((o) => o && o.disconnect());
     (this.loops || []).forEach((a) => a.cancel());
@@ -504,42 +518,82 @@ export default class SignIn extends ReferencePage {
       secondaryGo: () => this.nav("Software.dc.html"),
     };
     const rec = s.mode === "recover";
+    const signup = s.mode === "signup";
     page = {
       modes: [
         ["signin", "Sign in"],
+        ["signup", "Create account"],
         ["recover", "Reset password"],
       ].map((m) => ({
         label: m[1],
+        active: s.mode === m[0],
         bg: s.mode === m[0] ? "#190B25" : "transparent",
         c: s.mode === m[0] ? "#F6F1FA" : "#190B25",
-        pick: () => this.setState({ mode: m[0], done: false, error: "" }),
+        pick: () => {
+          this.setState({ mode: m[0], done: false, error: "" });
+          const path = m[0] === "signup" ? "/sign-up" : "/sign-in";
+          if (window.location.pathname !== path) window.__orgNav?.(path);
+        },
       })),
       showForm: !s.done,
       done: s.done,
       isSignin: !rec,
+      isSignup: signup,
       hasError: !!s.error,
       error: s.error,
-      title: rec ? "Reset your password" : "Sign in",
+      title: rec
+        ? "Reset your password"
+        : signup
+          ? "Create your account"
+          : "Sign in",
       sub: rec
         ? "Enter your work email and we’ll send a reset link."
-        : "Use the email linked to your OrgTik workspace.",
-      cta: rec ? "Send reset link" : "Sign in",
-      doneTitle: rec ? "Check your inbox." : "Preview complete.",
+        : signup
+          ? "Set up your OrgTik workspace account preview. No account is created yet."
+          : "Use the email linked to your OrgTik workspace.",
+      cta: rec ? "Send reset link" : signup ? "Preview sign up" : "Sign in",
+      doneTitle: rec
+        ? "Check your inbox."
+        : signup
+          ? "Sign-up preview complete."
+          : "Preview complete.",
       doneBody: rec
         ? "In the live product a reset link would arrive shortly. This preview sends nothing."
-        : "In the live product you would now enter your workspace. This preview does not authenticate.",
+        : signup
+          ? "Your details passed the preview checks. No account was created and no information was stored."
+          : "In the live product you would now enter your workspace. This preview does not authenticate.",
       back: () => this.setState({ done: false }),
       submit: (e) => {
         e.preventDefault();
         const f = new FormData(e.currentTarget),
           em = String(f.get("email") || "").trim(),
-          pw = String(f.get("password") || "");
+          pw = String(f.get("password") || ""),
+          name = String(f.get("name") || "").trim(),
+          confirm = String(f.get("confirmPassword") || "");
         if (!em || (!rec && !pw)) {
           this.setState({
             error: rec
               ? "Please enter your email."
               : "Please enter your email and password.",
           });
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+          this.setState({ error: "Please enter a valid work email." });
+          return;
+        }
+        if (signup && !name) {
+          this.setState({ error: "Please enter your name." });
+          return;
+        }
+        if (signup && pw.length < 8) {
+          this.setState({
+            error: "Use at least 8 characters for your password.",
+          });
+          return;
+        }
+        if (signup && pw !== confirm) {
+          this.setState({ error: "The passwords do not match." });
           return;
         }
         this.setState({ done: true, error: "" });
@@ -637,7 +691,7 @@ export default class SignIn extends ReferencePage {
       <>
         <div
           ref={v.rootRef}
-          data-screen-label={"Sign in"}
+          data-screen-label={v.isSignup ? "Create account" : "Sign in"}
           style={{
             position: "relative",
             background: "#0D0814",
@@ -1083,6 +1137,7 @@ export default class SignIn extends ReferencePage {
                   }}
                 >
                   <div
+                    className="account-modes"
                     style={{
                       display: "flex",
                       gap: "6px",
@@ -1096,14 +1151,16 @@ export default class SignIn extends ReferencePage {
                       <React.Fragment key={mIndex}>
                         <button
                           onClick={m.pick}
+                          aria-pressed={m.active}
                           style={{
-                            flex: "1",
+                            flex: "1 1 110px",
                             padding: "11px 14px",
                             borderRadius: "999px",
                             background: String(m.bg),
                             color: String(m.c),
                             fontSize: "14px",
                             fontWeight: "600",
+                            whiteSpace: "nowrap",
                           }}
                         >
                           {m.label}
@@ -1115,6 +1172,7 @@ export default class SignIn extends ReferencePage {
                     <>
                       <form
                         onSubmit={v.submit}
+                        noValidate
                         style={{
                           display: "flex",
                           flexDirection: "column",
@@ -1141,6 +1199,17 @@ export default class SignIn extends ReferencePage {
                         >
                           {v.sub}
                         </p>
+                        {v.isSignup && (
+                          <label className="account-field">
+                            Your name
+                            <input
+                              name="name"
+                              type="text"
+                              autoComplete="name"
+                              placeholder="Alex Morgan"
+                            />
+                          </label>
+                        )}
                         <label
                           style={{
                             display: "flex",
@@ -1156,7 +1225,7 @@ export default class SignIn extends ReferencePage {
                             name={"email"}
                             type={"email"}
                             placeholder={"alex@example.com"}
-                            autoComplete={"off"}
+                            autoComplete={v.isSignup ? "email" : "username"}
                             style={{
                               height: "54px",
                               padding: "0 16px",
@@ -1188,7 +1257,11 @@ export default class SignIn extends ReferencePage {
                                 name={"password"}
                                 type={"password"}
                                 placeholder={"••••••••"}
-                                autoComplete={"off"}
+                                autoComplete={
+                                  v.isSignup
+                                    ? "new-password"
+                                    : "current-password"
+                                }
                                 style={{
                                   height: "54px",
                                   padding: "0 16px",
@@ -1204,6 +1277,17 @@ export default class SignIn extends ReferencePage {
                               />
                             </label>
                           </>
+                        )}
+                        {v.isSignup && (
+                          <label className="account-field">
+                            Confirm password
+                            <input
+                              name="confirmPassword"
+                              type="password"
+                              autoComplete="new-password"
+                              placeholder="••••••••"
+                            />
+                          </label>
                         )}
                         {v.hasError && (
                           <>
@@ -1271,7 +1355,7 @@ export default class SignIn extends ReferencePage {
                             className={"ph ph-info"}
                           ></i>
                           {
-                            "Account preview · nothing is authenticated and no password is stored."
+                            "Account preview · nothing is authenticated, created, sent, or stored."
                           }
                         </p>
                       </form>

@@ -118,3 +118,22 @@ final result: passed
 - Service detail sections show two distinct existing project cards in one row on desktop and a single column on mobile. Each card preserves its own category and project status.
 - Verified all 11 service detail pages at 1440px and 390px (22 route/viewport checks): card count, distinct destinations, column placement, and absence of horizontal overflow.
 - Build and git diff --check passed. Final screenshots: qa/service-work-two-1440.png and qa/service-work-two-390.png.
+
+## Closing mark and sign-up preview — 2026-09-28
+
+- Resized and centered the full official closing mark on Home, Services, Software, Work, About, and Insights. At 1440px and 390px, the mark stayed fully within each section and no page had horizontal overflow.
+- Added /sign-up, a Create account mode beside Sign in and Reset password, and a sitemap entry. The preview validates name, work email, password length (at least eight characters), and matching confirmation, then states that no account was created or data stored.
+- Built successfully with npm run build. Browser checked empty, short, mismatched, and valid sign-up submissions at 1440px and 390px; checked tab changes, back navigation, sitemap entry, and mobile width. Existing Sign in and Reset password modes remained reachable.
+- Screenshots: qa/closing-logo-{1440,390}.png, qa/sign-up-{1440,390}.png, and qa/sign-up-form-390.png.
+
+## Restored closing mark and reset label — 2026-09-28
+
+The large closing mark is restored on Home, Services, Software, Work, About, and Insights. The closing section has enough height to display the whole mark, with a smaller mobile section height. The Reset password mode label now stays on one line. Built successfully and checked all six closing sections at 1440px and 390px; the mark stayed inside each section and the label did not wrap. Final screenshots: qa/closing-logo-restored-1440.png and qa/closing-logo-restored-390.png.
+
+## Closing mark rotation and headline — 2026-09-28
+
+The closing mark stays large and centered but no longer rotates, which prevented the mark from being clipped during normal motion. The Home closing headline is now 48px at 1440px and 30px at 390px. Built successfully and checked all six closing sections at both widths with normal motion enabled: the full mark remained inside the section. Final screenshots: qa/closing-logo-centered-1440.png and qa/closing-logo-centered-390.png.
+
+## Service detail section order — 2026-09-28
+
+On all 11 service detail pages, Related work now appears as section (04), followed by the same-family recommendations (for example, More in Design) as section (05). The two related project cards and recommendation links remain intact. Built successfully and checked 22 route/viewport cases at 1440px and 390px for DOM order, visible numbering, and horizontal overflow. Screenshots: qa/service-section-order-1440.png and qa/service-section-order-390.png.

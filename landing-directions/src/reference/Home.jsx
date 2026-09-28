@@ -5007,6 +5007,7 @@ export default class Home extends ReferencePage {
             <Testimonials />
             <section
               id={"contact"}
+              className="closing-cta"
               ref={v.closingRef}
               onMouseMove={v.closingMove}
               onMouseLeave={v.closingLeave}
@@ -5015,6 +5016,9 @@ export default class Home extends ReferencePage {
                 overflow: "clip",
                 isolation: "isolate",
                 padding: "var(--section-space) 0",
+                minHeight: "min(840px,90svh)",
+                display: "grid",
+                alignItems: "center",
                 textAlign: "center",
                 background: "#0B0612",
               }}
@@ -5038,17 +5042,15 @@ export default class Home extends ReferencePage {
                 }}
               ></div>
               <img
-                data-spin={"160000"}
                 src={"/assets/logo/orgtik-mark-white.svg"}
                 alt={""}
                 style={{
                   position: "absolute",
                   left: "50%",
                   top: "50%",
-                  width: "min(760px,90vw)",
+                  width: "min(760px,90vw,calc(90svh - 40px))",
                   height: "auto",
-                  marginLeft: "calc(min(760px,90vw) / -2)",
-                  marginTop: "calc(min(760px,90vw) / -2)",
+                  transform: "translate(-50%,-50%)",
                   opacity: ".04",
                   zIndex: "-1",
                   pointerEvents: "none",
@@ -5078,7 +5080,7 @@ export default class Home extends ReferencePage {
                   data-hw={""}
                   style={{
                     marginTop: "34px",
-                    fontSize: "var(--section-title-size)",
+                    fontSize: "clamp(30px,3.5vw,48px)",
                     lineHeight: ".95",
                     fontWeight: "500",
                     letterSpacing: "-.05em",

@@ -248,3 +248,32 @@ main > section {
 .legal-intro .contact-intro__subtitle {
   color: #cfc2db;
 }
+
+.account-modes {
+  flex-wrap: wrap;
+}
+.account-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b1e59;
+}
+.account-field input {
+  width: 100%;
+  height: 54px;
+  padding: 0 16px;
+  border: 1px solid #190b2526;
+  border-radius: 14px;
+  background: #fff;
+  color: #190b25;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+}
+
+@media (max-width: 760px) {
+  .closing-cta {
+    min-height: min(560px, 80svh) !important;
+  }
+}

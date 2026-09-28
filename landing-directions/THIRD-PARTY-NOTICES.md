@@ -173,3 +173,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## September 2026 reference migration
+
+The user-supplied OrgTik Website3.html export supplies the current page layouts, copy, artwork, video, and Phosphor icon font mappings. Montserrat and Phosphor remain locally served under their original licenses. The export's bundled React, document viewer, and image editor runtimes are not redistributed; the project uses its npm React dependency and a small display-only image element.

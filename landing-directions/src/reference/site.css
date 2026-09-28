@@ -1,0 +1,137 @@
+@import "./icons-regular.css";
+@import "./icons-fill.css";
+@import "./icons-light.css";
+@import "./states.css";
+
+@font-face {
+  font-family: Montserrat;
+  src: url("/assets/fonts/montserrat-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+:root {
+  font-family: Montserrat, "Montserrat Variable", Arial, sans-serif;
+  color: #f6f1fa;
+  background: #0d0814;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 110px;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #0d0814;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+a {
+  color: #c9a0f3;
+  text-decoration: none;
+}
+a:hover {
+  color: #eee3f7;
+}
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+ul {
+  margin: 0;
+}
+ul {
+  padding: 0;
+  list-style: none;
+}
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
+::selection {
+  background: #9458f4;
+  color: #fff;
+}
+image-slot[data-logo]::part(frame) {
+  background: transparent;
+}
+image-slot[data-logo]::part(image) {
+  filter: brightness(0) invert(1);
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #b98af7;
+  outline-offset: 5px;
+}
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 16px;
+  z-index: 200;
+  padding: 14px 20px;
+  border-radius: 30px;
+  background: #eee3f7;
+  color: #28123b;
+  transform: translateY(-160%);
+}
+.skip-link:focus {
+  transform: none;
+}
+.page-loading {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  color: #d4b7ec;
+}
+.not-found {
+  min-height: 100svh;
+  padding: 15vh 8vw;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 30px;
+}
+.not-found img {
+  width: 180px;
+}
+.not-found h1 {
+  font-size: clamp(40px, 7vw, 90px);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

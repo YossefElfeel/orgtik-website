@@ -1484,7 +1484,7 @@ export default class Insights extends ReferencePage {
                 <section
                   id={"articles"}
                   style={{
-                    padding: "clamp(128px,11vw,156px) 0 clamp(72px,7vw,108px)",
+                    padding: "var(--section-space) 0 var(--section-space)",
                   }}
                 >
                   <div
@@ -1501,7 +1501,7 @@ export default class Insights extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(32px,3.4vw,48px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -1541,7 +1541,7 @@ export default class Insights extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1.02",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -2048,7 +2048,7 @@ export default class Insights extends ReferencePage {
               <>
                 <section
                   id={"article"}
-                  style={{ padding: "clamp(72px,7vw,108px) 0" }}
+                  style={{ padding: "var(--section-space) 0" }}
                 >
                   <div
                     style={{
@@ -2377,7 +2377,7 @@ export default class Insights extends ReferencePage {
                 </section>
                 <section
                   style={{
-                    padding: "clamp(72px,7vw,108px) 0",
+                    padding: "var(--section-space) 0",
                     borderTop: "1px solid #ffffff12",
                   }}
                 >
@@ -2395,7 +2395,7 @@ export default class Insights extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(32px,3.4vw,48px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -2435,7 +2435,7 @@ export default class Insights extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1.02",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -2628,7 +2628,7 @@ export default class Insights extends ReferencePage {
                 position: "relative",
                 overflow: "clip",
                 isolation: "isolate",
-                padding: "clamp(84px,8.4vw,128px) 0",
+                padding: "var(--section-space) 0",
                 textAlign: "center",
                 background: "#0B0612",
                 borderTop: "1px solid #ffffff12",

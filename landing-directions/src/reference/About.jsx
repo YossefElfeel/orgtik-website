@@ -2031,7 +2031,7 @@ export default class About extends ReferencePage {
             <section
               id={"purpose"}
               style={{
-                padding: "clamp(128px,11vw,156px) 0 clamp(72px,7vw,108px)",
+                padding: "var(--section-space) 0 var(--section-space)",
               }}
             >
               <div
@@ -2048,7 +2048,7 @@ export default class About extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "32px 64px",
-                    marginBottom: "clamp(32px,3.4vw,48px)",
+                    marginBottom: "clamp(24px,3vh,32px)",
                   }}
                 >
                   <div style={{ minWidth: "0" }}>
@@ -2088,7 +2088,7 @@ export default class About extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1.02",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -2147,7 +2147,7 @@ export default class About extends ReferencePage {
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "flex-end",
-                      minHeight: "clamp(460px,40vw,600px)",
+                      minHeight: "clamp(300px,42svh,440px)",
                       padding: "clamp(24px,2.6vw,40px)",
                       borderRadius: "26px",
                       overflow: "hidden",
@@ -2455,7 +2455,7 @@ export default class About extends ReferencePage {
             <section
               id={"journey"}
               style={{
-                padding: "clamp(72px,7vw,108px) 0",
+                padding: "var(--section-space) 0",
                 background: "#190B25",
                 borderTop: "1px solid #ffffff12",
                 borderBottom: "1px solid #ffffff12",
@@ -2475,7 +2475,7 @@ export default class About extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "32px 64px",
-                    marginBottom: "clamp(32px,3.4vw,48px)",
+                    marginBottom: "clamp(24px,3vh,32px)",
                   }}
                 >
                   <div style={{ minWidth: "0" }}>
@@ -2515,7 +2515,7 @@ export default class About extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1.02",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -2694,7 +2694,7 @@ export default class About extends ReferencePage {
             <section
               id={"capabilities"}
               data-screen-label={"About — What we can do"}
-              style={{ padding: "clamp(72px,7vw,108px) 0" }}
+              style={{ padding: "var(--section-space) 0" }}
             >
               <div
                 style={{
@@ -2710,7 +2710,7 @@ export default class About extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "24px 64px",
-                    marginBottom: "clamp(32px,3.4vw,48px)",
+                    marginBottom: "clamp(24px,3vh,32px)",
                   }}
                 >
                   <div style={{ minWidth: "0" }}>
@@ -2750,7 +2750,7 @@ export default class About extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(34px,4.4vw,66px)",
+                        fontSize: "clamp(30px,4vw,56px)",
                         lineHeight: "1.02",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -3463,7 +3463,7 @@ export default class About extends ReferencePage {
                 position: "relative",
                 overflow: "clip",
                 isolation: "isolate",
-                padding: "clamp(84px,8.4vw,128px) 0",
+                padding: "var(--section-space) 0",
                 textAlign: "center",
                 background: "#0B0612",
                 borderTop: "1px solid #ffffff12",

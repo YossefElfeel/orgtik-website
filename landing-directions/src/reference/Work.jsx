@@ -1,3 +1,4 @@
+import { PROJECTS } from "./projects";
 import { Testimonials } from "./Testimonials";
 import { ContentHeading } from "./ContentHeading";
 import React from "react";
@@ -5,78 +6,7 @@ import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
 
 export default class Work extends ReferencePage {
-  P = [
-    {
-      slug: "orgtik-identity-system",
-      name: "OrgTik identity system",
-      category: "Brand & digital design",
-      sector: "Technology",
-      summary:
-        "A connected identity built to move from strategy into every useful touchpoint.",
-      transformation:
-        "From a strong mark to a complete, flexible brand experience.",
-      image: "brand-cards.webp",
-      status: "OrgTik-owned work",
-      service: "design",
-      gallery: ["brand-cards.webp", "brand-phone.webp", "brand-glass.webp"],
-    },
-    {
-      slug: "connected-platform-concept",
-      name: "Connected platform concept",
-      category: "Platform",
-      sector: "Business operations",
-      summary:
-        "A product direction for bringing six everyday systems into one coherent workspace.",
-      transformation:
-        "From disconnected tools to one clearer operating picture.",
-      image: "brand-tablet.webp",
-      status: "Concept preview",
-      service: "development",
-      gallery: ["brand-tablet.webp", "brand-phone.webp", "brand-cards.webp"],
-    },
-    {
-      slug: "managed-digital-presence",
-      name: "Managed digital presence",
-      category: "Hosting & support",
-      sector: "Digital infrastructure",
-      summary:
-        "A connected service model spanning the website, hosting, monitoring, and ongoing improvement.",
-      transformation:
-        "From launch-day delivery to a dependable long-term digital partnership.",
-      image: "brand-glass.webp",
-      status: "Private-preview sample",
-      service: "hosting",
-      gallery: ["brand-glass.webp", "brand-tablet.webp", "brand-phone.webp"],
-    },
-    {
-      slug: "campaign-growth-system",
-      name: "Campaign growth system",
-      category: "Marketing & growth",
-      sector: "Professional services",
-      summary:
-        "A mock campaign system connecting audience decisions, content, publishing, and the learning loop.",
-      transformation:
-        "From scattered activity to a campaign rhythm the whole team can see.",
-      image: "brand-phone.webp",
-      status: "Mock project",
-      service: "digital-marketing",
-      gallery: ["brand-phone.webp", "brand-glass.webp", "brand-cards.webp"],
-    },
-    {
-      slug: "support-continuity-system",
-      name: "Support continuity system",
-      category: "IT support",
-      sector: "Business operations",
-      summary:
-        "A mock support experience that makes requests, priorities, fixes, and follow-up easier to understand.",
-      transformation:
-        "From reactive fixes to a visible rhythm of care and improvement.",
-      image: "brand-phone.webp",
-      status: "Mock project",
-      service: "it-support",
-      gallery: ["brand-phone.webp", "brand-tablet.webp", "brand-glass.webp"],
-    },
-  ];
+  P = PROJECTS;
   SOCIALS = [
     ["Facebook", "ph-fill ph-facebook-logo"],
     ["Instagram", "ph-fill ph-instagram-logo"],
@@ -1463,7 +1393,7 @@ export default class Work extends ReferencePage {
                   id={"projects"}
                   data-screen-label={"Work — Projects"}
                   style={{
-                    padding: "clamp(128px,11vw,156px) 0 clamp(72px,7vw,108px)",
+                    padding: "var(--section-space) 0 var(--section-space)",
                   }}
                 >
                   <div
@@ -1480,7 +1410,7 @@ export default class Work extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "24px 64px",
-                        marginBottom: "clamp(32px,3.4vw,48px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -1520,7 +1450,7 @@ export default class Work extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1.02",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -2233,7 +2163,7 @@ export default class Work extends ReferencePage {
               <>
                 <section
                   id={"story"}
-                  style={{ padding: "clamp(72px,7vw,108px) 0" }}
+                  style={{ padding: "var(--section-space) 0" }}
                 >
                   <div
                     style={{
@@ -2355,7 +2285,7 @@ export default class Work extends ReferencePage {
                 <section
                   id={"gallery"}
                   style={{
-                    padding: "clamp(72px,7vw,108px) 0",
+                    padding: "var(--section-space) 0",
                     background: "#190B25",
                     borderTop: "1px solid #ffffff12",
                     borderBottom: "1px solid #ffffff12",
@@ -2375,7 +2305,7 @@ export default class Work extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(32px,3.4vw,48px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -2415,7 +2345,7 @@ export default class Work extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1.02",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -2498,7 +2428,7 @@ export default class Work extends ReferencePage {
                     </div>
                   </div>
                 </section>
-                <section style={{ padding: "clamp(72px,7vw,108px) 0" }}>
+                <section style={{ padding: "var(--section-space) 0" }}>
                   <div
                     style={{
                       maxWidth: "1440px",
@@ -2513,7 +2443,7 @@ export default class Work extends ReferencePage {
                         alignItems: "flex-end",
                         justifyContent: "space-between",
                         gap: "32px 64px",
-                        marginBottom: "clamp(32px,3.4vw,48px)",
+                        marginBottom: "clamp(24px,3vh,32px)",
                       }}
                     >
                       <div style={{ minWidth: "0" }}>
@@ -2553,7 +2483,7 @@ export default class Work extends ReferencePage {
                           data-reveal={"mask"}
                           data-hw={""}
                           style={{
-                            fontSize: "clamp(34px,4.4vw,66px)",
+                            fontSize: "clamp(30px,4vw,56px)",
                             lineHeight: "1.02",
                             fontWeight: "500",
                             letterSpacing: "-.045em",
@@ -2793,7 +2723,7 @@ export default class Work extends ReferencePage {
                 position: "relative",
                 overflow: "clip",
                 isolation: "isolate",
-                padding: "clamp(84px,8.4vw,128px) 0",
+                padding: "var(--section-space) 0",
                 textAlign: "center",
                 background: "#0B0612",
                 borderTop: "1px solid #ffffff12",

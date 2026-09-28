@@ -1137,7 +1137,7 @@ export default class Contact extends ReferencePage {
                 background:
                   "radial-gradient(70% 60% at 100% 0%,#9458F424,transparent 70%),#EEE8F7",
                 color: "#190B25",
-                padding: "clamp(128px,11vw,156px) 0 clamp(72px,7vw,108px)",
+                padding: "var(--section-space) 0 var(--section-space)",
               }}
             >
               <header className="contact-intro">

@@ -220,3 +220,30 @@ textarea:focus-visible,
     max-width: none;
   }
 }
+
+/* Content-first viewport rhythm: natural height is retained for dense sections. */
+:root {
+  --section-space: clamp(32px, 4.5svh, 64px);
+}
+main > section {
+  scroll-margin-top: 96px;
+}
+@media (max-width: 760px) {
+  :root {
+    --section-space: 36px;
+  }
+}
+
+.legal-intro .contact-intro__eyebrow {
+  color: #b5a6c4;
+}
+.legal-intro h1 {
+  color: #f6f1fa;
+  font-size: clamp(34px, 4.4vw, 62px);
+}
+.legal-intro h1 span {
+  color: #c9a0f3;
+}
+.legal-intro .contact-intro__subtitle {
+  color: #cfc2db;
+}

@@ -146,3 +146,12 @@ On all 11 service detail pages, Related work now appears as section (04), follow
 - `npm run build` passed. No P0, P1, or P2 visual mismatches remain in this scope.
 
 final result: passed
+
+## Closing CTA consistency across page groups — 2026-09-28
+
+- Home, Services, Software, Work, About, and Insights now share responsive closing-section dimensions, headline scale and line height, and centered official background-mark sizing. Contextual copy and existing CTA labels/destinations remain in place.
+- Browser-checked all 35 routes that render the closing CTA at 390px, 768px, 1024px, 1440px, and 2048px with a 960px viewport height, plus 1366 × 600px (210 route/viewport checks). The mark remains wholly inside the section; headings and content do not clip or overflow horizontally; the existing one-button Home and two-button other-page arrangements remain intact. Two longer Software variants expand the section naturally at 2048px.
+- Visually compared Home and the five other overview sections at 1440px and 390px. Captures: `qa/closing-consistency-{home,services,software,work,about,insights}-{1440,390}.png`.
+- `npm run build`, Prettier formatting, and `git diff --check` passed. No P0, P1, or P2 visual mismatches remain in this scope.
+
+final result: passed

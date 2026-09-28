@@ -272,8 +272,14 @@ main > section {
   font-size: 15px;
 }
 
+.closing-cta {
+  --closing-cta-height: min(960px, 100svh);
+  --closing-cta-mark-width: min(860px, 90vw, calc(100svh - 80px));
+  --closing-cta-title-size: clamp(38px, 9vw, 180px);
+}
+
 @media (max-width: 760px) {
   .closing-cta {
-    min-height: min(560px, 80svh) !important;
+    --closing-cta-height: min(560px, 80svh);
   }
 }

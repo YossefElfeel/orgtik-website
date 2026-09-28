@@ -5016,7 +5016,7 @@ export default class Home extends ReferencePage {
                 overflow: "clip",
                 isolation: "isolate",
                 padding: "var(--section-space) 0",
-                minHeight: "min(960px,100svh)",
+                minHeight: "var(--closing-cta-height)",
                 display: "grid",
                 alignItems: "center",
                 textAlign: "center",
@@ -5048,7 +5048,7 @@ export default class Home extends ReferencePage {
                   position: "absolute",
                   left: "50%",
                   top: "50%",
-                  width: "min(860px,90vw,calc(100svh - 80px))",
+                  width: "var(--closing-cta-mark-width)",
                   height: "auto",
                   transform: "translate(-50%,-50%)",
                   opacity: ".04",
@@ -5080,7 +5080,7 @@ export default class Home extends ReferencePage {
                   data-hw={""}
                   style={{
                     marginTop: "34px",
-                    fontSize: "clamp(38px,9vw,180px)",
+                    fontSize: "var(--closing-cta-title-size)",
                     lineHeight: ".95",
                     fontWeight: "500",
                     letterSpacing: "-.05em",

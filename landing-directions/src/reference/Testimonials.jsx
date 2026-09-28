@@ -44,7 +44,6 @@ const entries = [
 ];
 
 export function Testimonials({ scope = "All", project }) {
-  const [filter, setFilter] = useState("All");
   const [position, setPosition] = useState({ start: true, end: false });
   const section = useRef(null),
     track = useRef(null),
@@ -80,11 +79,7 @@ export function Testimonials({ scope = "All", project }) {
         topic,
         detail,
       }))
-    : entries.filter(
-        (item) =>
-          (scope === "All" || item.category === scope) &&
-          (scope !== "All" || filter === "All" || item.category === filter),
-      );
+    : entries.filter((item) => scope === "All" || item.category === scope);
   const update = () => {
     const el = track.current;
     if (el)
@@ -126,7 +121,7 @@ export function Testimonials({ scope = "All", project }) {
     const resize = new ResizeObserver(update);
     if (track.current) resize.observe(track.current);
     return () => resize.disconnect();
-  }, [filter, scope, project?.slug]);
+  }, [scope, project?.slug]);
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -189,30 +184,13 @@ export function Testimonials({ scope = "All", project }) {
             Approved client stories will appear here.
           </p>
         </div>
-        <div className="testimonials__toolbar">
-          {scope === "All" && !project ? (
-            <div
-              className="testimonials__filters"
-              role="group"
-              aria-label="Filter testimonials"
-            >
-              {["All", "Services", "Software"].map((value) => (
-                <button
-                  type="button"
-                  key={value}
-                  aria-pressed={filter === value}
-                  onClick={() => setFilter(value)}
-                >
-                  {value}
-                </button>
-              ))}
-            </div>
-          ) : (
+        {(scope !== "All" || project) && (
+          <div className="testimonials__toolbar">
             <p className="testimonials__context">
               {project ? project.name : scope + " testimonials"}
             </p>
-          )}
-        </div>
+          </div>
+        )}
         <div
           className="testimonials__track"
           ref={track}

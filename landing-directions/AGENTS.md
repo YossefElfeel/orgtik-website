@@ -123,3 +123,7 @@ Keep the large closing mark fully visible by giving the closing CTA enough heigh
 Keep the large closing mark centered and static. The former rotation clipped its corners even when the unrotated image fitted in the section. The Home closing headline uses a slightly larger responsive size.
 
 On every service detail page, Related work is section (04) and appears before the same-family recommendations, which are section (05). Preserve the existing service-specific wording (for example, “More in Design”) and links.
+
+## Closing CTA reference and testimonials — 2026-09-28
+
+Use the supplied large-type closing CTA reference on Home, with its latest CTA button unchanged. Keep the official background mark centered and fully visible at each viewport. Testimonial sections no longer show All/Services/Software filter tabs; retain the category tags on cards and the existing page/project content scopes and carousel controls.

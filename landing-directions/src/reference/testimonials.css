@@ -34,27 +34,12 @@
 .testimonials__toolbar {
   margin-bottom: 28px;
 }
-.testimonials__filters {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
 .testimonials button {
   font: inherit;
   cursor: pointer;
   color: inherit;
   background: transparent;
   border: 1px solid #766181;
-}
-.testimonials__filters button {
-  padding: 10px 20px;
-  border-radius: 999px;
-  font-size: 13px;
-}
-.testimonials__filters button[aria-pressed="true"] {
-  background: #dec8ee;
-  color: #23132e;
-  border-color: #dec8ee;
 }
 .testimonials button:focus-visible,
 .testimonials__track:focus-visible {

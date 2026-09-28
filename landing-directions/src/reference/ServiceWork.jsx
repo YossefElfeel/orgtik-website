@@ -4,7 +4,17 @@ import "./service-work.css";
 export function ServiceWork({ family, service }) {
   const category =
     family.slug === "marketing" ? "digital-marketing" : family.slug;
-  const projects = PROJECTS.filter((project) => project.service === category);
+  const relatedCategory = {
+    design: "development",
+    development: "hosting",
+    "digital-marketing": "design",
+    "it-support": "hosting",
+    hosting: "it-support",
+  }[category];
+  const projects = [
+    ...PROJECTS.filter((project) => project.service === category),
+    ...PROJECTS.filter((project) => project.service === relatedCategory),
+  ].slice(0, 2);
   if (!projects.length) return null;
   return (
     <section
@@ -30,31 +40,33 @@ export function ServiceWork({ family, service }) {
             current status.
           </p>
         </div>
-        {projects.map((project) => (
-          <a
-            className="service-work__card"
-            key={project.slug}
-            href={"/work#/project/" + project.slug}
-          >
-            <img
-              src={"/assets/" + project.image}
-              alt={project.name + " — project imagery"}
-              loading="lazy"
-            />
-            <div className="service-work__body">
-              <div className="service-work__tags">
-                <span>{project.status}</span>
-                <span>{family.short}</span>
+        <div className="service-work__grid">
+          {projects.map((project) => (
+            <a
+              className="service-work__card"
+              key={project.slug}
+              href={"/work#/project/" + project.slug}
+            >
+              <img
+                src={"/assets/" + project.image}
+                alt={project.name + " — project imagery"}
+                loading="lazy"
+              />
+              <div className="service-work__body">
+                <div className="service-work__tags">
+                  <span>{project.status}</span>
+                  <span>{project.category}</span>
+                </div>
+                <h3>{project.name}</h3>
+                <p>{project.summary}</p>
+                <span className="service-work__link">
+                  View project{" "}
+                  <i className="ph ph-arrow-up-right" aria-hidden="true" />
+                </span>
               </div>
-              <h3>{project.name}</h3>
-              <p>{project.summary}</p>
-              <span className="service-work__link">
-                View project{" "}
-                <i className="ph ph-arrow-up-right" aria-hidden="true" />
-              </span>
-            </div>
-          </a>
-        ))}
+            </a>
+          ))}
+        </div>
         <a className="service-work__all" href="/work">
           View all work <i className="ph ph-arrow-right" aria-hidden="true" />
         </a>

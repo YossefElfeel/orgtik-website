@@ -107,3 +107,9 @@ Keep section spacing responsive to viewport height. Prefer compact padding, head
 Project testimonial sections use three project-specific preview cards with the same desktop three-column carousel and previous/next controls as Services; show one card at a time on mobile.
 
 Legal and Sitemap share a two-column introduction: eyebrow and primary H1 on the left, supporting copy on the right; stack on mobile. Imprint, Privacy policy, Terms and conditions, and All pages use smaller H2 headings beneath this introduction.
+
+## Heading hierarchy — 2026-09-28
+
+Keep secondary H2 section titles visibly smaller than the page H1 on all routes, including service categories/details, software details, projects, articles, testimonials, and closing sections. Use the shared responsive --section-title-size token; compact page H1 titles retain the larger primary scale.
+
+Service detail related-work sections show two distinct existing projects side by side, with images above their text. Show the direct service match first and a complementary project second, preserving each project’s actual category and preview status. Stack cards on mobile.

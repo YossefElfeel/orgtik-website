@@ -2183,7 +2183,7 @@ export default class Contact extends ReferencePage {
                 <h2
                   style={{
                     maxWidth: "520px",
-                    fontSize: "clamp(32px,3vw,44px)",
+                    fontSize: "var(--section-title-size)",
                     lineHeight: "1.12",
                     letterSpacing: "-.04em",
                     fontWeight: "500",

@@ -2088,7 +2088,7 @@ export default class About extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(30px,4vw,56px)",
+                        fontSize: "var(--section-title-size)",
                         lineHeight: "1.02",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -2515,7 +2515,7 @@ export default class About extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(30px,4vw,56px)",
+                        fontSize: "var(--section-title-size)",
                         lineHeight: "1.02",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -2750,7 +2750,7 @@ export default class About extends ReferencePage {
                       data-reveal={"mask"}
                       data-hw={""}
                       style={{
-                        fontSize: "clamp(30px,4vw,56px)",
+                        fontSize: "var(--section-title-size)",
                         lineHeight: "1.02",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
@@ -3528,7 +3528,7 @@ export default class About extends ReferencePage {
                   data-hw={""}
                   style={{
                     marginTop: "34px",
-                    fontSize: "clamp(42px,6.6vw,104px)",
+                    fontSize: "var(--section-title-size)",
                     lineHeight: "1.04",
                     fontWeight: "500",
                     letterSpacing: "-.05em",
@@ -3762,7 +3762,7 @@ export default class About extends ReferencePage {
                 <h2
                   style={{
                     maxWidth: "520px",
-                    fontSize: "clamp(32px,3vw,44px)",
+                    fontSize: "var(--section-title-size)",
                     lineHeight: "1.12",
                     letterSpacing: "-.04em",
                     fontWeight: "500",

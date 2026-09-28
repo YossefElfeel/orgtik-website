@@ -16,7 +16,7 @@
   margin-bottom: 44px;
 }
 .testimonials h2 {
-  font-size: clamp(32px, 3.55vw, 80px);
+  font-size: var(--section-title-size);
   font-weight: 500;
   line-height: 1.12;
   letter-spacing: -0.045em;

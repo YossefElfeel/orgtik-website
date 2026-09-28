@@ -137,3 +137,12 @@ The closing mark stays large and centered but no longer rotates, which prevented
 ## Service detail section order — 2026-09-28
 
 On all 11 service detail pages, Related work now appears as section (04), followed by the same-family recommendations (for example, More in Design) as section (05). The two related project cards and recommendation links remain intact. Built successfully and checked 22 route/viewport cases at 1440px and 390px for DOM order, visible numbering, and horizontal overflow. Screenshots: qa/service-section-order-1440.png and qa/service-section-order-390.png.
+
+## Large Home closing CTA and testimonials without filters — 2026-09-28
+
+- Compared the supplied 2005 × 960 closing-section reference with `qa/closing-reference-viewport.png` at the same viewport. The Home section uses the reference's dominant two-line headline, centered faint official mark, and dark-violet composition. Its current single “Talk to us” button is intentionally preserved, as requested, instead of adding the reference's second button.
+- At 2048 × 960, the Home section and logo measured 960px and 860px high respectively, leaving about 45px above and below the mark. At 390 × 960, they measured 560px and 351px, leaving about 102px above and below. Neither viewport had horizontal overflow. Screenshots: `qa/closing-large-2048.png` and `qa/closing-large-390.png`.
+- Removed All/Services/Software filter tabs from the shared testimonial component. Checked Home, About, Services, Software, and all five project detail routes at 1440px and 390px (18 route/viewport cases). Category tags, project-specific content, and carousel navigation remain; the mobile next arrow advances the track. No horizontal overflow or JavaScript errors were observed. Screenshots: `qa/testimonials-no-tabs-1440.png` and `qa/testimonials-no-tabs-390.png`.
+- `npm run build` passed. No P0, P1, or P2 visual mismatches remain in this scope.
+
+final result: passed

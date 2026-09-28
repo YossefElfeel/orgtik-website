@@ -1,41 +1,48 @@
-import { useCallback, useEffect, useState } from "react";
-import Cinematic from "./Cinematic";
-import { RoutePage } from "./Pages";
-import { useReveals } from "./shared";
-import { useSmoothScroll } from "./useSmoothScroll";
+import React, { lazy, Suspense, useEffect, useState } from "react";
+import { toSiteHref, normalizeLocation } from "./reference/navigation";
+
+const pages = {
+  "/": lazy(() => import("./reference/Home")),
+  "/services": lazy(() => import("./reference/Services")),
+  "/software": lazy(() => import("./reference/Software")),
+  "/work": lazy(() => import("./reference/Work")),
+  "/about": lazy(() => import("./reference/About")),
+  "/insights": lazy(() => import("./reference/Insights")),
+  "/contact": lazy(() => import("./reference/Contact")),
+  "/roadmap": lazy(() => import("./reference/Roadmap")),
+  "/legal": lazy(() => import("./reference/Legal")),
+  "/sign-in": lazy(() => import("./reference/SignIn")),
+};
+normalizeLocation();
 
 export function App() {
-  const [location, setLocation] = useState(() => ({
-    path: window.location.pathname.replace(/\/$/, "") || "/",
-    search: window.location.search,
-    hash: window.location.hash,
-  }));
-  useReveals();
-  useSmoothScroll();
-
+  const [path, setPath] = useState(window.location.pathname);
   useEffect(() => {
-    const update = () =>
-      setLocation({
-        path: window.location.pathname.replace(/\/$/, "") || "/",
-        search: window.location.search,
-        hash: window.location.hash,
-      });
-    window.addEventListener("popstate", update);
-    return () => window.removeEventListener("popstate", update);
-  }, []);
-
-  const navigate = useCallback((destination) => {
-    const url = new URL(destination, window.location.origin);
-    window.history.pushState({}, "", `${url.pathname}${url.search}${url.hash}`);
-    setLocation({
-      path: url.pathname.replace(/\/$/, "") || "/",
-      search: url.search,
-      hash: url.hash,
-    });
-  }, []);
-
-  useEffect(() => {
-    const handleInternalLink = (event) => {
+    const update = () => {
+      normalizeLocation();
+      setPath(window.location.pathname);
+    };
+    const navigate = (destination) => {
+      const url = new URL(toSiteHref(destination), window.location.href);
+      if (url.origin !== window.location.origin) {
+        window.location.assign(url.href);
+        return;
+      }
+      const previous = window.location.href;
+      const changedPage = url.pathname !== window.location.pathname;
+      window.history.pushState({}, "", url.pathname + url.search + url.hash);
+      update();
+      if (changedPage) window.scrollTo({ top: 0, behavior: "instant" });
+      else
+        window.dispatchEvent(
+          new HashChangeEvent("hashchange", {
+            oldURL: previous,
+            newURL: url.href,
+          }),
+        );
+    };
+    window.__orgNav = navigate;
+    const click = (event) => {
       const anchor = event.target.closest?.("a[href]");
       if (
         !anchor ||
@@ -49,58 +56,52 @@ export function App() {
         anchor.hasAttribute("download")
       )
         return;
-      const url = new URL(anchor.href, window.location.origin);
-      if (url.origin !== window.location.origin) return;
-      const samePageHash =
-        url.pathname === window.location.pathname &&
-        url.search === window.location.search &&
-        url.hash;
-      if (samePageHash) return;
+      const href = toSiteHref(anchor.getAttribute("href"));
+      if (href.startsWith("#")) return;
+      const url = new URL(href, window.location.href);
+      if (
+        url.origin !== window.location.origin ||
+        !/^https?:$/.test(url.protocol)
+      )
+        return;
       event.preventDefault();
-      navigate(`${url.pathname}${url.search}${url.hash}`);
+      navigate(href);
     };
-    document.addEventListener("click", handleInternalLink);
-    return () => document.removeEventListener("click", handleInternalLink);
-  }, [navigate]);
-
+    document.addEventListener("click", click);
+    window.addEventListener("popstate", update);
+    return () => {
+      delete window.__orgNav;
+      document.removeEventListener("click", click);
+      window.removeEventListener("popstate", update);
+    };
+  }, []);
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      if (location.hash)
-        document.querySelector(location.hash)?.scrollIntoView();
-      else window.scrollTo({ top: 0, behavior: "instant" });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [location.path, location.search, location.hash]);
-
-  useEffect(() => {
-    if (location.path === "/")
-      document.title = "OrgTik | Digital services and business software";
-  }, [location.path]);
-
+    document.title = `${path === "/" ? "Digital studio + business software" : path.slice(1).replace(/-/g, " ")} | OrgTik`;
+  }, [path]);
+  const Page = pages[path];
   return (
     <>
-      <a className="skip-link" href="#main-content">
+      <a className="skip-link" href="#top">
         Skip to content
       </a>
-      {location.path === "/" ? (
-        <Cinematic
-          onContact={() => navigate("/contact")}
-          onAccount={() => navigate("/sign-in")}
-          onPlan={(module) =>
-            navigate(
-              typeof module === "string"
-                ? `/platform?module=${module}&mode=single#plan-builder`
-                : "/platform#plan-builder",
-            )
-          }
-        />
-      ) : (
-        <RoutePage
-          path={location.path}
-          search={location.search}
-          navigate={navigate}
-        />
-      )}
+      <Suspense
+        fallback={
+          <div className="page-loading" role="status">
+            Loading OrgTik…
+          </div>
+        }
+      >
+        {Page ? (
+          <Page key={path} />
+        ) : (
+          <main className="not-found">
+            <img src="/assets/logo/orgtik-lockup-white.svg" alt="OrgTik" />
+            <h1>Page not found.</h1>
+            <p>Explore our services, software, and ideas from the homepage.</p>
+            <a href="/">Back to home ↗</a>
+          </main>
+        )}
+      </Suspense>
     </>
   );
 }

@@ -1,319 +1,42 @@
-# OrgTik cinematic website design QA
+# Reference implementation QA
 
-## Unified open filter controls — 2026-09-22
+Date: 2026-09-28
 
-Source visual truth: `C:/Users/USER/AppData/Local/Temp/codex-clipboard-127c85d8-be94-4054-a1e0-81f562f4aa67.png` (1693 × 298 px). The reference establishes the eyebrow/title, result count, topic pills, and search anatomy; the user's written direction overrides its enclosing lavender frame and requires the same revised design wherever filters appear.
+Source: user-supplied `OrgTik Website3.html`.
+Implementation: `http://127.0.0.1:4173/`.
 
-Implementation scope: `/insights`, `/work`, and `/roadmap`. Work and Insights now share one open filter component with a compact heading/count row, a quiet divider, category pills, and a bordered search field on the page surface. Work gains live project search and count feedback. Roadmap keeps its dark controls and richer period/theme inputs while removing the enclosing panel fill, border, and rounded frame so its toolbar follows the same open rhythm.
+## Result
 
-Browser verification covered the default 1265 px viewport and the managed 375 px mobile viewport (requested 390 × 844; the in-app browser reserves 15 px for its rail). At desktop, Work and Insights share a 1153 × 121 px transparent filter region; Roadmap uses a 1153 × 63 px transparent toolbar with a single top divider and no radius. At mobile, Work and Insights share a 335 × 167 px filter region with a 335 px search field and horizontally scrollable pills; Roadmap stacks its period, theme, and search controls inside a 335 × 233 px open toolbar. All checked documents report `scrollWidth === clientWidth`.
+Passed visual and interaction checks. All ten page groups are implemented as editable React components, with source imagery, typography, colors, section treatments, and interactions. No document-viewer runtime or external font/icon CDN is required.
 
-Interaction verification: searching Work for “identity” returns one story and clearing restores five; searching Insights for “brand” returns one article and clearing restores six. Result counts update through the existing polite live region, and Roadmap retains its period/theme filtering. Browser warning and error logs are empty.
+## Browser coverage
 
-Pill alignment refinement: every shared filter anchor and button is an inline flex container with centered cross-axis and main-axis alignment, a one-unit line height, and centered text. This keeps single- and multi-word labels optically centered within the full pill height across Insights, Work, Roadmap, and other shared filter rows.
+- 26 views checked: all ten page groups plus product, service-family, and service-detail views, at 1440 × 1000 and 390 × 844.
+- No JavaScript exceptions, console warnings, or horizontal document overflow in the final sweep.
+- Desktop header/navigation and browser Back.
+- Six-product software bundle, billing duration, plan comparison, product detail.
+- Service bundle and contact handoff.
+- Contact validation and local success state.
+- Password-reset preview.
+- Insights search, empty state, and article navigation.
+- Reversible roadmap voting.
+- Mobile navigation, focus containment, Escape, focus restoration, and scroll unlock.
+- Legacy route mapping, product selection from query parameters, and disabled comparison for an empty workspace.
 
-`npm run format:check`, `git diff --check`, and the production build pass.
+Results: `qa/browser-results.json`, `qa/interaction-results.json`.
+Screenshots: `qa/reference-desktop.png`, `qa/desktop-home.png`, `qa/desktop-services.png`, `qa/desktop-software.png`, and matching mobile captures.
 
-final result: passed
+## Build checks
 
-## Unified Work project cards — 2026-09-22
+- Production build completed successfully (`dist/client`).
+- Prettier check passed.
+- Git whitespace check passed.
+- The final production build was rerun for the pull request after removing the redundant accessibility attribute; it passed without compiler warnings.
 
-Source visual truth: `https://orgtik-website.vercel.app/work`, captured in the in-app browser before implementation. The live layout separated each rounded image from unframed title, summary, and CTA copy below it, which made the project action feel detached from the visual card.
+## Corrections during verification
 
-Implementation evidence: browser-rendered `http://127.0.0.1:4173/work#work-list`, inspected at the default 1265 × 708 viewport and at 390 × 844 CSS px, density 1. The provider displayed the source and implementation captures inline; no persistent screenshot files were produced. Focused comparison covered the project grid because the hero, filter, closing CTA, and footer were outside the requested change.
-
-Each project now uses one clipped dark cinematic frame containing the supplied image, status/category label, title, summary, divider, and CTA row. The desktop layout is a deliberate 12-column bento: a 661 px seven-column lead spans two rows beside two stacked 464 px five-column cards, followed by an asymmetric 464/661 px final row. The lead height matches the combined height and gap of the two support cards within one pixel. Mobile stacks five 335 px cards. The unified cards preserve Montserrat hierarchy, use the established plum/lilac tokens, retain the original supplied imagery and copy, and add visible keyboard focus plus restrained hover lift, image scale, and arrow movement.
-
-Comparison history: the initial live capture showed two independent visual regions per project—the image card and loose paper-section copy. The first revision unified the surfaces while retaining a two-track editorial grid. The final revision establishes the 7/5 bento, balances the two-row lead against its stacked neighbors, and uses a 5/7 final row. Five cards render, Platform filtering expands the single result to the full 1153 px grid and restoring All returns five, no horizontal overflow appears at either checked width, and browser warning/error logs are empty. No actionable P0/P1/P2 differences remain for the requested layout.
-
-`npm run format:check`, `git diff --check`, and the production build pass.
-
-final result: passed
-
-## Unfilled selected-item plan frame — 2026-09-22
-
-Source visual truth: `C:/Users/USER/AppData/Local/Temp/codex-clipboard-058eb88b-600b-4815-b3f7-e04c40a9036d.png` (1746 × 325 px) identifies the selected HR product lockup; the user's written direction overrides its lavender fill and requires a light outline with no background fill across all plan sections.
-
-Implementation evidence: browser-rendered `/platform/hr?mode=single&duration=annual&modules=hr#plan-builder` and `/services/marketing/social-media-marketing#plan-builder`, inspected in the in-app browser at its current narrow viewport and density 1. The provider displayed the rendered captures inline; no persistent screenshot file was produced. The HR and service variants share `.product-plan-choice`, so the same rule covers every SaaS product and service-plan lockup.
-
-Focused comparison verified the selected-item region because this request changes only that component. The revised frame keeps the existing Montserrat hierarchy, dark icon tile, content spacing, status badge, radius, and copy. Computed browser styles report `background-color: rgba(0, 0, 0, 0)`, `background-image: none`, and a solid light-violet border on both product and service pages. The HR mobile render has no horizontal overflow, and both checked pages report no browser warnings or errors.
-
-Comparison history: the source showed a pale-lilac gradient behind the whole selected-product lockup. The implementation removes that fill, preserves the paper section beneath it, and retains a quiet outline for grouping. No P0/P1/P2 differences remain for the requested state.
-
-`npm run format:check` and the production build pass.
-
-final result: passed
-
-## Shared service process and related-card direction — 2026-09-22
-
-The service-detail “A practical path” section now reuses the homepage Process selector instead of four flat text rows. Understand, Design, Deliver, and Evolve switch the supplied image and narrative on hover, focus, keyboard arrows, or tap. The same flat process treatment on project-detail pages now uses the shared interaction on a dark section, keeping the service, work, and homepage flows in one visual language. Selecting Design updates the visible narrative to “Make the way forward clear.”
-
-Related services now use supplied-image cinematic cards with dark image gradients, capability tags, visible action rows, contextual cursors, and restrained hover movement. At 1440 px the Social media marketing detail uses two 648 × 430 px cards; Development detail uses one intentional 1313 × 470 px card. At 390 px the two related-service cards stack to 335 × 390 px, while the process selector uses four 335 × 76 px controls and a 335 × 210 px image stage. Neither viewport introduces horizontal overflow.
-
-The route-level card audit covered Services overview, a service family, a service detail, SaaS overview, a SaaS detail, Work, Insights, About, and Roadmap. All image-led marketing and related-content card systems use supplied imagery; the Roadmap remains the intentional data-card exception for project status and community suggestions. No image-free EditorialLink call sites remain, and no console warnings or errors were reported.
-
-`npm run format:check`, `git diff --check`, and the production build pass.
-
-final result: passed
-
-## About story, Roadmap direction and dark Insights cards — 2026-09-22
-
-`/about` now explains why OrgTik exists through an explicit mission, three goals, a four-chapter journey map, and four routed capability paths covering brand and demand, digital experiences, business systems, and continuity and care. The desktop mission bento measures 440 px high, the journey cards share a 330 px height, and the four capability cards share a 430 px height. The purpose heading uses a spaced en dash, and the journey replaces the former line-and-dot progress treatment with discrete arrow connectors between the four numbered cards. “Explore the roadmap” is aligned with the supporting introduction above the cards, links to `/roadmap`, and replaces the redundant action row below. At the narrow 319 px in-app viewport, all card groups stack into a 280 px content column without clipped copy; the mission, goal, journey, and capability cards remain content-complete.
-
-`/roadmap` now follows the supplied dark milestone and community-board references in OrgTik's own system. All, Past, Now, and Next filter the project period; a separate year switcher exposes 2025, 2026, and 2027 with matching counts and shows one selected-year grid at a time. Each of the six preview projects carries an independent Open, Planned, In progress, or Shipped delivery status, theme, timing, preview percentage, progress bar, and accessible detail dialog. At 1440 px the selected year uses two 565 × 300 px cards beside a 130 px year rail. Filtering Past returns the two Shipped 2025 projects, Next returns the two Planned 2027 projects, Hosting returns the single 2026 project, and searching “accessibility” returns the single 2027 project.
-
-The second Roadmap section is a four-column community board, with one column for each delivery status. Seven sample suggestions expose local session-only vote controls and comment-preview dialogs; searching “hosting” returns one suggestion and voting changes its visible count from 53 to 54 without persistence. At 1440 px the board uses four 316 px columns and 255 px cards; at 390 px, the project cards and community columns stack to 335 px without horizontal overflow. A light Contact us section follows the board and opens a clearly labelled local confirmation preview. No vote, comment, suggestion, or contact data is transmitted or stored.
-
-`/insights` keeps the compact 568 × 228 px desktop / 384 × 206–207 px mobile editorial anatomy but moves it to dark plum cards with white hierarchy, lilac metadata, and restrained imagery. Categories, search, and the live result count now sit in one contained light-lilac filter panel. The panel is 167 px high at 1280 px and 201 px at 439 px. Searching “brand” still returns one matching article, and neither tested viewport introduces horizontal overflow.
-
-`npm run format:check`, `git diff --check`, and the production build pass. Browser verification reports no console warnings or errors.
-
-final result: passed for the frontend prototype; approved company history, roadmap sources, community data, and live submission endpoints remain content dependencies
-
-## Insights editorial card density — 2026-09-22
-
-The `/insights` article index now uses a compact editorial card system that follows the OrgTik direction without making a long list visually heavy. Six articles form a two-column grid of consistent 568 × 228 px cards at 1280 px, with restrained 164 px imagery, 20–26 px titles, two-line summaries, quiet date metadata, and a small lilac action button. The grid occupies 715 px instead of the previous 897 px while preserving readable hierarchy and supplied imagery.
-
-Below 920 px the layout becomes one column. At 439 px, all six cards measure 384 × 206–207 px with 112 px thumbnails and no horizontal overflow. Search was verified with “brand,” returning one matching article, and the Design category route returns two articles using the same anatomy.
-
-The desktop and mobile states retain accessible links, visible metadata, and motion limited to a subtle four-pixel card lift and image scale. Reduced-motion behavior inherits the shared no-transform fallback.
-
-final result: passed
-
-## Service-family bento and unified service plans — 2026-09-22
-
-`/services/marketing` now replaces the three equal 371 × 440 px cards with an asymmetric supplied-asset bento: one 666 × 522 px lead card and two 471 px supporting cards at 264/242 px. Every card contains two service-specific capability tags and retains the contextual cursor and visible action. At 439 px, the same cards stack into three 384 × 390 px cards with no horizontal overflow.
-
-All service-family and child-detail routes now use one shared Focus, Connected, and Partnership plan component based on the SaaS product-plan anatomy. It includes a selected-service lockup, full-width indicative CHF notice, service-specific scope and feature lists, prototype estimates, one recommended dark card, and clear contact handoff. Child routes no longer use the sparse image-and-copy Engagement split. Marketing detail pages now use the same 666/471 px capability bento as SaaS, stacking to 384 px cards at 320/280/280 px on mobile.
-
-The variable family layouts were checked at 1280 px: Development uses a 666/471 px two-card split, while Hosting uses one intentional 1153 × 420 px card. All three Hosting plan actions continue to `https://orgtik.ch`. Desktop and 439 px mobile checks report no horizontal overflow.
-
-`npm run format:check`, `git diff --check`, and the production build pass.
-
-final result: passed for the frontend prototype; service pricing remains indicative until commercial approval
-
-## SaaS card balance, bento capabilities and product-only plans — 2026-09-22
-
-The `/platform` builder now balances its two-column composition: the six product selectors divide the review panel's 526 px desktop height into two equal 221 px rows. Each card uses that space for the product description, three included capabilities, category, and starting monthly prototype estimate. The four bundle cards were tightened from 148 px to 124 px and the Custom row from 92 px to 80 px. At 439 px mobile width, cards return to content-driven 165 px heights and one 384 px column.
-
-The configurator decision steps now share a consistent 24 px vertical gap: bundle selection to billing commitment, then billing commitment to product selection. The billing panel was tightened from 108 px to 100 px at desktop. Selected bundle paths stay on a light lilac surface while the billing duration remains the single dark decision band. Browser checks at 1280 px and 439 px confirm the same rhythm without horizontal overflow.
-
-Every `/platform/:product` “Built for the everyday work” section now uses an asymmetric bento layout. At 1280 px the lead story is 666 × 509 px and the two supporting stories are 471 × 247 px; each story contains the relevant capability previously shown in the detached checklist. The standalone checklist is removed. Mobile stacks the same stories at 384 px wide with 320/280/280 px heights.
-
-Product detail routes now treat the product as already chosen. The full bundle configurator is removed from all six detail routes and replaced with product-specific Essential, Connected, and Partnership cards, plus Monthly, 12-month, and 24-month duration switching. Browser checks confirmed three plans, three bento capabilities, no duplicate configurator, and no horizontal overflow for HR, CRM, Files, Tasks, Marketing, and Website Manager. Switching Website Manager from 12 months to Monthly updated the prototype estimate and URL state.
-
-The product workflow demo now follows the homepage process typography language instead of hero-sized type: Montserrat Variable at 500 weight, a lilac second line, a 34–52 px responsive desktop scale, and 36 px mobile type. Supporting copy and the prototype notice share one side column, removing the unnecessary third intro row. At 1280 px the intro is 172 px high instead of 301 px, the complete section is 816 px instead of 996 px, and the prototype stage remains 768 × 427 px. At the reported 1856 px desktop size the section is 883 px high with the title capped at 52 px. The 439 px mobile check reports no horizontal overflow. The product-plan estimate notice spans the full content container.
-
-“Choose. Review. Discuss.” now renders as three equal 374 × 253 px horizontal cards at desktop with violet edge, lift, number, and arrow hover treatments; mobile stacks them to the standard 384 px content width. Reduced-motion styles remove the transforms.
-
-`npm run format:check`, `git diff --check`, and the production build pass.
-
-final result: passed
-
-## Homepage gallery regression repair — 2026-09-22
-
-The homepage “Our identity, in the world” gallery is restored to its compact staggered two-image composition. The routed project-detail gallery now uses an isolated `project-detail-gallery` class, preventing its 860 px masonry lead image and absolute positioning from overriding the homepage cards through the older shared `project-gallery` class.
-
-Browser verification covered the homepage Work and SaaS sections at 1280 px desktop and 439 px mobile width. Both supplied project images load at their intended compact heights: 433/390 px on desktop and 265/260 px on mobile. The gallery measures 530 px tall on desktop and stacks to 657 px on mobile, with no horizontal overflow. The homepage SaaS explorer remains isolated from routed product-card styles, switches from HR to CRM correctly, retains all six tabs, and has no horizontal overflow at either viewport.
-
-`npm run format:check` and the production build pass.
-
-final result: passed
-
-## Services overview cards, process and testimonials — 2026-09-22
-
-The `/services` overview now uses the same image-led cinematic card system as SaaS: five supplied-asset cards, family-specific Phosphor icons, visible action rows, restrained hover motion, and contextual “Explore” cursors on mouse/fine-pointer devices. Four cards form two balanced rows and the fifth OrgTik Hosting card spans the grid as a deliberate final pathway. Service-family child cards also receive contextual cursors without changing their routes.
-
-“One engagement, clearly shaped” now reuses the homepage’s accessible Process selector. Understand, Design, Deliver, and Evolve switch the adjacent supplied image and supporting narrative on hover, focus, keyboard arrows, or tap. A five-story Services testimonial carousel follows, with every quote and identity explicitly labelled as placeholder content.
-
-Browser verification covered `/services` at 1280 px desktop and 439 px mobile width. Five service cards, five contextual cursors, four process tabs, and five testimonials are present; selecting Design updates the narrative to “Make the way forward clear.” Cards stack to one 384 px column at mobile, and neither viewport has horizontal overflow. The production build and formatting check pass.
-
-final result: passed for the frontend prototype; approved client quotes remain a content dependency
-
-## SaaS product-detail stories, demos and plans — 2026-09-22
-
-All six `/platform/:product` routes now share a product-specific detail system. “Built for the everyday work” adds three compact cinematic capability stories and a direct demo action. The workflow area follows the homepage’s stage-selector pattern: three practical usage scenarios switch an adjacent screenshot-style product preview on hover, keyboard focus, or tap; the active preview shows the relevant feature, example workflow state, and “How to use it” explanation. The supplied asset library does not contain approved product screenshots, so these visuals remain explicitly labelled interactive frontend previews.
-
-Each product now carries the real section 03 product/bundle configurator and section 04 “What happens next” sequence directly in its detail flow, preselected for that product and the annual duration. This replaces the temporary Essential, Team, and Scale cards, removes a navigation jump back to the SaaS overview, and keeps the product, bundle, duration, saving, estimate, and recommendation handoff in one continuous page. Three testimonial placeholders remain specific to each product’s workflows. The related-product section uses two homepage-aligned image cards, contextual cursors, and product pairings chosen for operational relevance.
-
-Production build and responsive browser verification passed at 1280 px desktop and a 439 px mobile-width in-app-browser viewport. The Website Manager route restores the exact section 03/04 planning flow with Single module and Website Manager already selected. The Files route contains three highlights, three demo scenarios, three Files testimonial placeholders, and two related product cards. Selecting “Find the current file” updates both the selected tab and the adjacent product preview. Shared-template checks covered HR, CRM, Files, Tasks, Marketing, and Website Manager; a clean desktop session reported no browser errors.
-
-The related-product section received its own responsive top inset after the image-card redesign: 112 px desktop, 84 px tablet, and 68 px mobile. This prevents the eyebrow from touching the preceding dark testimonial boundary. A spacing audit across Home, SaaS products, Services, Work, Insights, About, Roadmap, Contact, and the recommendation flow confirmed consistent 112 px routed-section insets at desktop and no horizontal overflow in the checked states.
-
-final result: passed for the frontend prototype; approved product captures, client names, and testimonial quotes remain content dependencies
-
-## Inline SaaS configurator and bundle hierarchy — 2026-09-22
-
-The product configuration and “What happens next” sections now live directly on `/platform`, so the SaaS story no longer sends visitors to a separate builder before they can understand bundle scope, duration, and price. The section label is “Choose how to start,” followed by the live product and duration configuration, the three-step explanation, testimonials, and the closing action. Existing `/pricing` deep links redirect to the equivalent `/platform?...#plan-builder` state; `/pricing/plans` remains the dedicated three-plan comparison.
-
-The bundle selector now uses four aligned starting options plus a full-width Custom workspace row. Each option states its product count and prototype saving: one flexible product, two three-product bundles at 15%, the six-product suite at 25%, and a custom 2–5 product path at 10%. This removes the earlier orphaned fourth card and makes the commercial difference visible before product selection.
-
-Browser verification covered the configurator and relocated next-step section at 1440 × 900, the legacy `/pricing?mode=growth&duration=annual` redirect, and the one-column mobile bundle selector at 390 × 844. URL state, selected mode, five starting paths, and responsive overflow all passed.
-
-final result: passed
-
-## SaaS card density, cursors and testimonials — 2026-09-22
-
-The `/platform` product grid now uses compact 448 px image cards at 1440 px and 390 px cards at 390 px. Copy is bottom-aligned inside a consistent 28 px desktop / 26 px mobile inset, with reduced heading, paragraph, and action spacing so each card hugs its useful content while preserving enough image area to communicate the brand. The grid uses a 16 px gap and no horizontal overflow at either checked viewport.
-
-All six product links reuse the homepage `CursorTarget` interaction with a pale-lavender “Explore [product]” cursor on mouse/fine-pointer devices. Touch, keyboard, and reduced-motion contexts retain the visible link action and normal pointer behavior.
-
-The shared six-item homepage testimonial carousel now appears on the SaaS overview after the product-path comparison. It covers brand, digital experiences, connected systems, development, marketing, and ongoing partnership; every quote and identity remains explicitly labelled as placeholder content. Desktop shows three cards, mobile shows one, and the existing autoplay, arrows, swipe, keyboard controls, pause rules, and reduced-motion behavior are preserved.
-
-Browser verification covered `/platform#modules` and `/platform#testimonials` at 1440 × 900 and 390 × 844. Six product cursors and six testimonial items are present, the mobile carousel uses 100% columns, and neither state introduces horizontal page overflow.
-
-final result: passed
-
-## SaaS, service and project-system refinement — 2026-09-22
-
-The routed experience now follows the homepage’s cinematic language instead of the previous oversized white card grid. `/platform` uses two-column image-led product stories built from the supplied OrgTik assets; service details use the same dark-gradient anatomy; the “One workspace” section is now an interactive six-product constellation with Phosphor icons, automatic context changes, hover/focus selection, data pulses, and reduced-motion behavior.
-
-The information architecture now labels Platform as “SaaS products” and removes the separate top-level Plans tab. The SaaS flow runs from product/bundle selection through monthly, 12-month, or 24-month duration, a live prototype CHF estimate, and three plan levels. Service families include Focus, Connected, and Partnership pricing examples. Hosting CTAs leave the frontend for the external OrgTik destination; the single URL remains isolated for owner confirmation.
-
-Work now contains five labelled projects so every top-level service family has a relevant example. Project details add a responsive three-image gallery and Insights filtered by project category. Browser review covered `/platform`, its animated workspace, `/pricing`, `/pricing/plans`, `/services/design`, service packages, and `/work/campaign-growth-system` at 1440 × 900 and 390 × 844. The mobile pricing mode chooser was changed from horizontal scrolling to a clear two-column grid. No horizontal overflow remained in the checked states.
-
-`npm run format:check` and the production `npm run build` pass. Current production output is 102.91 kB CSS (21.82 kB gzip) and 439.68 kB JavaScript (125.57 kB gzip).
-
-final result: passed for frontend prototype; commercial prices and the final external hosting URL require owner approval
-
-## Explicit Home navigation — 2026-09-21
-
-The shared header now exposes Home as the first text link on desktop and as item 01 in the mobile menu, while retaining the official logo link. Browser checks from the plan-recommendation screen verified that both versions navigate to `/`, the mobile dialog closes after selection, and Home receives the active-page state on arrival. The additional link fits the existing 1440 px header and the 390 px mobile menu without horizontal overflow or browser warning/error logs.
-
-final result: passed
-
-## Three-plan recommendation screen — 2026-09-21
-
-Source visual truth: the approved cinematic routed design system, the refined compact pricing builder, and the user-requested next step after “Discuss this plan.” Commercial prices and terms were not supplied, so the screen compares service scope while retaining explicit contact-led language.
-
-Implementation evidence: browser-rendered flow from `/pricing?mode=custom&modules=hr` to `/pricing/plans?mode=custom&modules=hr`, inspected at 1440 × 900 and 390 × 844 CSS viewports at density 1. The Connected CTA was followed into the contact preview, and the recommendation route was also loaded without module parameters to verify its recovery state.
-
-State: the new screen carries the selected systems into Launch, Connected, and Partnership cards. Connected receives the premium dark recommended treatment. All three cards show their distinct scope, inclusions, contact-led pricing status, selected-system count, and a direct plan-specific action. The compact hero uses the required animated brand-video treatment. An edit-selection path returns to the exact builder configuration.
-
-Findings: no actionable P0/P1/P2 issues remain. Desktop presents three equal-width cards at approximately 427 px each. Mobile stacks approximately 335 px cards inside the standard 20 px gutter and removes the desktop card offset. The HR selection, mode, and chosen recommendation persist in the URL; choosing Connected opens `/contact?intent=platform&plan=connected&mode=custom&modules=hr` with Platform selected. A direct empty-state visit renders no recommendation cards and provides a clear return to the builder. No horizontal overflow or browser warning/error logs were found.
-
-final result: passed
-
-## Pricing plan-builder density and alignment — 2026-09-21
-
-Source visual truth: the approved cinematic routed design system and the user-supplied state `/pricing?mode=custom&modules=hr`. No separate pricing mock was supplied; the existing page content, type system, palette, and interaction model were retained.
-
-Implementation evidence: browser-rendered pricing builder at 1440 × 900 and 390 × 844 CSS viewports at density 1. The supplied plural `modules=hr` deep link was loaded directly, then CRM was added through the interface to verify selection state, the count, review content, and URL synchronization.
-
-State: the five plan choices now render as compact 90 px selectors. The six module choices use a balanced three-by-two desktop grid with 108 px content-hugging cards, two columns on tablet, and one column on mobile. A numbered module heading and live selection-count pill clarify the builder sequence. The review card is top-aligned, reduced from approximately 542 px to 381 px, and no longer stretches the module rows.
-
-Findings: no actionable P0/P1/P2 issues remain. At desktop the selection area is approximately 965 px wide and 300 px high, with a 328 px review panel beside it. At mobile the content uses the established 20 px gutter and approximately 335 px cards. The page has no horizontal overflow. Loading the supplied URL restores HR; selecting CRM changes the pill to “2 modules,” updates the review to “HR · CRM,” and writes `modules=hr%2Ccrm` to the URL.
-
-final result: passed
-
-## Contained closing CTAs across routed pages — 2026-09-21
-
-Source visual truth: the approved homepage `.faq-contact-band` treatment and the Services refinement documented immediately below.
-
-Implementation evidence: browser-rendered closing states at `/services`, service family/detail, `/insights` and article detail, `/about`, `/platform` and module detail, `/pricing`, `/work` and case-study detail, and `/roadmap`. Desktop checks used 1440 × 900 CSS pixels; responsive checks used 390 × 844 at density 1.
-
-State: the shared `PageCTA` component now defaults to its contained treatment. Every route that renders this closing action uses the same warm-paper surround, 16 px violet panel, official OrgTik mark, two-column desktop composition, and stacked mobile composition. Utility and task-focused routes without a marketing closing action remain unchanged.
-
-Findings: no actionable P0/P1/P2 issues remain. At desktop, all twelve checked template states render one contained CTA approximately 1313 px wide with a 56 px page margin. At mobile, representative routes render a single-column CTA approximately 335 px wide with a 20 px margin. All checked routes retain their page-specific copy and destination, show no horizontal overflow, and produce no browser warning/error logs.
-
-final result: passed
-
-## Services closing CTA containment — 2026-09-21
-
-Source visual truth: `C:/Users/USER/AppData/Local/Temp/codex-clipboard-9b078f29-4145-4c92-8007-2d7aa1d00889.png` (1892 × 472), showing the earlier full-bleed Services CTA, plus the approved homepage `.faq-contact-band` as the requested contained treatment.
-
-Implementation evidence: browser-rendered `/services#page-cta`, inspected at 1440 × 900 and 390 × 844 CSS viewports at density 1. The desktop panel measures approximately 1313 px wide with a 56 px left margin and 16 px radius; the mobile panel measures approximately 335 px wide with a 20 px left margin. The browser provider displayed the rendered captures inline; no persistent screenshot file was produced.
-
-State: Services overview closing action immediately before the footer. Full-view comparison verified that the warm-paper surround separates the CTA from the dark process section and footer. Focused comparison verified the contained frame, two-column desktop composition, stacked mobile composition, official OrgTik mark, preserved heading/body/action copy, and functioning `/contact?intent=services` link.
-
-Findings: no actionable P0/P1/P2 issues remain. The earlier full-width violet fill was replaced by a homepage-aligned contained card. Typography remains Montserrat with the established display hierarchy; spacing uses the shared 56/20 px responsive gutters; the gradient reuses the homepage contact-band colors; the decorative mark is the official SVG asset rather than a recreation; and all app-specific copy remains unchanged.
-
-Comparison history: the source capture showed a full-viewport violet region with no outer paper margin. The implementation adds the requested warm-paper frame, 16 px radius, restrained homepage gradient, and responsive internal padding. Post-fix desktop/mobile browser captures show no horizontal overflow. Browser warning/error logs are empty.
-
-final result: passed
-
-## Routed website templates — 2026-09-21
-
-Extended the approved cinematic homepage system across the plan's remaining P02–P18 template families: Services overview, five service families including OrgTik hosting, reusable service detail, Insights/category/article, About, Contact, Legal, Sitemap, not found, Roadmap, Platform, six module pages, Plans, sign in/recovery, Work, and case study.
-
-The route shell preserves the official logo, Montserrat hierarchy, deep-plum and violet palette, warm-paper reading sections, 54px CTA anatomy, responsive media treatment, and restrained motion. Major marketing heroes use the existing branded motion or approved PDF-derived assets. Article, legal, sitemap, sign-in, work, and error templates use quieter static treatments where the plan prioritizes reading or task clarity.
-
-Functional verification covered route titles and headings, the fifth hosting family and managed-hosting detail, category/project filters, module selection and URL summary state, contact validation and explicit local success state, roadmap detail dialog and scroll unlock, sign-in preview, recovery route, and unknown-route recovery. Contact, account, pricing, roadmap, legal, case-study proof, and product imagery clearly state their preview or owner-review status.
-
-Browser checks covered all 18 template families at 1440 × 900 and representative commercial/content/utility routes at 390 × 844. The tested pages had no horizontal overflow and browser warning/error logs were empty. `npm run format:check` passes. The latest `npm run build` passes with 85.26 kB CSS (18.59 kB gzip) and 416.05 kB JavaScript (119.64 kB gzip), within the plan's gzip budgets.
-
-Remaining release dependencies are content and ownership decisions: approved client evidence, quotations and metrics; final legal wording; commercial plan names and prices; confirmed product availability and captures; verified contact details; and approved historical/roadmap claims.
-
-final result: passed for frontend template implementation; content approval pending
-
-## Review comments verification — 2026-09-21
-
-Source visual truth: `qa/cinematic-full-wide.png` (1424 × 6196) for the existing cinematic composition, plus the user’s requested CTA placement and fifth-service requirements. Brand imagery and palette remain grounded in `../ORGTIK.pdf` and `../assits/LOGO`.
-
-Implementation evidence: `qa/work-heading-updated.png` and `qa/hosting-service-updated.png` (1265 × 791 provider output from a 1280 × 800 CSS viewport), plus `qa/work-heading-mobile-updated.png` and `qa/hosting-service-mobile-updated.png` (375 × 811 provider output from a 390 × 844 CSS viewport). Density was approximately 1. The combined review input is `qa/review-comments-comparison.jpg` (1600 × 1205); it places the earlier work-section capture with the revised desktop and mobile states in one board.
-
-State reviewed: the projects introduction with the CTA beside the descriptive copy; the same introduction stacked on mobile; OrgTik hosting expanded on desktop and mobile; the projects overview dialog opened from the relocated CTA.
-
-Focused comparison was required because the requested changes concern the section-introduction alignment and one accordion row. The combined board makes the relocated CTA, new service row, supplied brand imagery, and responsive treatment readable without relying on a full-page reduction.
-
-Findings: no actionable P0/P1/P2 issues remain. The CTA now sits in the right-hand introduction column on desktop and follows the description on mobile. OrgTik hosting is service 05, uses the existing disclosure anatomy and a supplied OrgTik brand application, and avoids unsupported uptime or performance claims.
-
-Required fidelity surfaces: Montserrat hierarchy and optical weights are unchanged; the two-column heading rhythm matches adjacent split introductions; the existing plum, violet, paper, and pale-lavender tokens are reused; imagery remains an original PDF brand asset with the established crop and treatment; copy clearly describes managed hosting, monitoring/backups, and performance care. No replacement logo, fabricated customer proof, or custom illustration was introduced.
-
-Interaction and technical checks: the relocated button opens the existing accessible project dialog; OrgTik hosting expands and collapses through the shared disclosure; desktop and mobile pages have no horizontal overflow; browser warning/error logs are empty. `npm run format:check` and `npm run build` pass. Production output is 55.82 kB CSS (12.77 kB gzip) and 338.45 kB JavaScript (99.29 kB gzip).
-
-final result: passed
-
-Status: passed after the approach hover interaction refinement.
+Corrected malformed navigation attributes inherited from the export, removed duplicate class helpers and duplicate data properties, resolved dynamic hover rules, used local root-relative assets, hid decorative icons from accessible button names, added mobile-menu keyboard handling, promoted index-page headings, and retained older route/selection links.
 
 ## Scope
 
-Gateway and scroll refinement (2026-09-21): gateway choices now use full-bleed official brand photography with a deep bottom fade, white bottom-aligned copy, pale hover cursors, and independent category/title/body/action entrances. Section and accordion entrances trigger further inside the viewport; imagery uses controlled cropping and supported scroll-linked drift. Added Lenis 1.3.26 for mouse-wheel/anchor smoothing, with native touch/nested scrolling and a reduced-motion fallback. Background scrolling locks while a dialog is open. The floating navbar now has 85%-opaque plum glass, a 16px blur, active-section indication, and an opaque accessibility fallback. Verified desktop 1440px and mobile 390px card layout, readable fades, navbar treatment, anchors, keyboard menu opening/closing, and scroll lock. Fixed hidden custom cursors causing horizontal overflow after resizing. Browser logs were clean; build and formatting pass. Package installation reported five existing-toolchain dependency advisories (one moderate, four high); no broad dependency upgrades were applied in this visual task.
-
-Motion and navigation follow-up (2026-09-21): section entrances now replay on viewport re-entry with bounded grouped stagger and project-image cropping, using a visible fallback and a reduced-motion guard. The platform timer continues under mouse hover and pointer selection; keyboard interaction still pauses it. Testimonials advance one card every 3 seconds, loop to the start, and pause offscreen, during keyboard interaction, with reduced motion, or while a dialog is open. Autoplay does not announce live-region changes. Added a fixed navbar with a solid scrolled surface and anchor offsets, plus a shared “View all projects” CTA opening the two supplied projects in an on-page collection. FAQ, closing, and footer contact actions consistently say “Talk to us”. Verified desktop 1440px and mobile 390px navigation, gallery selection/close, carousel advancement and keyboard pause, with no horizontal overflow. Build and formatting checks pass.
-
-FAQ rollback (2026-09-21): restored the light split-layout FAQ from merged PR #1, including its question colors and full-width violet contact band. Testimonial navigation, shared CTAs, and the refined footer remain unchanged. The dark FAQ described in the earlier follow-up below is superseded.
-
-Scoped refinements (2026-09-21): removed the decorative platform feature-list badges and their reserved column. Light-section contextual cursors now use deep plum with white text; dark-section project cursors retain their light treatment. Verified the desktop hover cursor, icon-free platform, restored FAQ at 1440px and 390px, keyboard disclosure, and local contact dialog. No horizontal page overflow at either width. Production build, formatting, and diff whitespace checks pass.
-
-Latest follow-up (2026-09-21): testimonials now have six explicitly labeled placeholders on a native scroll-snap track with three visible at desktop/tablet and one on mobile. Previous/next buttons, keyboard Home/End, range updates, and boundary disabled states verified. FAQ uses a full-width dark panel with off-white/white question states, violet active toggle, readable muted-lavender answers, and an aligned compact contact band. Footer links are 16px desktop / 15px mobile; a separate logo row and top-aligned navigation replace the bottom-aligned tiny-link layout. `overflow: clip` fixes the decorative glow causing internal footer scrolling; confirmed footer scrollTop is zero and mobile bottom padding is 28px. Desktop 1440 × 1000, tablet 768 × 1024, and mobile 390 × 844 checks showed no horizontal page overflow. Contact dialog and FAQ keyboard behavior remain functional. Earlier entries below describe previous iterations.
-
-The selected Cinematic landing page is the only public experience. The comparison gallery, selection controls, Editorial direction, and Connected direction have been removed.
-
-## Visual source
-
-- `../ORGTIK.pdf` remains the source of truth for typography, color, and brand imagery.
-- `../assits/LOGO` is the source of truth for the official OrgTik logo exports used in the interface and favicon.
-- Cinematic evidence lives in `qa/cinematic-desktop.png`, `qa/cinematic-tablet.png`, `qa/cinematic-mobile.png`, and the full-page captures.
-
-## Verification checklist
-
-- [x] Formatting passes.
-- [x] Production build passes.
-- [x] Root URL opens the Cinematic page directly.
-- [x] No comparison or direction-selection UI is visible.
-- [x] Hero media, desktop navigation, and content sections render without console warnings or errors.
-- [x] At 1440 × 900, all eight sections span the viewport cleanly, no interactive elements are clipped, and there is no horizontal overflow.
-- [x] The premium Services accordion uses supplied OrgTik imagery, animated disclosures, and allows at most one service open at a time.
-- [x] The platform tour automatically advances every eight seconds; manual selection and keyboard navigation work. Hover, focus, offscreen, and hidden-page states pause progression. The separate status toolbar and playback controls were removed as requested.
-- [x] Desktop contextual cursors show “Let’s build”, “Explore plans”, and “View project”. Gateway actions navigate to Services or open the existing plan preview on this page.
-- [x] Project previews open in an on-page dialog; next/previous controls work, Escape closes it, and trigger focus is restored.
-- [x] Editorial FAQ disclosures animate and keep only the selected answer open.
-- [x] The closing section has automatic animated brand imagery and light, with offscreen pausing and no visible motion controls.
-- [x] Reduced-motion and non-hover input fallbacks are included in the implementation.
-- [x] The post-FAQ contact band remains visually distinct and readable at desktop, tablet, and mobile widths.
-- [x] The expanded footer has a complete navigation and contact hierarchy; its bottom aurora remains decorative and respects reduced-motion preferences.
-- [x] At 390 × 844, the service panel stacks to one column and the page has no horizontal overflow.
-- [x] The final browser pass reports no console warnings or errors.
-
-The earlier motion-pass production build contained 51.02 kB of CSS (11.77 kB gzip) and 305.66 kB of JavaScript (90.74 kB gzip). That pass was visually inspected in the browser at 1440 × 900 and 390 × 844; the saved screenshots above document the earlier cinematic baseline. The control-removal check confirmed no playback/status controls remain, the hero video is playing and looping, and the platform advances automatically.
-
-The footer social update was inspected at 1440 × 900 and 390 × 844: eight named social icons, the Swiss flag, and “Made in Switzerland” are visible without horizontal overflow. Social icons remain unlinked placeholders by user request. Browser warning/error logs are empty.
-
-Backend services, real accounts, payment, enquiry delivery, databases, and external API integrations remain outside this frontend prototype.
-
-FAQ / testimonials / CTA refinement (2026-09-21): FAQ rows now use larger type and continuous rules, with a full-width violet contact band. Three clearly labeled placeholder testimonial cards render side by side at 1440px and 768px, and stack at 390px. These are not real endorsements. All primary CTAs use the shared Action component (54px height, 12px label, pill silhouette, circular arrow), with a 46px header variant and matching secondary treatment. Inspected at 1440 × 1000 and 390 × 844; measured at 768 × 1024. No horizontal overflow. Verified keyboard FAQ expansion, mobile FAQ expansion, contact dialog opening/closing, and enabled/disabled plan-review states. A fresh reload produced no new warning/error logs; transient HMR import errors during multi-file editing were resolved. Final production build: 51.48 kB CSS (11.88 kB gzip), 312.90 kB JavaScript (92.45 kB gzip). Formatting and whitespace checks pass. Current screenshots were inspected inline; saved QA images remain the earlier baseline.
-
-Platform refinement: inspected at 1440px and 390px widths with no horizontal overflow or browser warnings/errors. Platform copy and features are preserved; the new plan CTA opens the existing local preview with HR selected. Production build, formatting, and diff whitespace checks passed.
-
-Approach refinement: the main agent visually inspected the hover stage selector at 1440 × 1000 and 390 × 844 with no horizontal overflow or browser warnings/errors. Verified interactions: clicking Design, ArrowDown from Design to Deliver, tapping Evolve on mobile, and mouse pointer entry selecting Design without a click. The large supplied OrgTik images and original stage narratives retain the cinematic Montserrat typography and violet palette. The fresh read-only reviewer returned “ship” for code, interactions, and accessibility; this was not pixel approval. The final production build passes with 52.32 kB CSS (11.97 kB gzip) and 306.87 kB JavaScript (91.14 kB gzip). Formatting and diff whitespace checks pass.
+Forms, account actions, votes, estimates, and plan choices remain clearly labelled local previews. Backend delivery, authentication, payments, production legal approval, deployment, and cross-browser certification were not part of this update. Verification used local Chromium/Edge because the in-app browser automation was unavailable.

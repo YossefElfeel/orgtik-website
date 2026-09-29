@@ -1,5 +1,6 @@
 import { Testimonials } from "./Testimonials";
 import React from "react";
+import { LanguageMenu } from "./LanguageMenu";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
 
@@ -1035,7 +1036,7 @@ export default class Home extends ReferencePage {
       workCols: s.narrow ? "minmax(0,1fr)" : "repeat(12,minmax(0,1fr))",
       workRows: s.narrow
         ? "none"
-        : "clamp(180px,22svh,240px) clamp(180px,22svh,240px) clamp(200px,24svh,260px)",
+        : "clamp(240px,26svh,280px) clamp(240px,26svh,280px) clamp(280px,30svh,320px)",
       w1: work(0, "1 / span 7", "1 / span 2"),
       w2: work(1, "8 / span 5", "1"),
       w3: work(2, "8 / span 5", "2"),
@@ -1163,6 +1164,7 @@ export default class Home extends ReferencePage {
             style={{ position: "sticky", top: "0", height: "0", zIndex: "50" }}
           >
             <header
+              className="site-header"
               ref={v.headerRef}
               style={{
                 position: "absolute",
@@ -1172,7 +1174,7 @@ export default class Home extends ReferencePage {
                 height: "96px",
                 display: "flex",
                 alignItems: "center",
-                gap: "28px",
+                gap: v.xwide ? "28px" : "10px",
                 padding:
                   "0 max(clamp(20px,4.4vw,64px), calc((100% - 1312px) / 2))",
                 color: "#F6F1FA",
@@ -1316,10 +1318,11 @@ export default class Home extends ReferencePage {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "22px",
+                      gap: "14px",
                       flexShrink: "0",
                     }}
                   >
+                    <LanguageMenu />
                     <a
                       href={toSiteHref("SignIn.dc.html")}
                       style={{
@@ -1375,12 +1378,14 @@ export default class Home extends ReferencePage {
               )}
               {v.notXwide && (
                 <>
+                  <LanguageMenu compact />
                   <button
                     onClick={v.openMenu}
                     aria-label="Open menu"
                     aria-expanded={v.menuOpen}
+                    className="site-menu-trigger"
                     style={{
-                      marginLeft: "auto",
+                      marginLeft: "0",
                       display: "flex",
                       alignItems: "center",
                       gap: "10px",
@@ -1392,7 +1397,7 @@ export default class Home extends ReferencePage {
                       fontWeight: "600",
                     }}
                   >
-                    {"Menu "}
+                    <span className="site-menu-trigger__label">{"Menu"}</span>
                     <i
                       aria-hidden={true}
                       style={{ fontSize: "17px" }}
@@ -3006,7 +3011,7 @@ export default class Home extends ReferencePage {
                     alignItems: "flex-end",
                     justifyContent: "space-between",
                     gap: "32px 64px",
-                    marginBottom: "clamp(24px,3vh,32px)",
+                    marginBottom: "clamp(48px,5vw,64px)",
                   }}
                 >
                   <div>
@@ -3045,10 +3050,10 @@ export default class Home extends ReferencePage {
                       data-hw={""}
                       style={{
                         fontSize: "var(--section-title-size)",
-                        lineHeight: "1",
+                        lineHeight: "1.06",
                         fontWeight: "500",
                         letterSpacing: "-.045em",
-                        marginTop: "22px",
+                        marginTop: "28px",
                       }}
                     >
                       <span style={{ display: "block" }}>
@@ -3078,7 +3083,7 @@ export default class Home extends ReferencePage {
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "flex-start",
-                      gap: "24px",
+                      gap: "30px",
                       maxWidth: "380px",
                     }}
                   >
@@ -3138,8 +3143,8 @@ export default class Home extends ReferencePage {
                     display: "grid",
                     gridTemplateColumns: String(v.workCols),
                     gridTemplateRows: String(v.workRows),
-                    gridAutoRows: "330px",
-                    gap: "clamp(16px,1.6vw,22px)",
+                    gridAutoRows: "360px",
+                    gap: "clamp(28px,2.8vw,40px)",
                   }}
                 >
                   <a
@@ -3158,7 +3163,7 @@ export default class Home extends ReferencePage {
                       flexDirection: "column",
                       justifyContent: "space-between",
                       gap: "24px",
-                      padding: "clamp(20px,2vw,28px)",
+                      padding: "clamp(26px,2.7vw,38px)",
                       borderRadius: "24px",
                       overflow: "hidden",
                       isolation: "isolate",
@@ -3259,7 +3264,7 @@ export default class Home extends ReferencePage {
                         </div>
                         <h3
                           style={{
-                            marginTop: "12px",
+                            marginTop: "20px",
                             fontSize: "clamp(25px,2.46vw,37px)",
                             lineHeight: "1.04",
                             fontWeight: "500",
@@ -3272,7 +3277,7 @@ export default class Home extends ReferencePage {
                         <p
                           style={{
                             fontFamily: "Arial,Helvetica,sans-serif",
-                            marginTop: "10px",
+                            marginTop: "18px",
                             fontSize: "15px",
                             lineHeight: "1.5",
                             color: "#DCD0E6",
@@ -3320,7 +3325,7 @@ export default class Home extends ReferencePage {
                       flexDirection: "column",
                       justifyContent: "space-between",
                       gap: "24px",
-                      padding: "clamp(20px,2vw,28px)",
+                      padding: "clamp(26px,2.7vw,38px)",
                       borderRadius: "24px",
                       overflow: "hidden",
                       isolation: "isolate",
@@ -3421,7 +3426,7 @@ export default class Home extends ReferencePage {
                         </div>
                         <h3
                           style={{
-                            marginTop: "12px",
+                            marginTop: "20px",
                             fontSize: "clamp(20px,1.75vw,28px)",
                             lineHeight: "1.04",
                             fontWeight: "500",
@@ -3434,7 +3439,7 @@ export default class Home extends ReferencePage {
                         <p
                           style={{
                             fontFamily: "Arial,Helvetica,sans-serif",
-                            marginTop: "10px",
+                            marginTop: "18px",
                             fontSize: "15px",
                             lineHeight: "1.5",
                             color: "#DCD0E6",
@@ -3482,7 +3487,7 @@ export default class Home extends ReferencePage {
                       flexDirection: "column",
                       justifyContent: "space-between",
                       gap: "24px",
-                      padding: "clamp(20px,2vw,28px)",
+                      padding: "clamp(26px,2.7vw,38px)",
                       borderRadius: "24px",
                       overflow: "hidden",
                       isolation: "isolate",
@@ -3583,7 +3588,7 @@ export default class Home extends ReferencePage {
                         </div>
                         <h3
                           style={{
-                            marginTop: "12px",
+                            marginTop: "20px",
                             fontSize: "clamp(20px,1.75vw,28px)",
                             lineHeight: "1.04",
                             fontWeight: "500",
@@ -3596,7 +3601,7 @@ export default class Home extends ReferencePage {
                         <p
                           style={{
                             fontFamily: "Arial,Helvetica,sans-serif",
-                            marginTop: "10px",
+                            marginTop: "18px",
                             fontSize: "15px",
                             lineHeight: "1.5",
                             color: "#DCD0E6",
@@ -3644,7 +3649,7 @@ export default class Home extends ReferencePage {
                       flexDirection: "column",
                       justifyContent: "space-between",
                       gap: "24px",
-                      padding: "clamp(20px,2vw,28px)",
+                      padding: "clamp(26px,2.7vw,38px)",
                       borderRadius: "24px",
                       overflow: "hidden",
                       isolation: "isolate",
@@ -3745,7 +3750,7 @@ export default class Home extends ReferencePage {
                         </div>
                         <h3
                           style={{
-                            marginTop: "12px",
+                            marginTop: "20px",
                             fontSize: "clamp(25px,2.46vw,37px)",
                             lineHeight: "1.04",
                             fontWeight: "500",
@@ -3758,7 +3763,7 @@ export default class Home extends ReferencePage {
                         <p
                           style={{
                             fontFamily: "Arial,Helvetica,sans-serif",
-                            marginTop: "10px",
+                            marginTop: "18px",
                             fontSize: "15px",
                             lineHeight: "1.5",
                             color: "#DCD0E6",

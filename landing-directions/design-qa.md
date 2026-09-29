@@ -155,3 +155,20 @@ final result: passed
 - `npm run build`, Prettier formatting, and `git diff --check` passed. No P0, P1, or P2 visual mismatches remain in this scope.
 
 final result: passed
+
+## Home selected-work card spacing — 2026-09-29
+
+- Increased grid gaps from 22px to 40px at desktop width and from 16px to 28px on mobile. Card padding grew from 28px to 38px on desktop and from 20px to 26px on mobile; eyebrow-to-title and title-to-summary gaps grew from 12px/10px to 20px/18px.
+- Increased the space from the section introduction to the card grid to 48–64px, the section eyebrow-to-heading gap to 28px, and the introduction copy-to-link gap to 30px. The two heading lines have a slightly more open line height.
+- Increased the short desktop card rows from about 211px to 250px at a 960px viewport height, and mobile cards from 330px to 360px, so the larger spacing does not crowd or clip content. The large lead card and final wide card expand consistently.
+- `npm run build`, Prettier, and `git diff --check` passed. Browser-checked the four cards at 2048px, 1440px, and 390px: the summaries stay inside their cards and there is no horizontal page overflow. Final section captures for review: `qa/home-work-spacing-1440.png` and `qa/home-work-spacing-390.png` (fixed navigation hidden in the captures so it does not cover the mobile cards).
+
+final result: passed
+
+## Navigation language dropdown preview — 2026-09-29
+
+- Added a shared English/Arabic/German selector to the desktop navigation and compact mobile header on Home, Services, Software, Work, About, Insights, Contact, Roadmap, Legal, and Sign in. The dropdown shows selected state and closes on outside click or Escape. Content, document language, direction, routing, and translations are unchanged.
+- Browser-checked all ten page templates at 1440px, 1180px, 390px, and 320px (40 cases) for header fit. Verified option selection, Escape dismissal, and dropdown viewport bounds on Home. No header collisions or out-of-bounds controls remained.
+- Review captures: `qa/language-menu-1440.png` and `qa/language-menu-390.png`. `npm run build`, Prettier, and `git diff --check` passed.
+
+final result: passed

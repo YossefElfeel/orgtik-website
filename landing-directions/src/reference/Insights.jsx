@@ -1,5 +1,6 @@
 import { ContentHeading } from "./ContentHeading";
 import React from "react";
+import { LanguageMenu } from "./LanguageMenu";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
 
@@ -1121,6 +1122,7 @@ export default class Insights extends ReferencePage {
             style={{ position: "sticky", top: "0", height: "0", zIndex: "50" }}
           >
             <header
+              className="site-header"
               ref={v.headerRef}
               style={{
                 position: "absolute",
@@ -1130,7 +1132,7 @@ export default class Insights extends ReferencePage {
                 height: "96px",
                 display: "flex",
                 alignItems: "center",
-                gap: "28px",
+                gap: v.xwide ? "28px" : "10px",
                 padding:
                   "0 max(clamp(20px,4.4vw,64px), calc((100% - 1312px) / 2))",
                 color: "#F6F1FA",
@@ -1274,10 +1276,11 @@ export default class Insights extends ReferencePage {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "22px",
+                      gap: "14px",
                       flexShrink: "0",
                     }}
                   >
+                    <LanguageMenu />
                     <a
                       href={toSiteHref("SignIn.dc.html")}
                       style={{
@@ -1333,12 +1336,14 @@ export default class Insights extends ReferencePage {
               )}
               {v.notXwide && (
                 <>
+                  <LanguageMenu compact />
                   <button
                     onClick={v.openMenu}
                     aria-label="Open menu"
                     aria-expanded={v.menuOpen}
+                    className="site-menu-trigger"
                     style={{
-                      marginLeft: "auto",
+                      marginLeft: "0",
                       display: "flex",
                       alignItems: "center",
                       gap: "10px",
@@ -1350,7 +1355,7 @@ export default class Insights extends ReferencePage {
                       fontWeight: "600",
                     }}
                   >
-                    {"Menu "}
+                    <span className="site-menu-trigger__label">{"Menu"}</span>
                     <i
                       aria-hidden={true}
                       style={{ fontSize: "17px" }}

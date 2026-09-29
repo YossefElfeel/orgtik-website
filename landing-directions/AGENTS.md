@@ -129,3 +129,7 @@ On every service detail page, Related work is section (04) and appears before th
 Use the supplied large-type closing CTA reference on Home, with its latest CTA button unchanged. Keep the official background mark centered and fully visible at each viewport. Testimonial sections no longer show All/Services/Software filter tabs; retain the category tags on cards and the existing page/project content scopes and carousel controls.
 
 Apply Home's closing CTA proportions across every page that uses that section: one shared responsive section height, large heading scale and line height, and centered full background mark. Keep each page's contextual copy and current CTA actions.
+
+The Home “Selected work” image-card grid needs generous gutters and internal padding. Keep enough card height for the larger spacing so labels, titles, summaries, and arrows remain distinct and unclipped at desktop and mobile widths.
+
+The top navigation includes an English/Arabic/German language selector as UI only. Its dropdown can show a local selection state, but it must not translate content or change document language, direction, or routing.

@@ -133,3 +133,7 @@ Apply Home's closing CTA proportions across every page that uses that section: o
 The Home “Selected work” image-card grid needs generous gutters and internal padding. Keep enough card height for the larger spacing so labels, titles, summaries, and arrows remain distinct and unclipped at desktop and mobile widths.
 
 The top navigation includes an English/Arabic/German language selector as UI only. Its dropdown can show a local selection state, but it must not translate content or change document language, direction, or routing.
+
+## Department case studies — 2026-09-30
+
+Project detail pages are full case studies built by `src/reference/CaseStudy.jsx` from `src/reference/case-studies.js`. Every project shares one brief (challenge, goal, our role, facts, headline result), followed by (02) how we got there, (03) what we delivered, and (04) the results, then the existing gallery (05) and more work (06). Each department keeps its own presentation style: Design uses an editorial design journal on paper with a system board; Development uses a blueprint sprint build log, an architecture diagram, and audit gauges; Marketing uses a performance report with a campaign timeline, weekly rhythm, KPI tiles, monthly chart, funnel, and channel mix; IT support uses a service-desk ticket log, a priority matrix, and before/after bars; Hosting uses a migration runbook, a status view, and a load-time chart. Keep figures in the data file and keep the visible sample-figure labels until approved project results are supplied.

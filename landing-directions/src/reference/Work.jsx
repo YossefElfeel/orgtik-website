@@ -1,6 +1,6 @@
 import { PROJECTS } from "./projects";
 import { Testimonials } from "./Testimonials";
-import { ContentHeading } from "./ContentHeading";
+import { CaseStudy } from "./CaseStudy";
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
 import { ReferencePage } from "./ReferencePage";
@@ -794,14 +794,6 @@ export default class Work extends ReferencePage {
         isIndex: false,
         isProject: true,
         pj: {
-          transformation: pj0.transformation,
-          summary: pj0.summary,
-          facts: [
-            ["Category", pj0.category],
-            ["Sector", pj0.sector],
-            ["Status", pj0.status],
-            ["Discipline", pj0.service.replace("-", " ")],
-          ].map((x) => ({ k: x[0], v: x[1] })),
           gallery: pj0.gallery.map((g, i) => ({
             id: "wk-" + pj0.slug + "-g" + (i + 1),
             image: g,
@@ -1391,7 +1383,12 @@ export default class Work extends ReferencePage {
             </>
           )}
           <main id={"top"} className="content-page">
-            {v.isProject && <ContentHeading title={v.hero} />}
+            {v.isProject && (
+              <CaseStudy
+                key={"case-study-" + this.state.route.slug}
+                project={this.P.find((p) => p.slug === this.state.route.slug)}
+              />
+            )}
             {v.isIndex && (
               <>
                 <section
@@ -2167,127 +2164,6 @@ export default class Work extends ReferencePage {
             {v.isProject && (
               <>
                 <section
-                  id={"story"}
-                  style={{ padding: "var(--section-space) 0" }}
-                >
-                  <div
-                    style={{
-                      maxWidth: "1440px",
-                      margin: "0 auto",
-                      padding: "0 clamp(20px,4.4vw,64px)",
-                    }}
-                  >
-                    <div
-                      data-reveal={"up"}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "14px",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        letterSpacing: ".2em",
-                        textTransform: "uppercase",
-                        color: "#B5A6C4",
-                      }}
-                    >
-                      <span
-                        style={{
-                          color: "#C9A0F3",
-                          fontVariantNumeric: "tabular-nums",
-                        }}
-                      >
-                        {"(01)"}
-                      </span>
-                      <span
-                        style={{
-                          width: "36px",
-                          height: "1px",
-                          background: "#ffffff2e",
-                        }}
-                      ></span>
-                      <span style={{ whiteSpace: "nowrap" }}>
-                        {"The story"}
-                      </span>
-                    </div>
-                    <p
-                      data-reveal={"mask"}
-                      data-hw={""}
-                      style={{
-                        marginTop: "28px",
-                        maxWidth: "1100px",
-                        fontSize: "clamp(26px,2.95vw,45px)",
-                        lineHeight: "1.12",
-                        fontWeight: "500",
-                        letterSpacing: "-.04em",
-                        textWrap: "balance",
-                      }}
-                    >
-                      <span data-line={""} style={{ display: "block" }}>
-                        {v.pj.transformation}
-                      </span>
-                    </p>
-                    <p
-                      data-reveal={"up"}
-                      style={{
-                        fontFamily: "Arial,Helvetica,sans-serif",
-                        marginTop: "22px",
-                        maxWidth: "640px",
-                        fontSize: "17px",
-                        lineHeight: "1.65",
-                        color: "#CFC2DB",
-                      }}
-                    >
-                      {v.pj.summary}
-                    </p>
-                    <div
-                      data-reveal={"up"}
-                      style={{
-                        marginTop: "clamp(40px,4vw,60px)",
-                        display: "grid",
-                        gridTemplateColumns:
-                          "repeat(auto-fit,minmax(min(100%,220px),1fr))",
-                        gap: "1px",
-                        background: "#ffffff17",
-                        border: "1px solid #ffffff17",
-                        borderRadius: "22px",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {(v.pj.facts || []).map((f, fIndex) => (
-                        <React.Fragment key={fIndex}>
-                          <div
-                            style={{
-                              padding: "22px 24px",
-                              background: "#0D0814",
-                            }}
-                          >
-                            <div
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "600",
-                                letterSpacing: ".16em",
-                                textTransform: "uppercase",
-                                color: "#9D8BAE",
-                              }}
-                            >
-                              {f.k}
-                            </div>
-                            <div
-                              style={{
-                                marginTop: "8px",
-                                fontSize: "16px",
-                                fontWeight: "600",
-                              }}
-                            >
-                              {f.v}
-                            </div>
-                          </div>
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-                <section
                   id={"gallery"}
                   style={{
                     padding: "var(--section-space) 0",
@@ -2333,7 +2209,7 @@ export default class Work extends ReferencePage {
                               fontVariantNumeric: "tabular-nums",
                             }}
                           >
-                            {"(02)"}
+                            {"(05)"}
                           </span>
                           <span
                             style={{
@@ -2471,7 +2347,7 @@ export default class Work extends ReferencePage {
                               fontVariantNumeric: "tabular-nums",
                             }}
                           >
-                            {"(03)"}
+                            {"(06)"}
                           </span>
                           <span
                             style={{

@@ -3,217 +3,15 @@ import { Testimonials } from "./Testimonials";
 import { ContentHeading } from "./ContentHeading";
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { CartLink } from "./CartControls";
+import { AddToCartButton } from "./CartControls";
+import { createCartItem } from "./cart-store";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
+import { SERVICE_FAMILIES, getServicePlanFeatures } from "./service-catalog";
 
 export default class Services extends ReferencePage {
-  FAM = [
-    {
-      slug: "design",
-      name: "Web design services",
-      short: "Design",
-      kicker: "Make it unmistakably yours",
-      title: "Identity and experiences with one clear direction.",
-      intro:
-        "Brand thinking, visual communication, and responsive interfaces connected across every useful touchpoint.",
-      image: "brand-cards.webp",
-      icon: "ph-palette",
-      children: [
-        {
-          slug: "graphic-design",
-          name: "Graphic design",
-          outcome: "Give every communication a stronger visual point of view.",
-          summary:
-            "Brand-consistent digital and print communication, from campaign assets to the everyday materials people see and use.",
-          capabilities: [
-            "Campaign design",
-            "Business materials",
-            "Digital asset systems",
-          ],
-        },
-        {
-          slug: "brand-development",
-          name: "Brand development and corporate branding",
-          outcome:
-            "Build an identity that stays coherent as the business grows.",
-          summary:
-            "Brand strategy, identity direction, visual systems, guidance, and a practical rollout across touchpoints.",
-          capabilities: [
-            "Brand strategy",
-            "Visual identity",
-            "Guidelines and rollout",
-          ],
-        },
-        {
-          slug: "web-and-app-design",
-          name: "Web design and application development",
-          outcome: "Make complex digital journeys feel clear and considered.",
-          summary:
-            "UX and UI, responsive design, implementation, usability testing, and ongoing experience improvement.",
-          capabilities: [
-            "UX direction",
-            "Interface systems",
-            "Responsive implementation",
-          ],
-        },
-      ],
-    },
-    {
-      slug: "development",
-      name: "Development services",
-      short: "Development",
-      kicker: "Make the idea work",
-      title: "Digital products built around the result.",
-      intro:
-        "From requirements and architecture to tested implementation, launch, and considered iteration.",
-      image: "brand-tablet.webp",
-      icon: "ph-code",
-      children: [
-        {
-          slug: "web-development",
-          name: "Web development and programming",
-          outcome:
-            "Turn a clear idea into a fast, dependable digital experience.",
-          summary:
-            "Requirements, architecture, frontend implementation, integrations, testing, deployment planning, and support.",
-          capabilities: [
-            "Technical architecture",
-            "Frontend implementation",
-            "Testing and launch",
-          ],
-        },
-        {
-          slug: "custom-app-development",
-          name: "Custom app development",
-          outcome:
-            "Shape a focused application around the way your business works.",
-          summary:
-            "Product discovery, UX and UI, tailored application development, integrations, testing, launch, and iteration.",
-          capabilities: [
-            "Product discovery",
-            "Application UX",
-            "Iterative delivery",
-          ],
-        },
-      ],
-    },
-    {
-      slug: "marketing",
-      name: "Marketing services",
-      short: "Marketing",
-      kicker: "Make the story travel",
-      title: "Turn attention into meaningful momentum.",
-      intro:
-        "Strategy, campaigns, search, and content shaped around the people your business needs to reach.",
-      image: "brand-glass.webp",
-      icon: "ph-megaphone",
-      children: [
-        {
-          slug: "social-media-marketing",
-          name: "Social media marketing",
-          outcome:
-            "Build a social presence people recognize and want to follow.",
-          summary:
-            "Channel strategy, content planning, publishing, community care, campaign management, and useful performance reporting.",
-          capabilities: [
-            "Channel strategy",
-            "Content systems",
-            "Community and campaign care",
-          ],
-        },
-        {
-          slug: "digital-advertising-switzerland",
-          name: "Digital advertising Switzerland",
-          outcome:
-            "Make every campaign clearer, more focused, and easier to improve.",
-          summary:
-            "Paid campaign planning for Swiss audiences, from targeting and creative through budget control and measured optimization.",
-          capabilities: [
-            "Audience planning",
-            "Campaign creative",
-            "Performance optimization",
-          ],
-        },
-        {
-          slug: "seo-services",
-          name: "SEO services",
-          outcome: "Help the right people find you when the need is real.",
-          summary:
-            "Technical and on-page improvements, search-led content, local relevance, and a sustainable measurement rhythm.",
-          capabilities: [
-            "Technical foundations",
-            "Content and keywords",
-            "Local search visibility",
-          ],
-        },
-      ],
-    },
-    {
-      slug: "it-support",
-      name: "IT support",
-      short: "IT support",
-      kicker: "Keep the work moving",
-      title: "Reliable support for the systems behind the day.",
-      intro:
-        "Ongoing care, troubleshooting, and thoughtful improvements for the digital tools your team depends on.",
-      image: "brand-phone.webp",
-      icon: "ph-lifebuoy",
-      children: [
-        {
-          slug: "website-management",
-          name: "Website management",
-          outcome:
-            "Keep your website current, secure, and ready for what comes next.",
-          summary:
-            "Content changes, maintenance, backups, monitoring, performance care, and practical day-to-day support.",
-          capabilities: [
-            "Content updates",
-            "Performance care",
-            "Maintenance and monitoring",
-          ],
-        },
-        {
-          slug: "software-support",
-          name: "Software support and error fixing",
-          outcome:
-            "Find the cause, restore stability, and reduce repeat problems.",
-          summary:
-            "Diagnosis, bug fixing, compatibility work, maintenance, and responsive technical support for existing software.",
-          capabilities: [
-            "Issue diagnosis",
-            "Stability fixes",
-            "Ongoing maintenance",
-          ],
-        },
-      ],
-    },
-    {
-      slug: "hosting",
-      name: "OrgTik hosting",
-      short: "Hosting",
-      kicker: "Keep it online",
-      title: "A dependable home for your digital presence.",
-      intro:
-        "Managed hosting, monitoring, backups, and performance care connected to the people who already understand your website.",
-      image: "brand-glass.webp",
-      icon: "ph-hard-drives",
-      children: [
-        {
-          slug: "managed-hosting",
-          name: "Managed website hosting",
-          outcome:
-            "Keep the website available, maintained, and ready to perform.",
-          summary:
-            "A managed hosting relationship with monitoring, backup routines, performance care, and direct support—without unsupported uptime promises.",
-          capabilities: [
-            "Managed hosting",
-            "Monitoring and backups",
-            "Performance care",
-          ],
-        },
-      ],
-    },
-  ];
+  FAM = SERVICE_FAMILIES;
   PACKS = [
     {
       id: "focus",
@@ -287,12 +85,30 @@ export default class Services extends ReferencePage {
   ];
   E = "cubic-bezier(.16,1,.3,1)";
   HOME = "OrgTik%20Home.dc.html";
+  readBundleQuery() {
+    const query = new URLSearchParams(window.location.search);
+    const ids = this.allSvc().map((item) => item.id);
+    const selected = [
+      ...new Set(
+        (query.get("services") || "")
+          .split(",")
+          .filter((id) => ids.includes(id)),
+      ),
+    ];
+    return {
+      ...(selected.length ? { sel: selected } : {}),
+      ...(["project", "partner"].includes(query.get("engagement"))
+        ? { mode: query.get("engagement") }
+        : {}),
+    };
+  }
   state = {
     route: this.parseRoute(location.hash) || { view: "overview" },
     proc: 0,
     famActive: 0,
     sel: ["design/brand-development", "development/web-development"],
     mode: "project",
+    ...this.readBundleQuery(),
     svcOpen: 0,
     svcHover: null,
     hoverCard: null,
@@ -1393,29 +1209,26 @@ export default class Services extends ReferencePage {
               body: p.note,
               scopeLabel: "Service scope",
               scope: name + " · " + p.name,
-              features:
-                p.id === "focus"
-                  ? [
-                      caps[0],
-                      "Clear brief and success criteria",
-                      "Defined delivery window",
-                    ]
-                  : p.id === "connected"
-                    ? caps
-                        .slice(0, 3)
-                        .concat(["One connected delivery roadmap"])
-                    : caps
-                        .slice(0, 3)
-                        .concat([
-                          "Ongoing support rhythm",
-                          "Improvement roadmap",
-                        ]),
+              features: getServicePlanFeatures(p.id, caps),
               priceLabel: "Prototype estimate",
               price: this.onReq() ? "On request" : "From " + this.chf(p.price),
               periodLabel: "Engagement rhythm",
               period: p.recurring ? "Monthly" : "Defined scope",
               cta: host ? "Continue to hosting" : "Choose " + p.name,
               href: host ? "https://orgtik.ch" : "Contact.dc.html",
+              hosting: host,
+              cartItem: createCartItem({
+                kind: "service",
+                name: name + " · " + p.name,
+                selections: [{ id: F.slug + (C ? "/" + C.slug : ""), name }],
+                plan: p.name,
+                duration: p.recurring ? "Ongoing partnership" : "Defined scope",
+                billing: p.recurring ? "monthly" : "project",
+                estimate: this.onReq() ? null : p.price,
+                sourceHref:
+                  "/services#/" +
+                  (C ? "service/" + F.slug + "/" + C.slug : "family/" + F.slug),
+              }),
             },
             sty(!!p.featured),
           ),
@@ -1618,6 +1431,26 @@ export default class Services extends ReferencePage {
               remove: () => this.toggleSvc(x.id),
             })),
           sum: {
+            cartItem: createCartItem({
+              kind: "service",
+              name: bnd
+                ? bnd.name
+                : n > 1
+                  ? "Custom service bundle"
+                  : "Single service",
+              selections: all
+                .filter((x) => sel.includes(x.id))
+                .map((x) => ({ id: x.id, name: x.c.name })),
+              duration: part ? "Ongoing partnership" : "One-off project",
+              billing: part ? "monthly" : "project",
+              estimate: this.onReq() ? null : tot,
+              sourceHref:
+                "/services?services=" +
+                sel.join(",") +
+                "&engagement=" +
+                s.mode +
+                "#svc-builder",
+            }),
             mode: bnd
               ? bnd.name
               : n > 1
@@ -2046,6 +1879,7 @@ export default class Services extends ReferencePage {
                       flexShrink: "0",
                     }}
                   >
+                    <CartLink />
                     <LanguageMenu />
                     <a
                       href={toSiteHref("SignIn.dc.html")}
@@ -2102,6 +1936,7 @@ export default class Services extends ReferencePage {
               )}
               {v.notXwide && (
                 <>
+                  <CartLink />
                   <LanguageMenu compact />
                   <button
                     onClick={v.openMenu}
@@ -4910,46 +4745,11 @@ export default class Services extends ReferencePage {
                             {v.sum.billed}
                           </div>
                         </div>
-                        <button
-                          onClick={v.sum.go}
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            gap: "20px",
-                            minHeight: "52px",
-                            padding: "7px 7px 7px 24px",
-                            borderRadius: "999px",
-                            background: "#EEE3F7",
-                            color: "#28123B",
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            opacity: String(v.sum.ctaO),
-                            cursor: String(v.sum.ctaCursor),
-                            transition:
-                              "background .3s, transform .45s cubic-bezier(.22,1,.36,1)",
-                          }}
-                          className={"reference-state-90"}
-                        >
-                          {v.sum.ctaLabel}
-                          <span
-                            style={{
-                              display: "grid",
-                              placeItems: "center",
-                              width: "38px",
-                              height: "38px",
-                              borderRadius: "50%",
-                              background: "#28123B",
-                              color: "#EEE3F7",
-                            }}
-                          >
-                            <i
-                              aria-hidden={true}
-                              style={{ fontSize: "16px" }}
-                              className={"ph ph-arrow-right"}
-                            ></i>
-                          </span>
-                        </button>
+                        <AddToCartButton
+                          item={v.sum.cartItem}
+                          disabled={v.sum.empty}
+                          className="commerce-action--light"
+                        />
                         <p
                           style={{
                             fontFamily: "Arial,Helvetica,sans-serif",
@@ -6460,44 +6260,23 @@ export default class Services extends ReferencePage {
                                     </span>
                                   </span>
                                 </div>
-                                <a
-                                  href={toSiteHref(k.href)}
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    gap: "20px",
-                                    minHeight: "50px",
-                                    padding: "7px 7px 7px 24px",
-                                    borderRadius: "999px",
-                                    background: String(k.btnBg),
-                                    color: String(k.btnC),
-                                    fontSize: "14px",
-                                    fontWeight: "600",
-                                    transition:
-                                      "transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s",
-                                  }}
-                                  className={"reference-state-97"}
-                                >
-                                  {k.cta}
-                                  <span
-                                    style={{
-                                      display: "grid",
-                                      placeItems: "center",
-                                      width: "40px",
-                                      height: "40px",
-                                      borderRadius: "50%",
-                                      background: String(k.btnArrowBg),
-                                      color: String(k.btnArrowC),
-                                    }}
+                                <AddToCartButton
+                                  item={k.cartItem}
+                                  style={{ background: k.btnBg, color: k.btnC }}
+                                  className="reference-state-97"
+                                />
+                                {k.hosting && (
+                                  <a
+                                    href={k.href}
+                                    className="commerce-hosting-link"
                                   >
+                                    Continue to hosting{" "}
                                     <i
-                                      aria-hidden={true}
-                                      style={{ fontSize: "16px" }}
-                                      className={"ph ph-arrow-up-right"}
-                                    ></i>
-                                  </span>
-                                </a>
+                                      className="ph ph-arrow-up-right"
+                                      aria-hidden="true"
+                                    />
+                                  </a>
+                                )}
                               </article>
                             </React.Fragment>
                           ))}

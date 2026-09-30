@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { toSiteHref, normalizeLocation } from "./reference/navigation";
+import { CartEditBar, CartNotice } from "./reference/CartControls";
 
 const pages = {
   "/": lazy(() => import("./reference/Home")),
@@ -9,6 +10,8 @@ const pages = {
   "/about": lazy(() => import("./reference/About")),
   "/insights": lazy(() => import("./reference/Insights")),
   "/contact": lazy(() => import("./reference/Contact")),
+  "/cart": lazy(() => import("./reference/Cart")),
+  "/checkout": lazy(() => import("./reference/Checkout")),
   "/roadmap": lazy(() => import("./reference/Roadmap")),
   "/legal": lazy(() => import("./reference/Legal")),
   "/sign-in": lazy(() => import("./reference/SignIn")),
@@ -103,6 +106,8 @@ export function App() {
           </main>
         )}
       </Suspense>
+      <CartNotice path={path} />
+      <CartEditBar path={path} />
     </>
   );
 }

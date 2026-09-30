@@ -2,8 +2,11 @@ import { Testimonials } from "./Testimonials";
 import { ContentHeading } from "./ContentHeading";
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref, readWorkspaceQuery } from "./navigation";
+import { AddToCartButton } from "./CartControls";
+import { createCartItem } from "./cart-store";
 
 export default class Software extends ReferencePage {
   MODS = [
@@ -1444,6 +1447,20 @@ export default class Software extends ReferencePage {
               price: this.chf(pp.monthly * MULT[i]),
               period: pp.d.label,
               cta: "Choose " + T[i],
+              cartItem: createCartItem({
+                kind: "software",
+                name: M.formal + " · " + T[i],
+                selections: [{ id: M.id, name: M.formal }],
+                plan: T[i],
+                duration: pp.d.label,
+                billing: "monthly",
+                commitmentMonths: pp.d.months,
+                estimate: this.onReq()
+                  ? null
+                  : Math.round(pp.monthly * MULT[i]),
+                sourceHref:
+                  "/software?duration=" + s.prodDur + "#/product/" + M.id,
+              }),
             },
             sty(!!p.featured),
           ),
@@ -1489,6 +1506,25 @@ export default class Software extends ReferencePage {
               price: this.chf(wp.monthly * MULT[i]),
               period: wp.d.label,
               cta: "Choose " + p.title.replace(" plan", ""),
+              cartItem: createCartItem({
+                kind: "software",
+                name: modeName(r.mode) + " · " + p.title,
+                selections: sel.map((m) => ({ id: m.id, name: m.formal })),
+                plan: p.title,
+                duration: wp.d.label,
+                billing: "monthly",
+                commitmentMonths: wp.d.months,
+                estimate: this.onReq()
+                  ? null
+                  : Math.round(wp.monthly * MULT[i]),
+                sourceHref:
+                  "/software#/plans/" +
+                  r.mode +
+                  "/" +
+                  r.duration +
+                  "/" +
+                  r.modules.join(","),
+              }),
             },
             sty(!!p.featured),
           ),
@@ -1799,6 +1835,25 @@ export default class Software extends ReferencePage {
         return h;
       })(),
       sum: {
+        cartItem: createCartItem({
+          kind: "software",
+          name: modeName(bmode),
+          selections: this.MODS.filter((m) => s.selected.includes(m.id)).map(
+            (m) => ({ id: m.id, name: m.formal }),
+          ),
+          duration: bp.d.label,
+          billing: "monthly",
+          commitmentMonths: bp.d.months,
+          estimate: this.onReq() ? null : bp.monthly,
+          sourceHref:
+            "/software?mode=" +
+            bmode +
+            "&duration=" +
+            s.duration +
+            "&modules=" +
+            s.selected.join(",") +
+            "#plan-builder",
+        }),
         mode: n ? modeName(bmode) : "",
         empty: n === 0,
         subtotal: n ? this.chf(bsub) : "—",
@@ -2133,6 +2188,7 @@ export default class Software extends ReferencePage {
                       flexShrink: "0",
                     }}
                   >
+                    <CartLink />
                     <LanguageMenu />
                     <a
                       href={toSiteHref("SignIn.dc.html")}
@@ -2189,6 +2245,7 @@ export default class Software extends ReferencePage {
               )}
               {v.notXwide && (
                 <>
+                  <CartLink />
                   <LanguageMenu compact />
                   <button
                     onClick={v.openMenu}
@@ -4267,6 +4324,11 @@ export default class Software extends ReferencePage {
                             {v.sum.billed}
                           </div>
                         </div>
+                        <AddToCartButton
+                          item={v.sum.cartItem}
+                          disabled={v.sum.empty}
+                          className="commerce-action--light"
+                        />
                         <button
                           onClick={v.sum.go}
                           disabled={v.sum.empty}
@@ -5723,44 +5785,11 @@ export default class Software extends ReferencePage {
                                     </span>
                                   </span>
                                 </div>
-                                <a
-                                  href={toSiteHref("Contact.dc.html")}
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    gap: "20px",
-                                    minHeight: "50px",
-                                    padding: "7px 7px 7px 24px",
-                                    borderRadius: "999px",
-                                    background: String(k.btnBg),
-                                    color: String(k.btnC),
-                                    fontSize: "14px",
-                                    fontWeight: "600",
-                                    transition:
-                                      "transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s",
-                                  }}
-                                  className={"reference-state-52"}
-                                >
-                                  {k.cta}
-                                  <span
-                                    style={{
-                                      display: "grid",
-                                      placeItems: "center",
-                                      width: "40px",
-                                      height: "40px",
-                                      borderRadius: "50%",
-                                      background: String(k.btnArrowBg),
-                                      color: String(k.btnArrowC),
-                                    }}
-                                  >
-                                    <i
-                                      aria-hidden={true}
-                                      style={{ fontSize: "16px" }}
-                                      className={"ph ph-arrow-up-right"}
-                                    ></i>
-                                  </span>
-                                </a>
+                                <AddToCartButton
+                                  item={k.cartItem}
+                                  style={{ background: k.btnBg, color: k.btnC }}
+                                  className="reference-state-52"
+                                />
                               </article>
                             </React.Fragment>
                           ))}

@@ -24,7 +24,7 @@ html {
 }
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: min(320px, 100%);
   background: #0d0814;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -250,7 +250,21 @@ main > section {
 }
 
 .account-modes {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+.account-recovery-link {
+  align-self: center;
+  min-height: 44px;
+  padding: 8px 12px;
+  color: #6c3caa;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 180ms;
+}
+.account-recovery-link:hover {
+  color: #3b1e59;
 }
 .account-field {
   display: flex;

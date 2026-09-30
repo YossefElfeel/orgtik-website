@@ -1,6 +1,7 @@
 import { Testimonials } from "./Testimonials";
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
 
@@ -1422,6 +1423,7 @@ export default class About extends ReferencePage {
                       flexShrink: "0",
                     }}
                   >
+                    <CartLink />
                     <LanguageMenu />
                     <a
                       href={toSiteHref("SignIn.dc.html")}
@@ -1478,6 +1480,7 @@ export default class About extends ReferencePage {
               )}
               {v.notXwide && (
                 <>
+                  <CartLink />
                   <LanguageMenu compact />
                   <button
                     onClick={v.openMenu}

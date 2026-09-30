@@ -49,10 +49,31 @@ const assert = require("node:assert/strict"),
   await p.getByRole("button", { name: /Care bundle/ }).click();
   await p.getByRole("button", { name: /Ongoing partnership/ }).click();
   await p
-    .getByRole("button", { name: "Request this bundle", exact: true })
+    .getByRole("button", { name: "Add Care bundle to cart", exact: true })
     .click();
+  await p.getByRole("link", { name: /^Cart,/ }).click();
+  await p.waitForURL("**/cart");
+  await p.getByRole("heading", { name: "Care bundle", exact: true }).waitFor();
+  await p
+    .getByRole("link", { name: "Continue to checkout", exact: true })
+    .click();
+  await p.waitForURL("**/checkout");
+  await p.getByRole("button", { name: "Preview enquiry", exact: true }).click();
+  await p
+    .getByText("Add your full name so we know who to contact.", { exact: true })
+    .waitFor();
+  await p.locator("[name=name]").fill("QA Preview");
+  await p.locator("[name=email]").fill("qa@example.com");
+  await p.getByRole("button", { name: "Preview enquiry", exact: true }).click();
+  await p
+    .getByRole("heading", {
+      name: "Enquiry preview ready, QA Preview.",
+      exact: true,
+    })
+    .waitFor();
+  ok("Service bundle, persistent cart and contact-led checkout preview");
+  await go("/contact");
   await p.waitForURL("**/contact");
-  ok("Service bundle to contact");
   await p.getByRole("button", { name: "Send enquiry", exact: true }).click();
   await p
     .getByText("Please add your name, email and a short message.", {

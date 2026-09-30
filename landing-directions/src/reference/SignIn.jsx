@@ -1,7 +1,10 @@
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
+
+let accountTabToFocus = null;
 
 export default class SignIn extends ReferencePage {
   X = 0;
@@ -89,6 +92,10 @@ export default class SignIn extends ReferencePage {
     this.srcMO = new MutationObserver(() => this.applyDataSrc());
     this.srcMO.observe(root, { childList: true, subtree: true });
     this.afterView(true);
+    if (accountTabToFocus) {
+      document.getElementById(`account-${accountTabToFocus}-tab`)?.focus();
+      accountTabToFocus = null;
+    }
   }
   componentDidUpdate(pp, ps) {
     pp = pp || {};
@@ -520,22 +527,36 @@ export default class SignIn extends ReferencePage {
     };
     const rec = s.mode === "recover";
     const signup = s.mode === "signup";
+    const pickMode = (mode) => {
+      const path = mode === "signup" ? "/sign-up" : "/sign-in";
+      if (window.location.pathname !== path && window.__orgNav) {
+        accountTabToFocus = mode;
+        window.__orgNav(path);
+        return;
+      }
+      this.setState({ mode, done: false, error: "" }, () => {
+        const selector =
+          mode === "recover"
+            ? "#account-panel input[name=email]"
+            : `#account-${mode}-tab`;
+        this.rootRef.current?.querySelector(selector)?.focus();
+      });
+    };
     page = {
       modes: [
         ["signin", "Sign in"],
-        ["signup", "Create account"],
-        ["recover", "Reset password"],
+        ["signup", "Sign up"],
       ].map((m) => ({
+        id: m[0],
         label: m[1],
-        active: s.mode === m[0],
-        bg: s.mode === m[0] ? "#190B25" : "transparent",
-        c: s.mode === m[0] ? "#F6F1FA" : "#190B25",
-        pick: () => {
-          this.setState({ mode: m[0], done: false, error: "" });
-          const path = m[0] === "signup" ? "/sign-up" : "/sign-in";
-          if (window.location.pathname !== path) window.__orgNav?.(path);
-        },
+        active: signup ? m[0] === "signup" : m[0] === "signin",
+        pick: () => pickMode(m[0]),
       })),
+      activeTabId: `account-${signup ? "signup" : "signin"}-tab`,
+      showReset: !rec && !signup,
+      isRecover: rec,
+      resetPassword: () => pickMode("recover"),
+      backToSignin: () => pickMode("signin"),
       showForm: !s.done,
       done: s.done,
       isSignin: !rec,
@@ -908,6 +929,7 @@ export default class SignIn extends ReferencePage {
                       flexShrink: "0",
                     }}
                   >
+                    <CartLink />
                     <LanguageMenu />
                     <a
                       href={toSiteHref("SignIn.dc.html")}
@@ -964,6 +986,7 @@ export default class SignIn extends ReferencePage {
               )}
               {v.notXwide && (
                 <>
+                  <CartLink />
                   <LanguageMenu compact />
                   <button
                     onClick={v.openMenu}
@@ -1143,6 +1166,8 @@ export default class SignIn extends ReferencePage {
                 >
                   <div
                     className="account-modes"
+                    role="tablist"
+                    aria-label="Account access"
                     style={{
                       display: "flex",
                       gap: "6px",
@@ -1155,14 +1180,34 @@ export default class SignIn extends ReferencePage {
                     {(v.modes || []).map((m, mIndex) => (
                       <React.Fragment key={mIndex}>
                         <button
+                          type="button"
+                          id={`account-${m.id}-tab`}
+                          role="tab"
+                          aria-controls="account-panel"
+                          aria-selected={m.active}
+                          tabIndex={m.active ? 0 : -1}
                           onClick={m.pick}
-                          aria-pressed={m.active}
+                          onKeyDown={(event) => {
+                            let index;
+                            if (event.key === "ArrowRight")
+                              index = (mIndex + 1) % v.modes.length;
+                            else if (event.key === "ArrowLeft")
+                              index =
+                                (mIndex + v.modes.length - 1) % v.modes.length;
+                            else if (event.key === "Home") index = 0;
+                            else if (event.key === "End")
+                              index = v.modes.length - 1;
+                            else return;
+                            event.preventDefault();
+                            v.modes[index].pick();
+                          }}
                           style={{
-                            flex: "1 1 110px",
+                            flex: "1 1 0",
+                            minHeight: "44px",
                             padding: "11px 14px",
                             borderRadius: "999px",
-                            background: String(m.bg),
-                            color: String(m.c),
+                            background: m.active ? "#190B25" : "transparent",
+                            color: m.active ? "#F6F1FA" : "#190B25",
                             fontSize: "14px",
                             fontWeight: "600",
                             whiteSpace: "nowrap",
@@ -1173,363 +1218,382 @@ export default class SignIn extends ReferencePage {
                       </React.Fragment>
                     ))}
                   </div>
-                  {v.showForm && (
-                    <>
-                      <form
-                        onSubmit={v.submit}
-                        noValidate
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "16px",
-                        }}
-                      >
-                        <h1
-                          data-hw={""}
-                          style={{
-                            fontSize: "clamp(26px,2.21vw,33px)",
-                            fontWeight: "500",
-                            letterSpacing: "-.04em",
-                          }}
-                        >
-                          {v.title}
-                        </h1>
-                        <p
-                          style={{
-                            fontFamily: "Arial,Helvetica,sans-serif",
-                            fontSize: "15px",
-                            lineHeight: "1.6",
-                            color: "#4A3A57",
-                          }}
-                        >
-                          {v.sub}
-                        </p>
-                        {v.isSignup && (
-                          <label className="account-field">
-                            Your name
-                            <input
-                              name="name"
-                              type="text"
-                              autoComplete="name"
-                              placeholder="Alex Morgan"
-                            />
-                          </label>
-                        )}
-                        <label
+                  <div
+                    id="account-panel"
+                    role="tabpanel"
+                    aria-labelledby={v.activeTabId}
+                  >
+                    {v.showForm && (
+                      <>
+                        <form
+                          onSubmit={v.submit}
+                          noValidate
                           style={{
                             display: "flex",
                             flexDirection: "column",
-                            gap: "8px",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            color: "#3B1E59",
+                            gap: "16px",
                           }}
                         >
-                          {"Work email"}
-                          <input
-                            name={"email"}
-                            type={"email"}
-                            placeholder={"alex@example.com"}
-                            autoComplete={v.isSignup ? "email" : "username"}
+                          <h1
+                            data-hw={""}
                             style={{
-                              height: "54px",
-                              padding: "0 16px",
-                              borderRadius: "14px",
-                              border: "1px solid #190B2526",
-                              background: "#FFFFFF",
-                              color: "#190B25",
+                              fontSize: "clamp(26px,2.21vw,33px)",
+                              fontWeight: "500",
+                              letterSpacing: "-.04em",
+                            }}
+                          >
+                            {v.title}
+                          </h1>
+                          <p
+                            style={{
                               fontFamily: "Arial,Helvetica,sans-serif",
                               fontSize: "15px",
-                              outline: "none",
+                              lineHeight: "1.6",
+                              color: "#4A3A57",
                             }}
-                            className={"reference-state-206"}
-                          />
-                        </label>
-                        {v.isSignin && (
-                          <>
-                            <label
-                              style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                                fontSize: "13px",
-                                fontWeight: "600",
-                                color: "#3B1E59",
-                              }}
-                            >
-                              {"Password"}
+                          >
+                            {v.sub}
+                          </p>
+                          {v.isSignup && (
+                            <label className="account-field">
+                              Your name
                               <input
-                                name={"password"}
-                                type={"password"}
-                                placeholder={"••••••••"}
-                                autoComplete={
-                                  v.isSignup
-                                    ? "new-password"
-                                    : "current-password"
-                                }
-                                style={{
-                                  height: "54px",
-                                  padding: "0 16px",
-                                  borderRadius: "14px",
-                                  border: "1px solid #190B2526",
-                                  background: "#FFFFFF",
-                                  color: "#190B25",
-                                  fontFamily: "Arial,Helvetica,sans-serif",
-                                  fontSize: "15px",
-                                  outline: "none",
-                                }}
-                                className={"reference-state-207"}
+                                name="name"
+                                type="text"
+                                autoComplete="name"
+                                placeholder="Alex Morgan"
                               />
                             </label>
-                          </>
-                        )}
-                        {v.isSignup && (
-                          <label className="account-field">
-                            Confirm password
+                          )}
+                          <label
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "8px",
+                              fontSize: "13px",
+                              fontWeight: "600",
+                              color: "#3B1E59",
+                            }}
+                          >
+                            {"Work email"}
                             <input
-                              name="confirmPassword"
-                              type="password"
-                              autoComplete="new-password"
-                              placeholder="••••••••"
+                              name={"email"}
+                              type={"email"}
+                              placeholder={"alex@example.com"}
+                              autoComplete={v.isSignup ? "email" : "username"}
+                              style={{
+                                height: "54px",
+                                padding: "0 16px",
+                                borderRadius: "14px",
+                                border: "1px solid #190B2526",
+                                background: "#FFFFFF",
+                                color: "#190B25",
+                                fontFamily: "Arial,Helvetica,sans-serif",
+                                fontSize: "15px",
+                                outline: "none",
+                              }}
+                              className={"reference-state-206"}
                             />
                           </label>
-                        )}
-                        {v.hasError && (
-                          <>
-                            <div
-                              role={"alert"}
+                          {v.isSignin && (
+                            <>
+                              <label
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "8px",
+                                  fontSize: "13px",
+                                  fontWeight: "600",
+                                  color: "#3B1E59",
+                                }}
+                              >
+                                {"Password"}
+                                <input
+                                  name={"password"}
+                                  type={"password"}
+                                  placeholder={"••••••••"}
+                                  autoComplete={
+                                    v.isSignup
+                                      ? "new-password"
+                                      : "current-password"
+                                  }
+                                  style={{
+                                    height: "54px",
+                                    padding: "0 16px",
+                                    borderRadius: "14px",
+                                    border: "1px solid #190B2526",
+                                    background: "#FFFFFF",
+                                    color: "#190B25",
+                                    fontFamily: "Arial,Helvetica,sans-serif",
+                                    fontSize: "15px",
+                                    outline: "none",
+                                  }}
+                                  className={"reference-state-207"}
+                                />
+                              </label>
+                            </>
+                          )}
+                          {v.isSignup && (
+                            <label className="account-field">
+                              Confirm password
+                              <input
+                                name="confirmPassword"
+                                type="password"
+                                autoComplete="new-password"
+                                placeholder="••••••••"
+                              />
+                            </label>
+                          )}
+                          {v.hasError && (
+                            <>
+                              <div
+                                role={"alert"}
+                                style={{
+                                  padding: "12px 14px",
+                                  borderRadius: "12px",
+                                  background: "#A0254414",
+                                  color: "#8A1F3A",
+                                  fontSize: "14px",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                {v.error}
+                              </div>
+                            </>
+                          )}
+                          <button
+                            type={"submit"}
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              minHeight: "52px",
+                              padding: "7px 7px 7px 24px",
+                              borderRadius: "999px",
+                              background: "#190B25",
+                              color: "#F6F1FA",
+                              fontSize: "15px",
+                              fontWeight: "600",
+                            }}
+                          >
+                            {v.cta}
+                            <span
                               style={{
-                                padding: "12px 14px",
-                                borderRadius: "12px",
-                                background: "#A0254414",
-                                color: "#8A1F3A",
-                                fontSize: "14px",
-                                fontWeight: "600",
+                                display: "grid",
+                                placeItems: "center",
+                                width: "38px",
+                                height: "38px",
+                                borderRadius: "50%",
+                                background: "#EEE3F7",
+                                color: "#190B25",
                               }}
                             >
-                              {v.error}
-                            </div>
-                          </>
-                        )}
-                        <button
-                          type={"submit"}
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            minHeight: "52px",
-                            padding: "7px 7px 7px 24px",
-                            borderRadius: "999px",
-                            background: "#190B25",
-                            color: "#F6F1FA",
-                            fontSize: "15px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          {v.cta}
-                          <span
+                              <i
+                                aria-hidden={true}
+                                className={"ph ph-arrow-right"}
+                              ></i>
+                            </span>
+                          </button>
+                          {(v.showReset || v.isRecover) && (
+                            <button
+                              type="button"
+                              className="account-recovery-link"
+                              onClick={
+                                v.isRecover ? v.backToSignin : v.resetPassword
+                              }
+                            >
+                              {v.isRecover
+                                ? "Back to sign in"
+                                : "Reset password"}
+                            </button>
+                          )}
+                          <p
                             style={{
-                              display: "grid",
-                              placeItems: "center",
-                              width: "38px",
-                              height: "38px",
-                              borderRadius: "50%",
-                              background: "#EEE3F7",
-                              color: "#190B25",
+                              fontFamily: "Arial,Helvetica,sans-serif",
+                              display: "flex",
+                              gap: "8px",
+                              fontSize: "13px",
+                              lineHeight: "1.5",
+                              color: "#4A3A57",
                             }}
                           >
                             <i
                               aria-hidden={true}
-                              className={"ph ph-arrow-right"}
+                              style={{ color: "#6C3CAA", flexShrink: "0" }}
+                              className={"ph ph-info"}
+                            ></i>
+                            {
+                              "Account preview · nothing is authenticated, created, sent, or stored."
+                            }
+                          </p>
+                        </form>
+                      </>
+                    )}
+                    {v.done && (
+                      <>
+                        <div
+                          role={"status"}
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "14px",
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: "grid",
+                              placeItems: "center",
+                              width: "60px",
+                              height: "60px",
+                              borderRadius: "50%",
+                              background: "#6C3CAA",
+                              color: "#FFFFFF",
+                            }}
+                          >
+                            <i
+                              aria-hidden={true}
+                              style={{ fontSize: "25px" }}
+                              className={"ph ph-check"}
                             ></i>
                           </span>
-                        </button>
-                        <p
-                          style={{
-                            fontFamily: "Arial,Helvetica,sans-serif",
-                            display: "flex",
-                            gap: "8px",
-                            fontSize: "13px",
-                            lineHeight: "1.5",
-                            color: "#4A3A57",
-                          }}
-                        >
-                          <i
-                            aria-hidden={true}
-                            style={{ color: "#6C3CAA", flexShrink: "0" }}
-                            className={"ph ph-info"}
-                          ></i>
-                          {
-                            "Account preview · nothing is authenticated, created, sent, or stored."
-                          }
-                        </p>
-                      </form>
-                    </>
-                  )}
-                  {v.done && (
-                    <>
-                      <div
-                        role={"status"}
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "14px",
-                        }}
-                      >
-                        <span
-                          style={{
-                            display: "grid",
-                            placeItems: "center",
-                            width: "60px",
-                            height: "60px",
-                            borderRadius: "50%",
-                            background: "#6C3CAA",
-                            color: "#FFFFFF",
-                          }}
-                        >
-                          <i
-                            aria-hidden={true}
-                            style={{ fontSize: "25px" }}
-                            className={"ph ph-check"}
-                          ></i>
-                        </span>
-                        <h1
-                          data-hw={""}
-                          style={{
-                            fontSize: "27px",
-                            fontWeight: "500",
-                            letterSpacing: "-.04em",
-                          }}
-                        >
-                          {v.doneTitle}
-                        </h1>
-                        <p
-                          style={{
-                            fontFamily: "Arial,Helvetica,sans-serif",
-                            fontSize: "15px",
-                            lineHeight: "1.6",
-                            color: "#4A3A57",
-                          }}
-                        >
-                          {v.doneBody}
-                        </p>
-                        <button
-                          onClick={v.back}
-                          style={{
-                            alignSelf: "flex-start",
-                            padding: "12px 18px",
-                            borderRadius: "999px",
-                            border: "1px solid #190B2533",
-                            fontSize: "14px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          {"Back"}
-                        </button>
-                        <div
-                          style={{
-                            width: "100%",
-                            marginTop: "8px",
-                            paddingTop: "18px",
-                            borderTop: "1px solid #190B251f",
-                          }}
-                        >
-                          <div
+                          <h1
+                            data-hw={""}
                             style={{
-                              fontSize: "12px",
+                              fontSize: "27px",
+                              fontWeight: "500",
+                              letterSpacing: "-.04em",
+                            }}
+                          >
+                            {v.doneTitle}
+                          </h1>
+                          <p
+                            style={{
+                              fontFamily: "Arial,Helvetica,sans-serif",
+                              fontSize: "15px",
+                              lineHeight: "1.6",
+                              color: "#4A3A57",
+                            }}
+                          >
+                            {v.doneBody}
+                          </p>
+                          <button
+                            onClick={v.back}
+                            style={{
+                              alignSelf: "flex-start",
+                              padding: "12px 18px",
+                              borderRadius: "999px",
+                              border: "1px solid #190B2533",
+                              fontSize: "14px",
                               fontWeight: "600",
-                              letterSpacing: ".16em",
-                              textTransform: "uppercase",
-                              color: "#6C3CAA",
                             }}
                           >
-                            {"Where to next"}
-                          </div>
+                            {"Back"}
+                          </button>
                           <div
                             style={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              gap: "10px",
-                              marginTop: "12px",
+                              width: "100%",
+                              marginTop: "8px",
+                              paddingTop: "18px",
+                              borderTop: "1px solid #190B251f",
                             }}
                           >
-                            <a
-                              href={toSiteHref("Software.dc.html")}
+                            <div
                               style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                padding: "11px 16px",
-                                borderRadius: "999px",
-                                background: "#190B25",
-                                color: "#F6F1FA",
-                                fontSize: "14px",
+                                fontSize: "12px",
                                 fontWeight: "600",
-                                whiteSpace: "nowrap",
-                                transition: "background .3s",
+                                letterSpacing: ".16em",
+                                textTransform: "uppercase",
+                                color: "#6C3CAA",
                               }}
-                              className={"reference-state-208"}
                             >
-                              {"Explore the software"}
-                              <i
-                                aria-hidden={true}
-                                style={{ fontSize: "14px" }}
-                                className={"ph ph-arrow-up-right"}
-                              ></i>
-                            </a>
-                            <a
-                              href={toSiteHref("Contact.dc.html")}
+                              {"Where to next"}
+                            </div>
+                            <div
                               style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                padding: "11px 16px",
-                                borderRadius: "999px",
-                                background: "#190B25",
-                                color: "#F6F1FA",
-                                fontSize: "14px",
-                                fontWeight: "600",
-                                whiteSpace: "nowrap",
-                                transition: "background .3s",
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: "10px",
+                                marginTop: "12px",
                               }}
-                              className={"reference-state-209"}
                             >
-                              {"Get support"}
-                              <i
-                                aria-hidden={true}
-                                style={{ fontSize: "14px" }}
-                                className={"ph ph-arrow-up-right"}
-                              ></i>
-                            </a>
-                            <a
-                              href={toSiteHref("OrgTik%20Home.dc.html")}
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                padding: "11px 16px",
-                                borderRadius: "999px",
-                                background: "#190B25",
-                                color: "#F6F1FA",
-                                fontSize: "14px",
-                                fontWeight: "600",
-                                whiteSpace: "nowrap",
-                                transition: "background .3s",
-                              }}
-                              className={"reference-state-210"}
-                            >
-                              {"Back to home"}
-                              <i
-                                aria-hidden={true}
-                                style={{ fontSize: "14px" }}
-                                className={"ph ph-arrow-up-right"}
-                              ></i>
-                            </a>
+                              <a
+                                href={toSiteHref("Software.dc.html")}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "8px",
+                                  padding: "11px 16px",
+                                  borderRadius: "999px",
+                                  background: "#190B25",
+                                  color: "#F6F1FA",
+                                  fontSize: "14px",
+                                  fontWeight: "600",
+                                  whiteSpace: "nowrap",
+                                  transition: "background .3s",
+                                }}
+                                className={"reference-state-208"}
+                              >
+                                {"Explore the software"}
+                                <i
+                                  aria-hidden={true}
+                                  style={{ fontSize: "14px" }}
+                                  className={"ph ph-arrow-up-right"}
+                                ></i>
+                              </a>
+                              <a
+                                href={toSiteHref("Contact.dc.html")}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "8px",
+                                  padding: "11px 16px",
+                                  borderRadius: "999px",
+                                  background: "#190B25",
+                                  color: "#F6F1FA",
+                                  fontSize: "14px",
+                                  fontWeight: "600",
+                                  whiteSpace: "nowrap",
+                                  transition: "background .3s",
+                                }}
+                                className={"reference-state-209"}
+                              >
+                                {"Get support"}
+                                <i
+                                  aria-hidden={true}
+                                  style={{ fontSize: "14px" }}
+                                  className={"ph ph-arrow-up-right"}
+                                ></i>
+                              </a>
+                              <a
+                                href={toSiteHref("OrgTik%20Home.dc.html")}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "8px",
+                                  padding: "11px 16px",
+                                  borderRadius: "999px",
+                                  background: "#190B25",
+                                  color: "#F6F1FA",
+                                  fontSize: "14px",
+                                  fontWeight: "600",
+                                  whiteSpace: "nowrap",
+                                  transition: "background .3s",
+                                }}
+                                className={"reference-state-210"}
+                              >
+                                {"Back to home"}
+                                <i
+                                  aria-hidden={true}
+                                  style={{ fontSize: "14px" }}
+                                  className={"ph ph-arrow-up-right"}
+                                ></i>
+                              </a>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </>
-                  )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </section>

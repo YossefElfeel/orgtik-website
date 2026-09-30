@@ -1,5 +1,6 @@
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
 
@@ -34,6 +35,10 @@ export default class Legal extends ReferencePage {
         [
           "Data in this preview",
           "The frontend demonstrations do not submit contact, account, roadmap, or plan information to a server.",
+        ],
+        [
+          "Cart and checkout",
+          "Cart selections are saved in this browser so they remain available after a refresh. Checkout contact details stay in memory during the preview and are not saved or sent to a server.",
         ],
         [
           "Final policy",
@@ -91,6 +96,8 @@ export default class Legal extends ReferencePage {
     ["About", "About.dc.html", []],
     ["Roadmap", "Roadmap.dc.html", []],
     ["Contact", "Contact.dc.html", []],
+    ["Cart", "/cart", []],
+    ["Checkout", "/checkout", []],
     ["Sign in", "SignIn.dc.html", []],
     ["Create account", "/sign-up", []],
   ];
@@ -969,6 +976,7 @@ export default class Legal extends ReferencePage {
                       flexShrink: "0",
                     }}
                   >
+                    <CartLink />
                     <LanguageMenu />
                     <a
                       href={toSiteHref("SignIn.dc.html")}
@@ -1025,6 +1033,7 @@ export default class Legal extends ReferencePage {
               )}
               {v.notXwide && (
                 <>
+                  <CartLink />
                   <LanguageMenu compact />
                   <button
                     onClick={v.openMenu}

@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:cart": "node tests/cart.test.mjs",
     "format": "prettier --write src index.html vite.config.mjs",
     "format:check": "prettier --check src index.html vite.config.mjs"
   },

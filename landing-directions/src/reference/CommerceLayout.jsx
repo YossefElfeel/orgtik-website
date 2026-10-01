@@ -4,6 +4,7 @@ import { LanguageMenu } from "./LanguageMenu";
 
 export function CommerceLayout({
   checkout = false,
+  complete = false,
   steps = true,
   className = "",
   children,
@@ -74,11 +75,15 @@ export function CommerceLayout({
         {steps && (
           <nav aria-label="Checkout steps" className="commerce-steps">
             <a href="/cart" aria-current={!checkout ? "step" : undefined}>
-              <span>1</span> Your cart
+              <span>1</span> Cart
             </a>
             <i className="ph ph-arrow-right" aria-hidden="true" />
-            <span aria-current={checkout ? "step" : undefined}>
-              <span>2</span> Contact details
+            <span aria-current={checkout && !complete ? "step" : undefined}>
+              <span>2</span> Payment
+            </span>
+            <i className="ph ph-arrow-right" aria-hidden="true" />
+            <span aria-current={complete ? "step" : undefined}>
+              <span>3</span> Account
             </span>
           </nav>
         )}
@@ -99,7 +104,7 @@ export function CommerceLayout({
         </a>
         <p>Strategy. Design. Technology.</p>
         <div>
-          <a href="/plans">Plans &amp; pricing</a>
+          <a href="/plans">Bundles &amp; pricing</a>
           <a href="/contact">Talk to us</a>
           <a href="/legal#/privacy">Privacy policy</a>
         </div>

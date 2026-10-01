@@ -1,3 +1,11 @@
+import {
+  findItem,
+  money,
+  groupFromIds,
+  configurationHref,
+  BUNDLES as PURCHASE_BUNDLES,
+} from "./purchase-catalog.js";
+import { PurchasingOverview, PackageSection } from "./PurchaseUI";
 import { Testimonials } from "./Testimonials";
 import { ContentHeading } from "./ContentHeading";
 import React from "react";
@@ -5,32 +13,15 @@ import { LanguageMenu } from "./LanguageMenu";
 import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref, readWorkspaceQuery } from "./navigation";
-import { AddToCartButton } from "./CartControls";
-import { createCartItem } from "./cart-store";
+
 import {
-  SOFTWARE_BUNDLES,
   SOFTWARE_MODES,
   SOFTWARE_PRODUCTS,
   SOFTWARE_TERMS,
   getSoftwareMode,
-  getSoftwarePlanAdditions,
-  getSoftwarePlanFeatures,
-  getSoftwareSavingHint,
-  nameSoftwareSelection,
-  priceSoftware,
   recommendSoftwarePlan,
   softwareModeOf,
 } from "./software-catalog";
-import {
-  PLAN_IDS,
-  formatCHF,
-  planBody,
-  planName,
-  planSubtitle,
-} from "./plan-ladder";
-import { getPlanComparison } from "./plan-pricing";
-import { PlanPicker } from "./PlanPicker";
-import { PlanCompareDialog, PlanCompareTable } from "./PlanCompare";
 
 export default class Software extends ReferencePage {
   MODS = SOFTWARE_PRODUCTS;
@@ -48,17 +39,17 @@ export default class Software extends ReferencePage {
     {
       n: "01",
       title: "Choose",
-      body: "Confirm the product and the support level that fits the way your team wants to begin.",
+      body: "Choose products and durations that fit the way your team works.",
     },
     {
       n: "02",
       title: "Review",
-      body: "Compare the duration, included capabilities and estimated monthly investment.",
+      body: "Review your selected periods, savings, and total upfront price.",
     },
     {
       n: "03",
-      title: "Discuss",
-      body: "Carry the preferred option into a focused commercial conversation with OrgTik.",
+      title: "Pay & access",
+      body: "Complete payment and access purchases, payments, and invoices through your OrgTik account.",
     },
   ];
   FLOW = [
@@ -166,6 +157,8 @@ export default class Software extends ReferencePage {
 
   parseRoute(hash) {
     const h = decodeURIComponent(String(hash || "").replace(/^#/, ""));
+    if (["plan-builder", "software-bundles"].includes(h))
+      return { view: "overview" };
     if (h === "") return { view: "overview" };
     if (h.charAt(0) !== "/") return null;
     const p = h.slice(1).split("/"),
@@ -216,6 +209,8 @@ export default class Software extends ReferencePage {
     setTimeout(this.measure, 300);
     this.onHash = () => {
       const r = this.parseRoute(location.hash);
+      if (["#plan-builder", "#software-bundles"].includes(location.hash))
+        this.pendingScroll = location.hash.slice(1);
       if (!r) return;
       this.setState((s) => ({
         route: r,
@@ -363,17 +358,10 @@ export default class Software extends ReferencePage {
     });
   }
   goBuilder(mode, sel, dur) {
-    const patch = {};
-    if (mode) patch.mode = mode;
-    if (sel && sel.length) patch.selected = sel;
-    if (dur) patch.duration = dur;
-    if (this.state.route.view === "overview") {
-      this.setState(patch, () => this.go("plan-builder"));
-      return;
-    }
-    this.pendingScroll = "plan-builder";
-    this.setState(patch);
-    location.hash = "#/";
+    const months =
+      dur === "annual" ? 12 : dur === "biennial" ? 24 : Number(dur) || 1;
+    const group = groupFromIds("software", sel || [], months);
+    window.__orgNav?.(configurationHref(group));
   }
   setupHeroVideo() {
     const v = this.videoRef.current;
@@ -741,11 +729,7 @@ export default class Software extends ReferencePage {
         el.setAttribute("src", v);
     });
   }
-  // Subscription price before plan support; plans multiply it in priceSoftware.
-  price(sel, mode, durId) {
-    const p = priceSoftware(sel, "starter", durId);
-    return { d: p.term, bd: p.rate, monthly: p.estimate, total: p.total };
-  }
+
   onReq() {
     return this.props.prices === "On request";
   }
@@ -754,44 +738,14 @@ export default class Software extends ReferencePage {
       ? "On request"
       : "CHF " + new Intl.NumberFormat("de-CH").format(Math.round(v));
   }
-  QUICK = SOFTWARE_BUNDLES.map((bundle) => ({
-    name: bundle.name,
-    ids: bundle.ids,
-    save: `−${Math.round(bundle.rate * 100)}%`,
-  }));
-  same(a, b) {
-    return a.length === b.length && a.every((x) => b.indexOf(x) >= 0);
-  }
+
   modeOf(sel) {
     return softwareModeOf(sel);
   }
-  pickPlan(plan) {
-    this.setState({ plan });
-  }
+
   // Keep the workspace builder shareable and restorable after refresh.
-  syncBuilderUrl() {
-    if (this.state.route.view !== "overview") return;
-    const url = new URL(window.location.href);
-    url.searchParams.delete("mode");
-    if (this.state.selected.length)
-      url.searchParams.set("modules", this.state.selected.join(","));
-    else url.searchParams.delete("modules");
-    url.searchParams.set("duration", this.state.duration);
-    if (this.state.plan) url.searchParams.set("plan", this.state.plan);
-    const next = (url.pathname + url.search + url.hash).replaceAll("%2C", ",");
-    if (next !== location.pathname + location.search + location.hash)
-      window.history.replaceState(window.history.state, "", next);
-  }
-  toggleMod(id) {
-    const all = this.MODS.map((m) => m.id);
-    this.setState((s) => {
-      const sel =
-        s.selected.indexOf(id) >= 0
-          ? s.selected.filter((x) => x !== id)
-          : s.selected.concat([id]);
-      return { selected: all.filter((x) => sel.indexOf(x) >= 0) };
-    });
-  }
+  syncBuilderUrl() {}
+
   renderVals() {
     const s = this.state,
       r = s.route,
@@ -823,7 +777,7 @@ export default class Software extends ReferencePage {
             : m.number + " · " + m.category,
         price: this.onReq()
           ? "Price on request"
-          : "From " + this.chf(m.monthlyPrice) + "/mo",
+          : "From " + money(findItem(m.id, "software").monthlyMinor) + "/mo",
         imgT: on ? "scale(1.06)" : "scale(1)",
         arrowBg: on ? "#EEE3F7" : "#0D081459",
         arrowC: on ? "#28123B" : "#F6F1FA",
@@ -858,15 +812,15 @@ export default class Software extends ReferencePage {
       const sel = r.modules.map(byId);
       hero = {
         hasCrumb: true,
-        crumb: "Plan comparison",
+        crumb: "Your configuration",
         crumbRootC: "#B5A6C4",
-        eyebrow: "Software · Plan comparison",
+        eyebrow: "Software · Your configuration",
         l1: "One workspace.",
         l2: "",
-        acc: "Three levels of support.",
-        body: "Your selected products and duration stay fixed while onboarding, workflow guidance and ongoing care change by plan.",
-        primary: "Compare the plans",
-        primaryGo: () => this.go("plans-section"),
+        acc: "Built around your team.",
+        body: "Choose your products and durations. Every package includes the same capabilities at every duration.",
+        primary: "Customize your plan",
+        primaryGo: () => this.go("plan-builder"),
         secondary: "Edit your systems",
         secondaryGo: () => this.goBuilder(r.mode, r.modules, r.duration),
         showStrip: true,
@@ -916,7 +870,10 @@ export default class Software extends ReferencePage {
             })),
             panelNote: this.onReq()
               ? "Pricing on request"
-              : "From " + this.chf(M.monthlyPrice) + "/mo · " + M.category,
+              : "From " +
+                money(findItem(M.id, "software").monthlyMinor) +
+                "/mo · " +
+                M.category,
           }
         : v === "plans"
           ? {
@@ -937,21 +894,12 @@ export default class Software extends ReferencePage {
                 meta: m.category,
                 href: "#/product/" + m.id,
               })),
-              panelNote: "Bundles save up to 25%.",
+              panelNote: "Save up to 15% with longer periods or more products.",
             },
     );
     const MM = this.MODS[s.mod],
       mp = split(MM.title);
-    const n = s.selected.length,
-      bmode = this.modeOf(s.selected),
-      bp = this.price(s.selected, bmode, s.duration),
-      brec = recommendSoftwarePlan(s.selected),
-      bplan = s.plan || "starter",
-      bplanPrice = priceSoftware(s.selected, bplan, s.duration),
-      bsub = this.MODS.filter((m) => s.selected.indexOf(m.id) >= 0).reduce(
-        (t, m) => t + m.monthlyPrice,
-        0,
-      );
+
     let pm = {
       id: "",
       formal: "",
@@ -1014,169 +962,6 @@ export default class Software extends ReferencePage {
         related: this.CONNECT[M.id].map((id) => card(byId(id), "rel")),
       };
     }
-    const sty = (f) =>
-      f
-        ? {
-            bg: "#190B25",
-            c: "#F6F1FA",
-            sub: "#CFC2DB",
-            acc: "#D4B7EC",
-            line: "#ffffff1f",
-            chipBg: "#ffffff12",
-            shadow: "0 40px 80px #190B2540",
-            btnBg: "#EEE3F7",
-            btnC: "#28123B",
-            btnArrowBg: "#28123B",
-            btnArrowC: "#EEE3F7",
-          }
-        : {
-            bg: "#FFFFFFb8",
-            c: "#190B25",
-            sub: "#4A3A57",
-            acc: "#6C3CAA",
-            line: "#190B251f",
-            chipBg: "#190B250a",
-            shadow: "0 20px 50px #190B2512",
-            btnBg: "#190B25",
-            btnC: "#F6F1FA",
-            btnArrowBg: "#EEE3F7",
-            btnArrowC: "#190B25",
-          };
-    // One card per plan for a selection, priced by the shared catalogue.
-    const planCards = (ids, termId, scopeLabel, scopeName) => {
-      const rec = recommendSoftwarePlan(ids);
-      const productLine =
-        ids.length === 1
-          ? `Full ${byId(ids[0]).formal}: ${byId(ids[0]).tasks.join(", ")}`
-          : `All ${ids.length} products, fully included`;
-      return PLAN_IDS.map((planId, i) => {
-        const price = priceSoftware(ids, planId, termId);
-        const featured = rec?.planId === planId;
-        return Object.assign(
-          {
-            planId,
-            showScope: Boolean(scopeLabel),
-            num: "0" + (i + 1),
-            featured,
-            eyebrow: planSubtitle("software", planId),
-            title: planName(planId),
-            body: planBody("software", planId),
-            scopeLabel,
-            scope: scopeName + " · " + planName(planId),
-            features: i
-              ? [`Everything in ${planName(PLAN_IDS[i - 1])}, plus`].concat(
-                  getSoftwarePlanAdditions(PLAN_IDS[i - 1], ids).items,
-                )
-              : [productLine].concat(
-                  getSoftwarePlanFeatures("starter", ids).slice(ids.length),
-                ),
-            price: this.chf(price.estimate),
-            period: price.term.label,
-            termTotal:
-              price.term.months > 1
-                ? this.chf(price.total) + " over " + price.term.label
-                : "Billed monthly, no fixed term",
-            cartItem: createCartItem({
-              kind: "software",
-              name: nameSoftwareSelection(ids),
-              planId,
-              termId,
-              selections: ids.map((id) => ({ id, name: byId(id).formal })),
-            }),
-          },
-          sty(featured),
-        );
-      });
-    };
-    let ps = {
-      num: "",
-      eyebrow: "",
-      l1: "",
-      acc: "",
-      body: "",
-      lockup: false,
-      duration: false,
-      chips: false,
-      hasCards: false,
-      empty: false,
-      note: "",
-      cards: [],
-      sel: [],
-      icon: "",
-      name: "",
-      short: "",
-      edit: () => {},
-    };
-    if (M) {
-      ps = Object.assign(ps, {
-        num: "03",
-        eyebrow: M.formal + " plans",
-        l1: "Choose the right",
-        acc: M.formal + " plan.",
-        body:
-          "Every plan includes the full " +
-          M.formal +
-          " product. Plans differ in how much setup and support you get.",
-        lockup: true,
-        duration: true,
-        hasCards: true,
-        icon: M.icon,
-        name: M.formal,
-        short: M.short,
-        note:
-          "Prototype CHF estimates for " +
-          M.formal +
-          ". Final limits, taxes, availability and contractual terms require confirmation.",
-        compare: () =>
-          this.setState({
-            compare: {
-              ids: [M.id],
-              termId: s.prodDur,
-              title: M.formal + " plans",
-            },
-          }),
-        combineHref: "/software?modules=" + M.id + "#plan-builder",
-        cards: planCards([M.id], s.prodDur, "", M.formal),
-      });
-    } else if (v === "plans") {
-      const sel = r.modules.map(byId),
-        k = sel.length,
-        scopeName = nameSoftwareSelection(r.modules);
-      ps = Object.assign(ps, {
-        num: "01",
-        eyebrow: "Your selected workspace",
-        l1: k ? k + " product" + (k === 1 ? "" : "s") + "," : "Choose your",
-        acc: k ? "three ways forward." : "systems first.",
-        body: k
-          ? scopeName +
-            " · " +
-            durLabel(r.duration) +
-            " · Every plan includes the same products. Setup and support change by plan."
-          : "Return to the plan builder and select at least one product before comparing plans.",
-        duration: k > 0,
-        chips: k > 0,
-        hasCards: k > 0,
-        empty: k === 0,
-        sel: sel.map((m) => ({
-          href: "#/product/" + m.id,
-          icon: m.icon,
-          formal: m.formal,
-        })),
-        note: "Prototype CHF pricing for product review. Final limits, contractual terms, taxes and availability require approval.",
-        edit: () => this.goBuilder(r.mode, r.modules, r.duration),
-        compare: () =>
-          this.setState({
-            compare: {
-              ids: r.modules,
-              termId: r.duration,
-              title: scopeName + " plans",
-            },
-          }),
-        cards: k
-          ? planCards(r.modules, r.duration, "Workspace scope", scopeName)
-          : [],
-      });
-    }
     const toContact = () => {
       window.__orgNav
         ? window.__orgNav("Contact.dc.html")
@@ -1188,10 +973,10 @@ export default class Software extends ReferencePage {
           l1: "Put " + M.formal,
           acc: "in your workspace.",
           body:
-            "Compare the three " +
+            "Choose the duration for " +
             M.formal +
-            " support levels, then bring the best fit into a focused conversation.",
-          label: "Review " + M.formal + " plans",
+            ", review your price, and add it to your cart.",
+          label: "Configure " + M.formal,
           go: () => this.go("plans-section"),
           second: "Talk to us",
           secondGo: toContact,
@@ -1200,10 +985,10 @@ export default class Software extends ReferencePage {
         ? {
             eyebrow: "A plan shaped around the work",
             l1: "Bring it into one",
-            acc: "useful conversation.",
-            body: "We’ll clarify the fit, final limits and commercial details before anything is agreed.",
-            label: "Start a project",
-            go: toContact,
+            acc: "connected workspace.",
+            body: "Review your products and durations, add them to your cart, and complete your purchase.",
+            label: "Configure your plan",
+            go: () => this.go("plan-builder"),
             second: "Edit your systems",
             secondGo: () => this.goBuilder(null, r.modules, r.duration),
           }
@@ -1220,11 +1005,11 @@ export default class Software extends ReferencePage {
     return {
       isOverview: v === "overview",
       isProduct: v === "product",
-      isPlans: v === "plans",
+
       showPlans: v === "product" || v === "plans",
       xwide: !!s.xwide,
       notXwide: !s.xwide,
-      narrow: s.narrow,
+
       menuOpen: s.menuOpen,
       openMenu: () => this.setState({ menuOpen: true }),
       closeMenu: () => this.setState({ menuOpen: false }),
@@ -1240,42 +1025,12 @@ export default class Software extends ReferencePage {
       tickerLabel: "Software",
       tickerList: [0, 1].map(() =>
         this.MODS.map((m) => m.formal).concat(
-          SOFTWARE_BUNDLES.map((bundle) => bundle.name),
+          PURCHASE_BUNDLES.filter((b) => b.kind === "software").map(
+            (b) => b.name,
+          ),
         ),
       ),
-      rowCols: s.narrow
-        ? "46px minmax(0,1fr) 40px"
-        : "46px minmax(0,1fr) auto 40px",
-      showRowPrice: !s.narrow,
-      familyCols: s.xwide
-        ? "repeat(4,minmax(0,1fr))"
-        : this.rootRef.current && this.rootRef.current.offsetWidth < 600
-          ? "minmax(0,1fr)"
-          : "repeat(2,minmax(0,1fr))",
-      groups: [
-        [
-          "Operations",
-          "The inside of the business.",
-          "People, work and the documents that connect them, in one clear structure.",
-          "Operations bundle",
-          ["hr", "tasks", "files"],
-        ],
-        [
-          "Growth",
-          "The way you reach customers.",
-          "Relationships, campaigns and your website, moving in one rhythm.",
-          "Growth bundle",
-          ["crm", "marketing", "website"],
-        ],
-      ].map((g, i) => ({
-        label: g[0],
-        title: g[1],
-        body: g[2],
-        save: "−15%",
-        bundle: g[3].replace(" bundle", ""),
-        pick: () => this.goBuilder(null, g[4]),
-        cards: g[4].map((id) => card(byId(id), "ov")),
-      })),
+
       flow: this.FLOW.map((f, i) => {
         const on = s.flow === i,
           past = i < s.flow;
@@ -1329,227 +1084,7 @@ export default class Software extends ReferencePage {
       flowLeave: () => {
         this.flowHover = false;
       },
-      mods: this.MODS.map((x, i) => {
-        const sel = i === s.mod;
-        return {
-          id: x.id,
-          icon: x.icon,
-          formal: x.formal,
-          sel: sel,
-          color: sel ? "#28123B" : "#DCD0E6",
-          bg: sel ? "#EEE3F7" : "#ffffff08",
-          border: sel ? "#EEE3F7" : "#ffffff1a",
-          select: () => this.selectMod(i),
-        };
-      }),
-      mod: {
-        num: MM.number,
-        category: MM.category,
-        t1: mp[0],
-        t2: mp.length > 1 ? " " + mp.slice(1).join(" ") : "",
-        desc: MM.description,
-        tasks: MM.tasks,
-        formal: MM.formal,
-        href: "#/product/" + MM.id,
-      },
-      lineDeg: s.lineDeg,
-      nodes: this.MODS.map((x, i) => {
-        const a = ((-90 + i * 60) * Math.PI) / 180,
-          sel = i === s.mod;
-        return {
-          icon: x.icon,
-          formal: x.formal,
-          x: (50 + 39 * Math.cos(a)).toFixed(2) + "%",
-          y: (50 + 39 * Math.sin(a)).toFixed(2) + "%",
-          bg: sel ? "#EEE3F7" : "#190B25",
-          border: sel ? "#EEE3F7" : "#D4B7EC3d",
-          color: sel ? "#28123B" : "#DCD0E6",
-          shadow: sel ? "0 0 0 8px #EEE3F71a, 0 0 50px #9458F48c" : "none",
-          labelC: sel ? "#FFFFFF" : "#9D8BAE",
-          select: () => this.selectMod(i),
-        };
-      }),
-      quick: this.QUICK.map((q) => {
-        const on = this.same(s.selected, q.ids);
-        return {
-          name: q.name,
-          save: q.save,
-          bg: on ? "#190B25" : "#FFFFFF",
-          c: on ? "#F6F1FA" : "#190B25",
-          badgeBg: on ? "#EEE3F7" : "#6C3CAA14",
-          badgeC: on ? "#28123B" : "#6C3CAA",
-          border: on ? "#190B25" : "#190B251f",
-          pick: () => this.setState({ selected: q.ids.slice() }),
-        };
-      }),
-      clearSel: () => this.setState({ selected: [] }),
-      bdurs: this.DURATIONS.map((d) => {
-        const on = s.duration === d.id;
-        return {
-          label: d.label,
-          note: d.discount
-            ? "Save " + Math.round(d.discount * 100) + "%"
-            : "Pay monthly",
-          bg: on ? "#190B25" : "#FFFFFF",
-          c: on ? "#F6F1FA" : "#190B25",
-          sub: on ? "#D4B7EC" : "#6C3CAA",
-          border: on ? "#190B25" : "#190B251f",
-          radioB: on ? "#D4B7EC" : "#190B2540",
-          radioDot: on ? "#D4B7EC" : "transparent",
-          pick: () => this.setState({ duration: d.id }),
-        };
-      }),
-      pdurs: this.DURATIONS.map((d) => {
-        const plans = v === "plans";
-        const on = (plans ? r.duration : s.prodDur) === d.id;
-        return {
-          label: d.label,
-          note: d.discount
-            ? Math.round(d.discount * 100) + "% saving"
-            : "Flexible",
-          bg: on ? "#190B25" : "transparent",
-          c: on ? "#F6F1FA" : "#190B25",
-          sub: on ? "#D4B7EC" : "#6C3CAA",
-          pick: () => {
-            if (!plans) return this.setState({ prodDur: d.id });
-            const hash =
-              "#/plans/" + r.mode + "/" + d.id + "/" + r.modules.join(",");
-            history.replaceState(
-              history.state,
-              "",
-              location.pathname + location.search + hash,
-            );
-            this.setState({ route: { ...r, duration: d.id } });
-          },
-        };
-      }),
-      countLabel: n + (n === 1 ? " product" : " products"),
-      prods: this.MODS.map((m) => {
-        const on = s.selected.indexOf(m.id) >= 0;
-        return {
-          on: on,
-          icon: m.icon,
-          formal: m.formal,
-          short: m.short,
-          category: m.category,
-          price: this.onReq() ? "On request" : this.chf(m.monthlyPrice) + "/mo",
-          border: on ? "#6C3CAA" : "#190B251a",
-          bg: on ? "#FFFFFF" : "#FFFFFF80",
-          ring: on ? "0 0 0 1px #6C3CAA, 0 16px 36px #6C3CAA1f" : "none",
-          tileBg: on ? "#6C3CAA" : "#190B25",
-          checkBg: on ? "#6C3CAA" : "transparent",
-          checkB: on ? "#6C3CAA" : "#190B2540",
-          checkO: on ? 1 : 0,
-          toggle: () => this.toggleMod(m.id),
-        };
-      }),
-      lines: this.MODS.filter((m) => s.selected.indexOf(m.id) >= 0).map(
-        (m) => ({
-          icon: m.icon,
-          formal: m.formal,
-          price: this.onReq() ? "—" : this.chf(m.monthlyPrice),
-          remove: () => this.toggleMod(m.id),
-        }),
-      ),
-      hint: (() => {
-        const next = getSoftwareSavingHint(s.selected);
-        return next
-          ? {
-              show: true,
-              text: next.text,
-              label: next.label,
-              add: next.addId ? () => this.toggleMod(next.addId) : null,
-            }
-          : { show: false, text: "", label: "", add: null };
-      })(),
-      sum: {
-        cartItem: createCartItem({
-          kind: "software",
-          name: nameSoftwareSelection(s.selected),
-          planId: bplan,
-          termId: s.duration,
-          selections: this.MODS.filter((m) => s.selected.includes(m.id)).map(
-            (m) => ({ id: m.id, name: m.formal }),
-          ),
-        }),
-        plan: bplan,
-        plans: PLAN_IDS.map((id) => ({
-          planId: id,
-          name: planName(id),
-          subtitle: planSubtitle("software", id),
-          price: n
-            ? this.chf(priceSoftware(s.selected, id, s.duration).estimate)
-            : "—",
-          note: n
-            ? id === "starter"
-              ? "per month, subscription only"
-              : "per month, incl. +" +
-                this.chf(
-                  priceSoftware(s.selected, id, s.duration).estimate -
-                    bp.monthly,
-                ) +
-                " support"
-            : "per month",
-          recommended: brec?.planId === id,
-        })),
-        why: brec?.why || "",
-        pickPlan: (id) => this.pickPlan(id),
-        compare: () =>
-          n &&
-          this.setState({
-            compare: {
-              ids: s.selected,
-              termId: s.duration,
-              title: nameSoftwareSelection(s.selected) + " plans",
-            },
-          }),
-        mode: n ? modeName(bmode) : "",
-        empty: n === 0,
-        subtotal: n ? this.chf(bsub) : "—",
-        bundleLabel:
-          bmode === "operations"
-            ? "Operations bundle"
-            : bmode === "growth"
-              ? "Growth bundle"
-              : bmode === "suite"
-                ? "All-in-one suite"
-                : bmode === "custom"
-                  ? "Multi-product saving"
-                  : "Bundle saving",
-        bundleVal: bp.bd
-          ? "−" + Math.round(bp.bd * 100) + "%"
-          : n === 1
-            ? "Add a 2nd product"
-            : "—",
-        bundleC: bp.bd ? "#D4B7EC" : "#B5A6C4",
-        billLabel: "Billing · " + bp.d.label,
-        billVal: bp.d.discount
-          ? "−" + Math.round(bp.d.discount * 100) + "%"
-          : "—",
-        billC: bp.d.discount ? "#D4B7EC" : "#B5A6C4",
-        total: n ? this.chf(bplanPrice.estimate) : "—",
-        billed: this.onReq()
-          ? "Final pricing is confirmed with the OrgTik team"
-          : !n
-            ? "per workspace / month"
-            : (bplan === "starter"
-                ? "Subscription only"
-                : planName(bplan) + " plan incl. support") +
-              " · " +
-              (bp.d.months > 1
-                ? this.chf(bplanPrice.total) + " over " + bp.d.label
-                : "billed monthly"),
-        ctaO: n ? 1 : 0.45,
-        ctaCursor: n ? "pointer" : "not-allowed",
-        helper: n
-          ? "Prototype pricing, nothing is charged. You can change your plan in the cart or before you sign."
-          : "Select at least one product to continue.",
-        go: () => {
-          if (!s.selected.length) return;
-          location.hash =
-            "#/plans/" + bmode + "/" + s.duration + "/" + s.selected.join(",");
-        },
-      },
+
       steps: this.STEPS,
       nsNum: v === "plans" ? "02" : "04",
       pm: pm,
@@ -1558,7 +1093,7 @@ export default class Software extends ReferencePage {
       bentoRows: s.narrow ? "none" : "minmax(300px,auto) minmax(300px,auto)",
       bentoL: s.narrow ? "auto" : "1 / span 7",
       bentoLR: s.narrow ? "auto" : "1 / span 2",
-      ps: ps,
+
       cta: cta,
       closingMove: (e) => {
         const sec = this.closingRef.current,
@@ -1595,7 +1130,7 @@ export default class Software extends ReferencePage {
       ].map(([label, href]) => ({ label, href })),
       footStart: [
         ["Build a software plan", "/software#plan-builder"],
-        ["Plans & pricing", "/plans"],
+        ["Bundles & pricing", "/plans"],
         ["Tell us about your project", "/contact"],
         ["Roadmap", "/roadmap"],
         ["Sitemap", "/legal#/sitemap"],
@@ -1610,7 +1145,7 @@ export default class Software extends ReferencePage {
       videoRef: this.videoRef,
       heroMediaRef: this.heroMediaRef,
       parallaxRef: this.parallaxRef,
-      explorerRef: this.explorerRef,
+
       closingRef: this.closingRef,
       glowRef: this.glowRef,
       magnetRef: this.magnetRef,
@@ -3142,904 +2677,7 @@ export default class Software extends ReferencePage {
                     </div>
                   </div>
                 </section>
-                <section
-                  id={"plan-builder"}
-                  data-screen-label={"Software — Plan builder"}
-                  style={{
-                    background:
-                      "radial-gradient(70% 60% at 100% 0%,#9458F424,transparent 70%),#EEE8F7",
-                    color: "#190B25",
-                    padding: "var(--section-space) 0",
-                  }}
-                >
-                  <div
-                    style={{
-                      maxWidth: "1440px",
-                      margin: "0 auto",
-                      padding: "0 clamp(20px,4.4vw,64px)",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        alignItems: "flex-end",
-                        justifyContent: "space-between",
-                        gap: "32px 64px",
-                        marginBottom: "clamp(24px,3vh,32px)",
-                      }}
-                    >
-                      <div style={{ minWidth: "0" }}>
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "14px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            letterSpacing: ".2em",
-                            textTransform: "uppercase",
-                            color: "#6E6178",
-                          }}
-                        >
-                          <span
-                            style={{
-                              color: "#6C3CAA",
-                              fontVariantNumeric: "tabular-nums",
-                            }}
-                          >
-                            {"(02)"}
-                          </span>
-                          <span
-                            style={{
-                              width: "36px",
-                              height: "1px",
-                              background: "#190B252e",
-                            }}
-                          ></span>
-                          <span style={{ whiteSpace: "nowrap" }}>
-                            {"Choose how to start"}
-                          </span>
-                        </div>
-                        <h2
-                          data-reveal={"mask"}
-                          data-hw={""}
-                          style={{
-                            fontSize: "var(--section-title-size)",
-                            lineHeight: "1",
-                            fontWeight: "500",
-                            letterSpacing: "-.045em",
-                            marginTop: "22px",
-                            textWrap: "balance",
-                          }}
-                        >
-                          <span style={{ display: "block" }}>
-                            <span data-line={""} style={{ display: "block" }}>
-                              {"Pick what you need."}
-                            </span>
-                          </span>
-                          <span style={{ display: "block" }}>
-                            <span
-                              data-line={""}
-                              data-acc={""}
-                              style={{
-                                display: "block",
-                                fontWeight: "500",
-                                color: "#6C3CAA",
-                                letterSpacing: "-.045em",
-                              }}
-                            >
-                              {"We’ll apply the savings."}
-                            </span>
-                          </span>
-                        </h2>
-                      </div>
-                      <div
-                        data-reveal={"up"}
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "flex-start",
-                          gap: "24px",
-                          maxWidth: "400px",
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontFamily: "Arial,Helvetica,sans-serif",
-                            fontSize: "16px",
-                            lineHeight: "1.65",
-                            color: "#4A3A57",
-                          }}
-                        >
-                          {
-                            "Select the products your team needs and choose how you’d like to be billed. Bundle savings apply automatically and the estimate updates as you go."
-                          }
-                        </p>
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        alignItems: "flex-start",
-                        gap: "20px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          flex: "2 1 560px",
-                          minWidth: "0",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "16px",
-                        }}
-                      >
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            padding: "clamp(18px,2vw,26px)",
-                            borderRadius: "24px",
-                            background: "#FFFFFFa6",
-                            border: "1px solid #190B2514",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              gap: "12px 24px",
-                              marginBottom: "16px",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "14px",
-                              }}
-                            >
-                              <span
-                                style={{
-                                  display: "grid",
-                                  placeItems: "center",
-                                  width: "38px",
-                                  height: "38px",
-                                  borderRadius: "50%",
-                                  background: "#190B25",
-                                  color: "#F6F1FA",
-                                  fontSize: "15px",
-                                  fontWeight: "600",
-                                  flexShrink: "0",
-                                }}
-                              >
-                                {"1"}
-                              </span>
-                              <span>
-                                <span
-                                  data-hw={""}
-                                  style={{
-                                    display: "block",
-                                    fontSize: "clamp(19px,1.6vw,23px)",
-                                    fontWeight: "500",
-                                    letterSpacing: "-.03em",
-                                  }}
-                                >
-                                  {"Pick your products"}
-                                </span>
-                                <span
-                                  style={{
-                                    display: "block",
-                                    marginTop: "3px",
-                                    fontFamily: "Arial,Helvetica,sans-serif",
-                                    fontSize: "14px",
-                                    color: "#4A3A57",
-                                  }}
-                                >
-                                  {
-                                    "Tap to add or remove. A quick start selects a ready-made bundle."
-                                  }
-                                </span>
-                              </span>
-                            </div>
-                            <span
-                              style={{
-                                padding: "8px 14px",
-                                borderRadius: "999px",
-                                background: "#190B25",
-                                color: "#F6F1FA",
-                                fontSize: "13px",
-                                fontWeight: "600",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {v.countLabel}
-                            </span>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              alignItems: "center",
-                              gap: "8px",
-                              marginBottom: "18px",
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "600",
-                                letterSpacing: ".14em",
-                                textTransform: "uppercase",
-                                color: "#6E6178",
-                                marginRight: "6px",
-                              }}
-                            >
-                              {"Quick start"}
-                            </span>
-                            {(v.quick || []).map((q, qIndex) => (
-                              <React.Fragment key={qIndex}>
-                                <button
-                                  onClick={q.pick}
-                                  style={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    gap: "10px",
-                                    padding: "8px 8px 8px 16px",
-                                    borderRadius: "999px",
-                                    border: "1px solid " + q.border,
-                                    background: String(q.bg),
-                                    color: String(q.c),
-                                    fontSize: "14px",
-                                    fontWeight: "600",
-                                    whiteSpace: "nowrap",
-                                    transition:
-                                      "all .35s cubic-bezier(.22,1,.36,1)",
-                                  }}
-                                  className={"reference-state-41"}
-                                >
-                                  {q.name}
-                                  <span
-                                    style={{
-                                      padding: "4px 9px",
-                                      borderRadius: "999px",
-                                      background: String(q.badgeBg),
-                                      color: String(q.badgeC),
-                                      fontSize: "12px",
-                                      fontWeight: "700",
-                                    }}
-                                  >
-                                    {q.save}
-                                  </span>
-                                </button>
-                              </React.Fragment>
-                            ))}
-                            <button
-                              onClick={v.clearSel}
-                              style={{
-                                marginLeft: "auto",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "6px",
-                                padding: "8px 4px",
-                                fontSize: "13px",
-                                fontWeight: "600",
-                                color: "#6C3CAA",
-                              }}
-                              className={"reference-state-42"}
-                            >
-                              <i
-                                aria-hidden={true}
-                                style={{ fontSize: "15px" }}
-                                className={"ph ph-arrow-counter-clockwise"}
-                              ></i>
-                              {"Clear"}
-                            </button>
-                          </div>
-                          <div
-                            style={{
-                              display: "grid",
-                              gridTemplateColumns:
-                                "repeat(auto-fill,minmax(min(100%,290px),1fr))",
-                              gap: "8px",
-                            }}
-                          >
-                            {(v.prods || []).map((p, pIndex) => (
-                              <React.Fragment key={pIndex}>
-                                <button
-                                  onClick={p.toggle}
-                                  aria-pressed={p.on}
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "12px",
-                                    padding: "12px 14px",
-                                    borderRadius: "16px",
-                                    border: "1px solid " + p.border,
-                                    background: String(p.bg),
-                                    boxShadow: String(p.ring),
-                                    color: "#190B25",
-                                    textAlign: "left",
-                                    transition:
-                                      "all .35s cubic-bezier(.22,1,.36,1)",
-                                  }}
-                                  className={"reference-state-43"}
-                                >
-                                  <span
-                                    style={{
-                                      flexShrink: "0",
-                                      display: "grid",
-                                      placeItems: "center",
-                                      width: "38px",
-                                      height: "38px",
-                                      borderRadius: "11px",
-                                      background: String(p.tileBg),
-                                      color: "#F6F1FA",
-                                      transition: "background .35s",
-                                    }}
-                                  >
-                                    <i
-                                      aria-hidden={true}
-                                      style={{ fontSize: "18px" }}
-                                      className={"ph " + p.icon}
-                                    ></i>
-                                  </span>
-                                  <span style={{ flex: "1", minWidth: "0" }}>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        fontSize: "15px",
-                                        fontWeight: "600",
-                                        letterSpacing: "-.01em",
-                                        lineHeight: "1.3",
-                                      }}
-                                    >
-                                      {p.formal}
-                                    </span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        marginTop: "3px",
-                                        fontFamily:
-                                          "Arial,Helvetica,sans-serif",
-                                        fontSize: "13px",
-                                        lineHeight: "1.4",
-                                        color: "#4A3A57",
-                                      }}
-                                    >
-                                      {p.short}
-                                    </span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        marginTop: "6px",
-                                        fontSize: "12px",
-                                        fontWeight: "600",
-                                        color: "#6E6178",
-                                      }}
-                                    >
-                                      {p.category + " · " + p.price}
-                                    </span>
-                                  </span>
-                                  <span
-                                    style={{
-                                      flexShrink: "0",
-                                      display: "grid",
-                                      placeItems: "center",
-                                      width: "22px",
-                                      height: "22px",
-                                      borderRadius: "7px",
-                                      border: "1.5px solid " + p.checkB,
-                                      background: String(p.checkBg),
-                                      color: "#FFFFFF",
-                                      transition: "all .3s",
-                                    }}
-                                  >
-                                    <i
-                                      aria-hidden={true}
-                                      style={{
-                                        fontSize: "13px",
-                                        fontWeight: "700",
-                                        opacity: String(p.checkO),
-                                      }}
-                                      className={"ph ph-check"}
-                                    ></i>
-                                  </span>
-                                </button>
-                              </React.Fragment>
-                            ))}
-                          </div>
-                          {v.hint.show && (
-                            <>
-                              <div
-                                style={{
-                                  marginTop: "14px",
-                                  display: "flex",
-                                  flexWrap: "wrap",
-                                  alignItems: "center",
-                                  gap: "12px 20px",
-                                  padding: "14px 14px 14px 18px",
-                                  borderRadius: "16px",
-                                  background: "#6C3CAA14",
-                                  border: "1px solid #6C3CAA33",
-                                }}
-                              >
-                                <i
-                                  aria-hidden={true}
-                                  style={{ fontSize: "18px", color: "#6C3CAA" }}
-                                  className={"ph-fill ph-sparkle"}
-                                ></i>
-                                <span
-                                  style={{
-                                    flex: "1 1 260px",
-                                    fontFamily: "Arial,Helvetica,sans-serif",
-                                    fontSize: "15px",
-                                    lineHeight: "1.45",
-                                    color: "#3B1E59",
-                                  }}
-                                >
-                                  {v.hint.text}
-                                </span>
-                                {v.hint.add && (
-                                  <button
-                                    onClick={v.hint.add}
-                                    style={{
-                                      padding: "10px 16px",
-                                      borderRadius: "999px",
-                                      background: "#6C3CAA",
-                                      color: "#FFFFFF",
-                                      fontSize: "13px",
-                                      fontWeight: "600",
-                                      whiteSpace: "nowrap",
-                                    }}
-                                    className={"reference-state-44"}
-                                  >
-                                    {v.hint.label}
-                                  </button>
-                                )}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            padding: "clamp(18px,2vw,26px)",
-                            borderRadius: "24px",
-                            background: "#FFFFFFa6",
-                            border: "1px solid #190B2514",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              gap: "12px 24px",
-                              marginBottom: "16px",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "14px",
-                              }}
-                            >
-                              <span
-                                style={{
-                                  display: "grid",
-                                  placeItems: "center",
-                                  width: "38px",
-                                  height: "38px",
-                                  borderRadius: "50%",
-                                  background: "#190B25",
-                                  color: "#F6F1FA",
-                                  fontSize: "15px",
-                                  fontWeight: "600",
-                                  flexShrink: "0",
-                                }}
-                              >
-                                {"2"}
-                              </span>
-                              <span>
-                                <span
-                                  data-hw={""}
-                                  style={{
-                                    display: "block",
-                                    fontSize: "clamp(19px,1.6vw,23px)",
-                                    fontWeight: "500",
-                                    letterSpacing: "-.03em",
-                                  }}
-                                >
-                                  {"Choose billing"}
-                                </span>
-                                <span
-                                  style={{
-                                    display: "block",
-                                    marginTop: "3px",
-                                    fontFamily: "Arial,Helvetica,sans-serif",
-                                    fontSize: "14px",
-                                    color: "#4A3A57",
-                                  }}
-                                >
-                                  {
-                                    "A longer commitment lowers the monthly estimate."
-                                  }
-                                </span>
-                              </span>
-                            </div>
-                          </div>
-                          <div
-                            style={{
-                              display: "grid",
-                              gridTemplateColumns:
-                                "repeat(auto-fit,minmax(min(100%,170px),1fr))",
-                              gap: "10px",
-                            }}
-                          >
-                            {(v.bdurs || []).map((d, dIndex) => (
-                              <React.Fragment key={dIndex}>
-                                <button
-                                  onClick={d.pick}
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    gap: "14px",
-                                    padding: "14px 16px",
-                                    borderRadius: "16px",
-                                    border: "1px solid " + d.border,
-                                    background: String(d.bg),
-                                    color: String(d.c),
-                                    textAlign: "left",
-                                    transition:
-                                      "all .35s cubic-bezier(.22,1,.36,1)",
-                                  }}
-                                  className={"reference-state-45"}
-                                >
-                                  <span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        fontSize: "16px",
-                                        fontWeight: "600",
-                                      }}
-                                    >
-                                      {d.label}
-                                    </span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        marginTop: "4px",
-                                        fontSize: "13px",
-                                        fontWeight: "600",
-                                        color: String(d.sub),
-                                      }}
-                                    >
-                                      {d.note}
-                                    </span>
-                                  </span>
-                                  <span
-                                    style={{
-                                      display: "grid",
-                                      placeItems: "center",
-                                      width: "22px",
-                                      height: "22px",
-                                      borderRadius: "50%",
-                                      border: "1.5px solid " + d.radioB,
-                                      flexShrink: "0",
-                                    }}
-                                  >
-                                    <span
-                                      style={{
-                                        width: "10px",
-                                        height: "10px",
-                                        borderRadius: "50%",
-                                        background: String(d.radioDot),
-                                      }}
-                                    ></span>
-                                  </span>
-                                </button>
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      <aside
-                        style={{
-                          flex: "1 1 340px",
-                          position: "sticky",
-                          top: "104px",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "18px",
-                          padding: "28px",
-                          borderRadius: "26px",
-                          background: "#190B25",
-                          color: "#F6F1FA",
-                          boxShadow: "0 40px 80px #190B2533",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: "600",
-                              letterSpacing: ".16em",
-                              textTransform: "uppercase",
-                              color: "#C9A0F3",
-                            }}
-                          >
-                            {"3 · Your estimate"}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: "600",
-                              color: "#B5A6C4",
-                            }}
-                          >
-                            {v.sum.mode}
-                          </span>
-                        </div>
-                        <div style={{ display: "grid", gap: "2px" }}>
-                          {(v.lines || []).map((ln, lnIndex) => (
-                            <React.Fragment key={lnIndex}>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "12px",
-                                  padding: "10px 0",
-                                  borderBottom: "1px solid #ffffff14",
-                                }}
-                              >
-                                <span
-                                  style={{
-                                    display: "grid",
-                                    placeItems: "center",
-                                    width: "32px",
-                                    height: "32px",
-                                    borderRadius: "9px",
-                                    background: "#ffffff12",
-                                    color: "#D4B7EC",
-                                  }}
-                                >
-                                  <i
-                                    aria-hidden={true}
-                                    style={{ fontSize: "16px" }}
-                                    className={"ph " + ln.icon}
-                                  ></i>
-                                </span>
-                                <span
-                                  style={{
-                                    flex: "1",
-                                    fontSize: "15px",
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  {ln.formal}
-                                </span>
-                                <span
-                                  style={{ fontSize: "14px", color: "#CFC2DB" }}
-                                >
-                                  {ln.price}
-                                </span>
-                                <button
-                                  onClick={ln.remove}
-                                  aria-label={
-                                    "Remove " +
-                                    (ln.formal || ln.name || "selection")
-                                  }
-                                  title={"Remove"}
-                                  style={{
-                                    display: "grid",
-                                    placeItems: "center",
-                                    width: "28px",
-                                    height: "28px",
-                                    borderRadius: "50%",
-                                    color: "#B5A6C4",
-                                  }}
-                                  className={"reference-state-46"}
-                                >
-                                  <i
-                                    aria-hidden={true}
-                                    style={{ fontSize: "14px" }}
-                                    className={"ph ph-x"}
-                                  ></i>
-                                </button>
-                              </div>
-                            </React.Fragment>
-                          ))}
-                          {v.sum.empty && (
-                            <>
-                              <div
-                                style={{
-                                  padding: "18px",
-                                  borderRadius: "14px",
-                                  border: "1px dashed #ffffff2e",
-                                  fontFamily: "Arial,Helvetica,sans-serif",
-                                  fontSize: "15px",
-                                  lineHeight: "1.5",
-                                  color: "#CFC2DB",
-                                }}
-                              >
-                                {
-                                  "No products yet. Pick one on the left, or use a quick start."
-                                }
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        <div
-                          style={{
-                            display: "grid",
-                            gap: "10px",
-                            fontSize: "14px",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              gap: "12px",
-                            }}
-                          >
-                            <span style={{ color: "#B5A6C4" }}>
-                              {"Subtotal"}
-                            </span>
-                            <span style={{ fontWeight: "600" }}>
-                              {v.sum.subtotal}
-                            </span>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              gap: "12px",
-                            }}
-                          >
-                            <span style={{ color: "#B5A6C4" }}>
-                              {v.sum.bundleLabel}
-                            </span>
-                            <span
-                              style={{
-                                fontWeight: "600",
-                                color: String(v.sum.bundleC),
-                              }}
-                            >
-                              {v.sum.bundleVal}
-                            </span>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              gap: "12px",
-                            }}
-                          >
-                            <span style={{ color: "#B5A6C4" }}>
-                              {v.sum.billLabel}
-                            </span>
-                            <span
-                              style={{
-                                fontWeight: "600",
-                                color: String(v.sum.billC),
-                              }}
-                            >
-                              {v.sum.billVal}
-                            </span>
-                          </div>
-                        </div>
-                        <PlanPicker
-                          tone="dark"
-                          label={
-                            v.sum.empty
-                              ? "Plans"
-                              : "Every plan for this selection"
-                          }
-                          options={v.sum.plans}
-                          value={v.sum.plan}
-                          onChange={v.sum.pickPlan}
-                          why={v.sum.why}
-                        />
-                        <div
-                          style={{
-                            paddingTop: "18px",
-                            borderTop: "1px solid #ffffff1f",
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: "600",
-                              letterSpacing: ".16em",
-                              textTransform: "uppercase",
-                              color: "#B5A6C4",
-                            }}
-                          >
-                            {"Estimated monthly"}
-                          </div>
-                          <div
-                            style={{
-                              marginTop: "8px",
-                              fontSize: "clamp(35px,2.95vw,43px)",
-                              fontWeight: "500",
-                              letterSpacing: "-.05em",
-                              lineHeight: "1",
-                            }}
-                          >
-                            {v.sum.total}
-                          </div>
-                          <div
-                            style={{
-                              marginTop: "8px",
-                              fontSize: "13px",
-                              color: "#CFC2DB",
-                            }}
-                          >
-                            {v.sum.billed}
-                          </div>
-                        </div>
-                        <AddToCartButton
-                          item={v.sum.cartItem}
-                          editable
-                          disabled={v.sum.empty}
-                          className="commerce-action--light"
-                        />
-                        <div className="plan-links plan-links--dark">
-                          <button
-                            type="button"
-                            onClick={v.sum.go}
-                            disabled={v.sum.empty}
-                          >
-                            <i className="ph ph-columns" aria-hidden="true" />
-                            Compare the plans in detail
-                          </button>
-                          <a href="/plans">
-                            See all plans and prices
-                            <i
-                              className="ph ph-arrow-right"
-                              aria-hidden="true"
-                            />
-                          </a>
-                        </div>
-                        <p
-                          style={{
-                            fontFamily: "Arial,Helvetica,sans-serif",
-                            display: "flex",
-                            gap: "8px",
-                            fontSize: "13px",
-                            lineHeight: "1.5",
-                            color: "#B5A6C4",
-                          }}
-                        >
-                          <i
-                            aria-hidden={true}
-                            style={{
-                              fontSize: "16px",
-                              flexShrink: "0",
-                              marginTop: "1px",
-                            }}
-                            className={"ph ph-info"}
-                          ></i>
-                          {v.sum.helper}
-                        </p>
-                      </aside>
-                    </div>
-                  </div>
-                </section>
+                <PurchasingOverview kind="software" />
               </>
             )}
             {v.isProduct && (
@@ -4844,742 +3482,22 @@ export default class Software extends ReferencePage {
             )}
             {v.showPlans && (
               <>
-                <section
-                  id={"plans-section"}
-                  data-screen-label={"Software — Plans"}
-                  style={{
-                    background:
-                      "radial-gradient(70% 60% at 100% 0%,#9458F424,transparent 70%),#EEE8F7",
-                    color: "#190B25",
-                    padding: "var(--section-space) 0",
-                  }}
-                >
-                  <div
-                    style={{
-                      maxWidth: "1440px",
-                      margin: "0 auto",
-                      padding: "0 clamp(20px,4.4vw,64px)",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        alignItems: "flex-end",
-                        justifyContent: "space-between",
-                        gap: "32px 64px",
-                        marginBottom: "clamp(24px,3vh,32px)",
-                      }}
-                    >
-                      <div style={{ minWidth: "0" }}>
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "14px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            letterSpacing: ".2em",
-                            textTransform: "uppercase",
-                            color: "#6E6178",
-                          }}
-                        >
-                          <span
-                            style={{
-                              color: "#6C3CAA",
-                              fontVariantNumeric: "tabular-nums",
-                            }}
-                          >
-                            {"(" + v.ps.num + ")"}
-                          </span>
-                          <span
-                            style={{
-                              width: "36px",
-                              height: "1px",
-                              background: "#190B252e",
-                            }}
-                          ></span>
-                          <span style={{ whiteSpace: "nowrap" }}>
-                            {v.ps.eyebrow}
-                          </span>
-                        </div>
-                        <h2
-                          data-reveal={"mask"}
-                          data-hw={""}
-                          style={{
-                            fontSize: "var(--section-title-size)",
-                            lineHeight: "1",
-                            fontWeight: "500",
-                            letterSpacing: "-.045em",
-                            marginTop: "22px",
-                            textWrap: "balance",
-                          }}
-                        >
-                          <span style={{ display: "block" }}>
-                            <span data-line={""} style={{ display: "block" }}>
-                              {v.ps.l1}
-                            </span>
-                          </span>
-                          <span style={{ display: "block" }}>
-                            <span
-                              data-line={""}
-                              data-acc={""}
-                              style={{
-                                display: "block",
-                                fontWeight: "500",
-                                color: "#6C3CAA",
-                                letterSpacing: "-.045em",
-                              }}
-                            >
-                              {v.ps.acc}
-                            </span>
-                          </span>
-                        </h2>
-                      </div>
-                      <div
-                        data-reveal={"up"}
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "flex-start",
-                          gap: "24px",
-                          maxWidth: "400px",
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontFamily: "Arial,Helvetica,sans-serif",
-                            fontSize: "16px",
-                            lineHeight: "1.65",
-                            color: "#4A3A57",
-                          }}
-                        >
-                          {v.ps.body}
-                        </p>
-                      </div>
-                    </div>
-                    {v.ps.lockup && (
-                      <>
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            alignItems: "center",
-                            gap: "16px 20px",
-                            padding: "18px 22px",
-                            borderRadius: "22px",
-                            border: "1px solid #190B2533",
-                          }}
-                        >
-                          <span
-                            style={{
-                              display: "grid",
-                              placeItems: "center",
-                              width: "54px",
-                              height: "54px",
-                              borderRadius: "15px",
-                              background: "#190B25",
-                              color: "#EEE3F7",
-                              flexShrink: "0",
-                            }}
-                          >
-                            <i
-                              aria-hidden={true}
-                              style={{ fontSize: "22px" }}
-                              className={"ph-fill " + v.ps.icon}
-                            ></i>
-                          </span>
-                          <span style={{ flex: "1 1 240px", minWidth: "0" }}>
-                            <span
-                              style={{
-                                display: "block",
-                                fontSize: "12px",
-                                fontWeight: "600",
-                                letterSpacing: ".14em",
-                                textTransform: "uppercase",
-                                color: "#6E6178",
-                              }}
-                            >
-                              {"Selected product"}
-                            </span>
-                            <span
-                              style={{
-                                display: "block",
-                                marginTop: "4px",
-                                fontSize: "18px",
-                                fontWeight: "600",
-                                letterSpacing: "-.02em",
-                              }}
-                            >
-                              {v.ps.name}
-                            </span>
-                            <span
-                              style={{
-                                display: "block",
-                                marginTop: "3px",
-                                fontFamily: "Arial,Helvetica,sans-serif",
-                                fontSize: "14px",
-                                color: "#4A3A57",
-                              }}
-                            >
-                              {v.ps.short}
-                            </span>
-                          </span>
-                          <span
-                            style={{
-                              padding: "8px 14px",
-                              borderRadius: "999px",
-                              background: "#190B250d",
-                              fontSize: "12px",
-                              fontWeight: "600",
-                              color: "#3B1E59",
-                            }}
-                          >
-                            {"Fixed for this comparison"}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                    {v.ps.duration && (
-                      <>
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            marginTop: "14px",
-                            display: "flex",
-                            flexWrap: "wrap",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: "16px 40px",
-                            padding: "14px 14px 14px 24px",
-                            borderRadius: "22px",
-                            background: "#FFFFFF99",
-                            border: "1px solid #190B251a",
-                          }}
-                        >
-                          <div>
-                            <div
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "600",
-                                letterSpacing: ".14em",
-                                textTransform: "uppercase",
-                                color: "#6E6178",
-                              }}
-                            >
-                              {"Subscription duration"}
-                            </div>
-                            <div
-                              style={{
-                                marginTop: "4px",
-                                fontSize: "16px",
-                                fontWeight: "500",
-                              }}
-                            >
-                              {"Choose your billing commitment"}
-                            </div>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              gap: "6px",
-                            }}
-                          >
-                            {(v.pdurs || []).map((d, dIndex) => (
-                              <React.Fragment key={dIndex}>
-                                <button
-                                  onClick={d.pick}
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "flex-start",
-                                    gap: "3px",
-                                    minWidth: "132px",
-                                    padding: "11px 16px",
-                                    borderRadius: "13px",
-                                    background: String(d.bg),
-                                    color: String(d.c),
-                                    textAlign: "left",
-                                    transition: "background .35s, color .35s",
-                                  }}
-                                >
-                                  <span
-                                    style={{
-                                      fontSize: "15px",
-                                      fontWeight: "600",
-                                    }}
-                                  >
-                                    {d.label}
-                                  </span>
-                                  <span
-                                    style={{
-                                      fontSize: "12px",
-                                      fontWeight: "500",
-                                      color: String(d.sub),
-                                    }}
-                                  >
-                                    {d.note}
-                                  </span>
-                                </button>
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    {v.ps.chips && (
-                      <>
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            alignItems: "center",
-                            gap: "8px",
-                          }}
-                        >
-                          {(v.ps.sel || []).map((sm, smIndex) => (
-                            <React.Fragment key={smIndex}>
-                              <a
-                                href={toSiteHref(sm.href)}
-                                style={{
-                                  display: "inline-flex",
-                                  alignItems: "center",
-                                  gap: "8px",
-                                  padding: "10px 15px",
-                                  borderRadius: "999px",
-                                  background: "#190B25",
-                                  color: "#F6F1FA",
-                                  fontSize: "13px",
-                                  fontWeight: "600",
-                                  whiteSpace: "nowrap",
-                                }}
-                                className={"reference-state-49"}
-                              >
-                                <i
-                                  aria-hidden={true}
-                                  style={{ fontSize: "16px", color: "#D4B7EC" }}
-                                  className={"ph " + sm.icon}
-                                ></i>
-                                {sm.formal}
-                              </a>
-                            </React.Fragment>
-                          ))}
-                          <button
-                            onClick={v.ps.edit}
-                            style={{
-                              marginLeft: "auto",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "10px",
-                              fontSize: "14px",
-                              fontWeight: "600",
-                              color: "#6C3CAA",
-                            }}
-                            className={"reference-state-50"}
-                          >
-                            {"Edit selection "}
-                            <i
-                              aria-hidden={true}
-                              style={{ fontSize: "16px" }}
-                              className={"ph ph-arrow-right"}
-                            ></i>
-                          </button>
-                        </div>
-                      </>
-                    )}
-                    <p
-                      data-reveal={"up"}
-                      style={{
-                        fontFamily: "Arial,Helvetica,sans-serif",
-                        display: "flex",
-                        gap: "8px",
-                        margin: "22px 0",
-                        fontSize: "14px",
-                        lineHeight: "1.5",
-                        color: "#4A3A57",
-                      }}
-                    >
-                      <i
-                        aria-hidden={true}
-                        style={{
-                          fontSize: "16px",
-                          flexShrink: "0",
-                          marginTop: "1px",
-                          color: "#6C3CAA",
-                        }}
-                        className={"ph ph-info"}
-                      ></i>
-                      {v.ps.note}
-                    </p>
-                    {v.ps.hasCards && (
-                      <>
-                        <div
-                          data-reveal={"stagger"}
-                          style={{
-                            display: "grid",
-                            gridTemplateColumns:
-                              "repeat(auto-fit,minmax(min(100%,300px),1fr))",
-                            gap: "16px",
-                            alignItems: "stretch",
-                          }}
-                        >
-                          {(v.ps.cards || []).map((k, kIndex) => (
-                            <React.Fragment key={kIndex}>
-                              <article
-                                style={{
-                                  position: "relative",
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  gap: "20px",
-                                  padding: "clamp(24px,2.4vw,32px)",
-                                  borderRadius: "26px",
-                                  border: "1px solid " + k.line,
-                                  background: String(k.bg),
-                                  color: String(k.c),
-                                  boxShadow: String(k.shadow),
-                                  transition:
-                                    "transform .6s cubic-bezier(.22,1,.36,1)",
-                                }}
-                                className={"reference-state-51"}
-                              >
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <span
-                                    style={{
-                                      fontSize: "13px",
-                                      fontWeight: "600",
-                                      color: String(k.sub),
-                                    }}
-                                  >
-                                    {k.num}
-                                  </span>
-                                  {k.featured && (
-                                    <>
-                                      <span
-                                        style={{
-                                          padding: "7px 12px",
-                                          borderRadius: "999px",
-                                          background: "#EEE3F7",
-                                          color: "#28123B",
-                                          fontSize: "12px",
-                                          fontWeight: "700",
-                                        }}
-                                      >
-                                        {"Recommended"}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                                <div>
-                                  <div
-                                    style={{
-                                      fontSize: "12px",
-                                      fontWeight: "600",
-                                      letterSpacing: ".16em",
-                                      textTransform: "uppercase",
-                                      color: String(k.acc),
-                                    }}
-                                  >
-                                    {k.eyebrow}
-                                  </div>
-                                  <h3
-                                    data-hw={""}
-                                    style={{
-                                      marginTop: "10px",
-                                      fontSize: "clamp(28px,2.39vw,37px)",
-                                      lineHeight: "1",
-                                      fontWeight: "500",
-                                      letterSpacing: "-.04em",
-                                    }}
-                                  >
-                                    {k.title}
-                                  </h3>
-                                  <p
-                                    style={{
-                                      fontFamily: "Arial,Helvetica,sans-serif",
-                                      marginTop: "12px",
-                                      fontSize: "15px",
-                                      lineHeight: "1.6",
-                                      color: String(k.sub),
-                                    }}
-                                  >
-                                    {k.body}
-                                  </p>
-                                </div>
-                                {k.showScope && (
-                                  <>
-                                    <div
-                                      style={{
-                                        padding: "14px 16px",
-                                        borderRadius: "14px",
-                                        background: String(k.chipBg),
-                                      }}
-                                    >
-                                      <div
-                                        style={{
-                                          fontSize: "11px",
-                                          fontWeight: "600",
-                                          letterSpacing: ".14em",
-                                          textTransform: "uppercase",
-                                          color: String(k.sub),
-                                        }}
-                                      >
-                                        {k.scopeLabel}
-                                      </div>
-                                      <div
-                                        style={{
-                                          marginTop: "4px",
-                                          fontSize: "15px",
-                                          fontWeight: "600",
-                                        }}
-                                      >
-                                        {k.scope}
-                                      </div>
-                                    </div>
-                                  </>
-                                )}
-                                <ul style={{ display: "grid", gap: "10px" }}>
-                                  {(k.features || []).map((f, fIndex) => (
-                                    <React.Fragment key={fIndex}>
-                                      {/^Everything in /.test(f) ? (
-                                        <li className="service-plan__lead">
-                                          {f}
-                                        </li>
-                                      ) : (
-                                        <li
-                                          style={{
-                                            display: "flex",
-                                            alignItems: "flex-start",
-                                            gap: "10px",
-                                            fontSize: "14px",
-                                            fontWeight: "500",
-                                            lineHeight: "1.4",
-                                          }}
-                                        >
-                                          <i
-                                            aria-hidden={true}
-                                            style={{
-                                              fontSize: "16px",
-                                              color: String(k.acc),
-                                              flexShrink: "0",
-                                            }}
-                                            className={
-                                              "ph-fill ph-check-circle"
-                                            }
-                                          ></i>
-                                          {f}
-                                        </li>
-                                      )}
-                                    </React.Fragment>
-                                  ))}
-                                </ul>
-                                <div
-                                  style={{
-                                    marginTop: "auto",
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "16px",
-                                    paddingTop: "18px",
-                                    borderTop: "1px solid " + k.line,
-                                  }}
-                                >
-                                  <span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        fontSize: "12px",
-                                        fontWeight: "600",
-                                        color: String(k.sub),
-                                      }}
-                                    >
-                                      {"Monthly estimate"}
-                                    </span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        marginTop: "4px",
-                                        fontSize: "27px",
-                                        fontWeight: "500",
-                                        letterSpacing: "-.04em",
-                                      }}
-                                    >
-                                      {k.price}
-                                    </span>
-                                  </span>
-                                  <span style={{ textAlign: "right" }}>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        fontSize: "12px",
-                                        fontWeight: "600",
-                                        color: String(k.sub),
-                                      }}
-                                    >
-                                      {"Billing period"}
-                                    </span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        marginTop: "6px",
-                                        fontSize: "16px",
-                                        fontWeight: "600",
-                                      }}
-                                    >
-                                      {k.period}
-                                    </span>
-                                  </span>
-                                </div>
-                                <p
-                                  style={{
-                                    marginTop: "-6px",
-                                    fontFamily: "Arial,Helvetica,sans-serif",
-                                    fontSize: "13px",
-                                    color: String(k.sub),
-                                  }}
-                                >
-                                  {k.termTotal}
-                                </p>
-                                <AddToCartButton
-                                  item={k.cartItem}
-                                  style={{ background: k.btnBg, color: k.btnC }}
-                                  className="reference-state-52"
-                                />
-                              </article>
-                            </React.Fragment>
-                          ))}
-                        </div>
-                        <div className="plan-links">
-                          <button type="button" onClick={v.ps.compare}>
-                            <i className="ph ph-columns" aria-hidden="true" />
-                            Compare all features side by side
-                          </button>
-                          {v.ps.combineHref && (
-                            <a href={v.ps.combineHref}>
-                              Combine with other products
-                              <i
-                                className="ph ph-arrow-right"
-                                aria-hidden="true"
-                              />
-                            </a>
-                          )}
-                          <a href="/plans">
-                            See every service and software plan
-                            <i
-                              className="ph ph-arrow-right"
-                              aria-hidden="true"
-                            />
-                          </a>
-                        </div>
-                      </>
-                    )}
-                    {v.ps.empty && (
-                      <>
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "18px",
-                            padding: "64px 24px",
-                            borderRadius: "26px",
-                            border: "1px dashed #190B2540",
-                            textAlign: "center",
-                          }}
-                        >
-                          <span
-                            style={{
-                              display: "grid",
-                              placeItems: "center",
-                              width: "56px",
-                              height: "56px",
-                              borderRadius: "16px",
-                              background: "#190B25",
-                              color: "#EEE3F7",
-                            }}
-                          >
-                            <i
-                              aria-hidden={true}
-                              style={{ fontSize: "22px" }}
-                              className={"ph ph-squares-four"}
-                            ></i>
-                          </span>
-                          <div
-                            data-hw={""}
-                            style={{
-                              fontSize: "25px",
-                              fontWeight: "500",
-                              letterSpacing: "-.035em",
-                            }}
-                          >
-                            {"No systems selected"}
-                          </div>
-                          <p
-                            style={{
-                              fontFamily: "Arial,Helvetica,sans-serif",
-                              maxWidth: "420px",
-                              fontSize: "16px",
-                              lineHeight: "1.6",
-                              color: "#4A3A57",
-                            }}
-                          >
-                            {
-                              "Build a workspace first, then return here to compare the three plans."
-                            }
-                          </p>
-                          <button
-                            onClick={v.ps.edit}
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "20px",
-                              minHeight: "50px",
-                              padding: "7px 7px 7px 24px",
-                              borderRadius: "999px",
-                              background: "#190B25",
-                              color: "#F6F1FA",
-                              fontSize: "14px",
-                              fontWeight: "600",
-                              whiteSpace: "nowrap",
-                              transition:
-                                "background .3s, transform .45s cubic-bezier(.22,1,.36,1)",
-                            }}
-                            className={"reference-state-53"}
-                          >
-                            {"Build your workspace"}
-                            <span
-                              style={{
-                                display: "grid",
-                                placeItems: "center",
-                                width: "40px",
-                                height: "40px",
-                                borderRadius: "50%",
-                                background: "#EEE3F7",
-                                color: "#190B25",
-                                flexShrink: "0",
-                              }}
-                            >
-                              <i
-                                aria-hidden={true}
-                                style={{ fontSize: "16px" }}
-                                className={"ph ph-arrow-up-right"}
-                              ></i>
-                            </span>
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </section>
+                <React.Fragment>
+                  {this.state.route.view === "plans" ? (
+                    <PurchasingOverview
+                      key={this.routeKey(this.state.route)}
+                      kind="software"
+                      initialIds={this.state.route.modules}
+                      initialDuration={this.state.route.duration}
+                    />
+                  ) : (
+                    <PackageSection
+                      key={this.routeKey(this.state.route)}
+                      kind="software"
+                      id={this.state.route.id}
+                    />
+                  )}
+                </React.Fragment>
               </>
             )}
             {v.showPlans && (
@@ -5656,7 +3574,7 @@ export default class Software extends ReferencePage {
                             <span data-line={""} style={{ display: "block" }}>
                               {"Choose. Review. "}
                               <span data-acc={""} style={{ color: "#D4B7EC" }}>
-                                {"Discuss."}
+                                {"Pay & access."}
                               </span>
                             </span>
                           </span>
@@ -5673,7 +3591,7 @@ export default class Software extends ReferencePage {
                         }}
                       >
                         {
-                          "Nothing is charged here. You compare the options, then we confirm scope and pricing together."
+                          "Complete a simulated payment, then continue to your OrgTik customer account for purchases, payments, and invoices."
                         }
                       </p>
                     </div>
@@ -6228,39 +4146,7 @@ export default class Software extends ReferencePage {
               </div>
             </section>
           </main>
-          <PlanCompareDialog
-            open={Boolean(this.state.compare)}
-            onClose={() => this.setState({ compare: null })}
-            title={this.state.compare?.title || "Compare plans"}
-            description="Every plan includes the same products. Setup and support change by plan."
-          >
-            {this.state.compare &&
-              (() => {
-                const { ids, termId, title } = this.state.compare;
-                const comparison = getPlanComparison("software", ids, {
-                  termId,
-                });
-                return (
-                  <PlanCompareTable
-                    caption={title}
-                    plans={comparison.plans}
-                    groups={comparison.groups}
-                    renderAction={(plan) => (
-                      <AddToCartButton
-                        onAction={() => this.setState({ compare: null })}
-                        item={createCartItem({
-                          kind: "software",
-                          name: nameSoftwareSelection(ids),
-                          planId: plan.planId,
-                          termId,
-                          selections: ids.map((id) => ({ id, name: id })),
-                        })}
-                      />
-                    )}
-                  />
-                );
-              })()}
-          </PlanCompareDialog>
+          <></>
           <footer
             style={{
               position: "relative",

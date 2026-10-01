@@ -81,7 +81,7 @@ export function App() {
     };
   }, []);
   useEffect(() => {
-    document.title = `${path === "/" ? "Digital studio + business software" : path === "/plans" ? "Plans & pricing" : path.slice(1).replace(/-/g, " ")} | OrgTik`;
+    document.title = `${path === "/" ? "Digital studio + business software" : path === "/plans" ? "Bundles & pricing" : path.slice(1).replace(/-/g, " ")} | OrgTik`;
   }, [path]);
   const Page = pages[path];
   return (

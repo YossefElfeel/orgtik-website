@@ -176,3 +176,25 @@ The user approved a redesign so visitors (mostly non-technical SMB owners) can s
 - **Confirmed promises only:** "Reply within 1 business day", "Free scoping call", "Change anything before you sign" and "Nothing is charged" (`PlanPromises.jsx`). Do not add other claims without approval.
 - **Checkout:** two optional one-tap questions (when to start, best way to reach you; phone requires a number), "What happens next" with the confirmed promises, and totals in both the summary and the enquiry preview (payload schema version 2 with `preferences`).
 - **Compact duration pills** inside cards and cart rows show one even row, or an even 2 × 2 grid when narrow (container query); never three plus one.
+
+## Purchasing and CRM handoff — approved 2026-10-01
+
+This supersedes the earlier tier ladder, project estimates, enquiry checkout, Hosting selection, bundle names, and stacked discount rules above.
+
+- One package per service/product, with identical published capabilities at 1, 3, 6, and 12 months. All services are ongoing delivery. Default duration is one month. No Starter/Complete/Ongoing choices.
+- `purchase-catalog.js` is the purchasing source of truth: sample CHF prices in minor units, bundles, configurations, and quotes. Each line receives the greater of its duration saving (0/5/10/15%) and its configured group's distinct-item saving (0/5/10/15% at 1/2/3–4/5+ items). Never stack; duration wins ties. Round once per full-period line and sum. Monthly figures are equivalents, not payment installments.
+- Ready-made bundles precede separate services/software builders. Both feed one editable cart. Shared duration changes explicitly confirm replacing overrides. Filters preserve hidden selections. Cart content changes require Save/Cancel; immediate duration/renewal/removal changes have Undo. Resolve overlap explicitly, never charge the same catalog item twice. Automatic renewal defaults off.
+- `/plans` is Bundles & pricing. Hosting is available only at `https://orgtik.ch` and cannot enter the local cart. Exclude advertising media spend and label tax calculation as unconfigured.
+- Cart v2 stores configuration only. Preserve v1 and a backup, migrate valid selections/durations, and require scope review. Unsupported terms remain unset. Customer name/email/company stay in memory; the session receipt contains no identity or payment credentials.
+- Checkout offers guest or demo sign-in, billing name/email and optional company, then clearly simulated payment. No enquiry fields or card collection. Failed/cancelled payment preserves the cart. Successful payment creates an immutable preview purchase, then independently provisions the CRM handoff.
+- `purchase-adapter.js` is the mock boundary. CRM retries use the purchase reference and never trigger another payment. Support ready/pending/failed setup, guest email verification, and verified existing customers. Reloading a confirmation never restores verified identity. Software activates after payment; service periods await CRM onboarding.
+- The separate CRM owns accounts, onboarding, payments, invoices, and dashboards. Do not build local copies or create real accounts/send emails. An unset `VITE_CRM_PORTAL_URL` leads to a labeled handoff preview; configure an HTTPS destination only when supplied. Browser state never proves a production payment or sets authoritative prices.
+- Preserve the OrgTik palette, typography, assets, and pill buttons. Verify pricing/storage/adapter tests, formatting, production build, keyboard focus, and 320/390/768/1440px layouts. See `PURCHASING.md` for the integration boundary and QA scenarios.
+
+### Purchasing journey review — 2026-10-01
+
+- Keep discovery's custom-builder entry visible before bundle cards. Configuration order is select items, shared duration, then individual durations/renewals. New configurations reset department filters; filtering an existing configuration preserves its selections.
+- The builder summary names selected packages and keeps Add/View in cart available. Mobile builders show a total/action bar only while their section intersects the viewport. Cart has a persistent mobile checkout action.
+- Cart capabilities use native disclosures to keep names, terms, renewal, and prices easy to scan. Duration/renewal edits save immediately with Undo. Content edits display their draft amount; checkout stays disabled until every draft is saved or cancelled. Clear old notifications when entering content editing so they cannot cover Save.
+- On mobile/tablet, put a keyboard-accessible order disclosure with the upfront total before checkout choices and billing. Optional company details stay collapsed initially. Keep guest verification and CRM setup separate from successful payment.
+- Current browser review and screenshots: `qa/journey-review/README.md`. This evidence supplements the broader `qa/purchasing/README.md` acceptance pass.

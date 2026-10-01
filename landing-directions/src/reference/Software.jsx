@@ -7,364 +7,35 @@ import { ReferencePage } from "./ReferencePage";
 import { toSiteHref, readWorkspaceQuery } from "./navigation";
 import { AddToCartButton } from "./CartControls";
 import { createCartItem } from "./cart-store";
+import {
+  SOFTWARE_BUNDLES,
+  SOFTWARE_MODES,
+  SOFTWARE_PRODUCTS,
+  SOFTWARE_TERMS,
+  getSoftwareMode,
+  getSoftwarePlanAdditions,
+  getSoftwarePlanFeatures,
+  getSoftwareSavingHint,
+  nameSoftwareSelection,
+  priceSoftware,
+  recommendSoftwarePlan,
+  softwareModeOf,
+} from "./software-catalog";
+import {
+  PLAN_IDS,
+  formatCHF,
+  planBody,
+  planName,
+  planSubtitle,
+} from "./plan-ladder";
+import { getPlanComparison } from "./plan-pricing";
+import { PlanPicker } from "./PlanPicker";
+import { PlanCompareDialog, PlanCompareTable } from "./PlanCompare";
 
 export default class Software extends ReferencePage {
-  MODS = [
-    {
-      id: "hr",
-      name: "People",
-      formal: "HR",
-      icon: "ph-users-three",
-      title: "A little less admin. A lot more human.",
-      short: "Bring your people and their work together.",
-      description:
-        "Give people, documents, and everyday processes a clearer place in your business.",
-      tasks: ["People & teams", "Leave & onboarding", "Employee documents"],
-      category: "Operations",
-      number: "01",
-      monthlyPrice: 39,
-      image: "brand-phone.webp",
-      highlights: [
-        {
-          title: "One people directory",
-          body: "Keep roles, teams, contacts, and essential employee information easy to understand.",
-        },
-        {
-          title: "Guided people moments",
-          body: "Turn onboarding, leave, and recurring HR requests into clear repeatable flows.",
-        },
-        {
-          title: "Documents with context",
-          body: "Connect employee records to the people and decisions they belong to.",
-        },
-      ],
-      useCases: [
-        {
-          title: "Welcome a new teammate",
-          body: "Create the profile, assign the onboarding checklist, and keep the right documents together.",
-        },
-        {
-          title: "Coordinate leave",
-          body: "Collect a request, make the decision visible, and keep the team calendar current.",
-        },
-        {
-          title: "Answer a people question",
-          body: "Move from the employee record to the policy or document without losing the context.",
-        },
-      ],
-    },
-    {
-      id: "crm",
-      name: "Relationships",
-      formal: "CRM",
-      icon: "ph-chart-line-up",
-      title: "Make the next conversation count.",
-      short: "Keep relationships moving forward.",
-      description:
-        "Organize contacts, understand opportunities, and keep the next action in view.",
-      tasks: [
-        "Contacts & companies",
-        "Pipeline visibility",
-        "Follow-ups & activities",
-      ],
-      category: "Growth",
-      number: "02",
-      monthlyPrice: 49,
-      image: "brand-glass.webp",
-      highlights: [
-        {
-          title: "A shared customer picture",
-          body: "Bring contacts, companies, conversations, and ownership into one clear relationship view.",
-        },
-        {
-          title: "A pipeline people can read",
-          body: "See opportunity stage, value, confidence, and the next action without reconstructing the story.",
-        },
-        {
-          title: "Follow-ups that stay visible",
-          body: "Keep the next conversation connected to the relationship that made it necessary.",
-        },
-      ],
-      useCases: [
-        {
-          title: "Qualify a new lead",
-          body: "Capture the relationship, decide its stage, and assign the next useful action.",
-        },
-        {
-          title: "Review the pipeline",
-          body: "Compare active opportunities and focus the team on work that needs attention.",
-        },
-        {
-          title: "Prepare a follow-up",
-          body: "Read the recent context, confirm the owner, and schedule the next conversation.",
-        },
-      ],
-    },
-    {
-      id: "files",
-      name: "Files",
-      formal: "Files",
-      icon: "ph-folder-simple",
-      title: "Find the file. Keep the flow.",
-      short: "Give your business knowledge a home.",
-      description:
-        "Bring the documents that matter into a clear, shared structure your team can understand.",
-      tasks: [
-        "Folders & organization",
-        "Document discovery",
-        "Sharing workflows",
-      ],
-      category: "Operations",
-      number: "03",
-      monthlyPrice: 19,
-      image: "brand-cards.webp",
-      highlights: [
-        {
-          title: "A structure people recognize",
-          body: "Create a shared filing pattern that reflects how the business actually works.",
-        },
-        {
-          title: "Faster document discovery",
-          body: "Use clear labels and useful context to reduce the time spent searching and asking.",
-        },
-        {
-          title: "Sharing with purpose",
-          body: "Keep documents connected to the team, project, or customer moment that needs them.",
-        },
-      ],
-      useCases: [
-        {
-          title: "Build a shared library",
-          body: "Turn scattered business documents into a structure the whole team can navigate.",
-        },
-        {
-          title: "Find the current file",
-          body: "Use the folder, label, and owner context to reach the right version quickly.",
-        },
-        {
-          title: "Hand work to another team",
-          body: "Share the document with its purpose, status, and next action already attached.",
-        },
-      ],
-    },
-    {
-      id: "tasks",
-      name: "Work",
-      formal: "Tasks",
-      icon: "ph-check-square",
-      title: "From a good idea to a job well done.",
-      short: "Turn priorities into progress.",
-      description:
-        "Connect projects, people, and next steps so everyone can see what moves the work forward.",
-      tasks: [
-        "Project planning",
-        "Ownership & priorities",
-        "Progress visibility",
-      ],
-      category: "Operations",
-      number: "04",
-      monthlyPrice: 25,
-      image: "brand-tablet.webp",
-      highlights: [
-        {
-          title: "Priorities in one view",
-          body: "Connect projects, milestones, and daily actions without turning the workspace into noise.",
-        },
-        {
-          title: "Ownership people can see",
-          body: "Make every next step clear with an owner, status, and useful deadline.",
-        },
-        {
-          title: "Progress with context",
-          body: "Review what moved, what is blocked, and what decision will unlock the next stage.",
-        },
-      ],
-      useCases: [
-        {
-          title: "Plan a new project",
-          body: "Define the outcome, organize the milestones, and give the first actions clear owners.",
-        },
-        {
-          title: "Run a weekly review",
-          body: "Scan priorities, unblock stalled work, and agree what the team moves next.",
-        },
-        {
-          title: "Hand off completed work",
-          body: "Close the task with its files, decisions, and follow-on action still connected.",
-        },
-      ],
-    },
-    {
-      id: "marketing",
-      name: "Marketing",
-      formal: "Marketing",
-      icon: "ph-megaphone",
-      title: "Give every campaign a direction.",
-      short: "Make your next move more intentional.",
-      description:
-        "Bring campaign plans, content, and customer activity into a more considered marketing workflow.",
-      tasks: ["Campaign planning", "Content calendar", "Performance overview"],
-      category: "Growth",
-      number: "05",
-      monthlyPrice: 35,
-      image: "brand-glass.webp",
-      highlights: [
-        {
-          title: "Campaigns with a clear brief",
-          body: "Connect the audience, message, channel, owner, and intended outcome before production begins.",
-        },
-        {
-          title: "A useful content rhythm",
-          body: "Plan, review, and publish content through one shared calendar and approval flow.",
-        },
-        {
-          title: "Performance in context",
-          body: "Relate campaign activity to the goal and decision it should inform next.",
-        },
-      ],
-      useCases: [
-        {
-          title: "Shape a campaign",
-          body: "Turn the business goal into an audience, message, channel mix, and delivery plan.",
-        },
-        {
-          title: "Run the content calendar",
-          body: "Coordinate briefs, production, approvals, and publishing across the team.",
-        },
-        {
-          title: "Review what worked",
-          body: "Bring the result back to the original goal and choose the next experiment.",
-        },
-      ],
-    },
-    {
-      id: "website",
-      name: "Website",
-      formal: "Website Manager",
-      icon: "ph-browser",
-      title: "Keep your digital front door open.",
-      short: "Make your website easier to manage.",
-      description:
-        "See content, requests, and website priorities together, with a clearer path from update to action.",
-      tasks: ["Content management", "Website requests", "Maintenance overview"],
-      category: "Growth",
-      number: "06",
-      monthlyPrice: 29,
-      image: "brand-tablet.webp",
-      highlights: [
-        {
-          title: "Content changes in one queue",
-          body: "Collect requests with the page, priority, owner, and approval context already attached.",
-        },
-        {
-          title: "A visible publishing flow",
-          body: "Move updates from request to review and release without losing the reason behind them.",
-        },
-        {
-          title: "Maintenance people understand",
-          body: "Keep routine checks, technical work, and improvement ideas visible in one operating view.",
-        },
-      ],
-      useCases: [
-        {
-          title: "Request a page update",
-          body: "Capture the change, reference the right page, and route it to the correct owner.",
-        },
-        {
-          title: "Prepare a release",
-          body: "Review content, approvals, dependencies, and publishing status in one sequence.",
-        },
-        {
-          title: "Plan website care",
-          body: "Organize maintenance, quality checks, and improvement work around business priorities.",
-        },
-      ],
-    },
-  ];
-  PLAN_OPTIONS = [
-    {
-      id: "single",
-      name: "Single module",
-      note: "Start with one focused system.",
-    },
-    {
-      id: "operations",
-      name: "Operations bundle",
-      note: "People, Tasks and Files.",
-    },
-    {
-      id: "growth",
-      name: "Growth bundle",
-      note: "CRM, Marketing and Website.",
-    },
-    {
-      id: "complete",
-      name: "Complete suite",
-      note: "All six modules in one workspace.",
-    },
-    {
-      id: "custom",
-      name: "Custom workspace",
-      note: "Choose the combination that fits.",
-    },
-  ];
-  PLAN_META = {
-    single: "1 product · Maximum flexibility",
-    operations: "3 products · 15% bundle saving",
-    growth: "3 products · 15% bundle saving",
-    complete: "6 products · 25% bundle saving",
-    custom: "Choose 2–5 · 10% bundle saving",
-  };
-  DURATIONS = [
-    { id: "monthly", label: "Monthly", months: 1, discount: 0 },
-    { id: "annual", label: "12 months", months: 12, discount: 0.15 },
-    { id: "biennial", label: "24 months", months: 24, discount: 0.22 },
-  ];
-  REC = [
-    {
-      id: "launch",
-      number: "01",
-      eyebrow: "Start focused",
-      title: "Launch plan",
-      body: "Shape the selected systems into a clear first release your team can understand and adopt.",
-      scope: "Selected systems",
-      features: [
-        "Configuration workshop",
-        "Core workspace setup",
-        "Guided launch plan",
-        "Team handover session",
-      ],
-    },
-    {
-      id: "connected",
-      number: "02",
-      eyebrow: "Build the flow",
-      title: "Connected plan",
-      body: "Connect the selected systems around the work, decisions and handoffs that matter most.",
-      scope: "Systems + connected workflows",
-      featured: true,
-      features: [
-        "Everything in Launch",
-        "Workflow and role mapping",
-        "Cross-system coordination",
-        "Adoption support",
-      ],
-    },
-    {
-      id: "partnership",
-      number: "03",
-      eyebrow: "Keep evolving",
-      title: "Partnership plan",
-      body: "Launch the selected workspace with an ongoing rhythm for support, learning and improvement.",
-      scope: "Systems + ongoing evolution",
-      features: [
-        "Everything in Connected",
-        "Improvement roadmap",
-        "Ongoing support rhythm",
-        "Evolution planning",
-      ],
-    },
-  ];
+  MODS = SOFTWARE_PRODUCTS;
+  PLAN_OPTIONS = SOFTWARE_MODES;
+  DURATIONS = SOFTWARE_TERMS;
   CONNECT = {
     hr: ["tasks", "files"],
     crm: ["marketing", "website"],
@@ -466,6 +137,11 @@ export default class Software extends ReferencePage {
     selected: ["hr"],
     duration: "annual",
     prodDur: "annual",
+    // Start on the recommended plan; it never switches by itself afterwards.
+    plan:
+      recommendSoftwarePlan(readWorkspaceQuery().selected || ["hr"])?.planId ||
+      "starter",
+    compare: null,
     mod: 0,
     lineDeg: -90,
     uc: 0,
@@ -499,20 +175,17 @@ export default class Software extends ReferencePage {
     if (p[0] === "plans")
       return {
         view: "plans",
-        mode: this.PLAN_META[p[1]] ? p[1] : "custom",
+        mode: getSoftwareMode(p[1])?.id || "custom",
         duration: this.DURATIONS.some((d) => d.id === p[2]) ? p[2] : "annual",
         modules: (p[3] || "").split(",").filter((x) => ids.indexOf(x) >= 0),
       };
     return { view: "overview" };
   }
+  // The billing term is left out so switching it on the compare view keeps the scroll position.
   routeKey(r) {
-    return [
-      r.view,
-      r.id || "",
-      r.mode || "",
-      r.duration || "",
-      (r.modules || []).join(","),
-    ].join("|");
+    return [r.view, r.id || "", r.mode || "", (r.modules || []).join(",")].join(
+      "|",
+    );
   }
 
   componentDidMount() {
@@ -586,6 +259,12 @@ export default class Software extends ReferencePage {
       });
     }
     this.applyDataSrc();
+    if (
+      ps.selected !== this.state.selected ||
+      ps.duration !== this.state.duration ||
+      ps.plan !== this.state.plan
+    )
+      this.syncBuilderUrl();
     if (ps.mod !== this.state.mod) {
       this.startModTimer();
       this.swapIn("[data-swap]");
@@ -1062,22 +741,10 @@ export default class Software extends ReferencePage {
         el.setAttribute("src", v);
     });
   }
+  // Subscription price before plan support; plans multiply it in priceSoftware.
   price(sel, mode, durId) {
-    const d = this.DURATIONS.find((x) => x.id === durId) || this.DURATIONS[1];
-    const sub = this.MODS.filter((m) => sel.indexOf(m.id) >= 0).reduce(
-      (a, m) => a + m.monthlyPrice,
-      0,
-    );
-    const bd =
-      mode === "complete"
-        ? 0.25
-        : mode === "operations" || mode === "growth"
-          ? 0.15
-          : sel.length > 1
-            ? 0.1
-            : 0;
-    const monthly = Math.round(sub * (1 - bd) * (1 - d.discount));
-    return { d: d, bd: bd, monthly: monthly, total: monthly * d.months };
+    const p = priceSoftware(sel, "starter", durId);
+    return { d: p.term, bd: p.rate, monthly: p.estimate, total: p.total };
   }
   onReq() {
     return this.props.prices === "On request";
@@ -1087,32 +754,33 @@ export default class Software extends ReferencePage {
       ? "On request"
       : "CHF " + new Intl.NumberFormat("de-CH").format(Math.round(v));
   }
-  QUICK = [
-    { name: "Operations bundle", ids: ["hr", "tasks", "files"], save: "−15%" },
-    {
-      name: "Growth bundle",
-      ids: ["crm", "marketing", "website"],
-      save: "−15%",
-    },
-    {
-      name: "Complete suite",
-      ids: ["hr", "crm", "files", "tasks", "marketing", "website"],
-      save: "−25%",
-    },
-  ];
+  QUICK = SOFTWARE_BUNDLES.map((bundle) => ({
+    name: bundle.name,
+    ids: bundle.ids,
+    save: `−${Math.round(bundle.rate * 100)}%`,
+  }));
   same(a, b) {
     return a.length === b.length && a.every((x) => b.indexOf(x) >= 0);
   }
   modeOf(sel) {
-    return sel.length === 6
-      ? "complete"
-      : this.same(sel, ["hr", "tasks", "files"])
-        ? "operations"
-        : this.same(sel, ["crm", "marketing", "website"])
-          ? "growth"
-          : sel.length <= 1
-            ? "single"
-            : "custom";
+    return softwareModeOf(sel);
+  }
+  pickPlan(plan) {
+    this.setState({ plan });
+  }
+  // Keep the workspace builder shareable and restorable after refresh.
+  syncBuilderUrl() {
+    if (this.state.route.view !== "overview") return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("mode");
+    if (this.state.selected.length)
+      url.searchParams.set("modules", this.state.selected.join(","));
+    else url.searchParams.delete("modules");
+    url.searchParams.set("duration", this.state.duration);
+    if (this.state.plan) url.searchParams.set("plan", this.state.plan);
+    const next = (url.pathname + url.search + url.hash).replaceAll("%2C", ",");
+    if (next !== location.pathname + location.search + location.hash)
+      window.history.replaceState(window.history.state, "", next);
   }
   toggleMod(id) {
     const all = this.MODS.map((m) => m.id);
@@ -1277,6 +945,9 @@ export default class Software extends ReferencePage {
     const n = s.selected.length,
       bmode = this.modeOf(s.selected),
       bp = this.price(s.selected, bmode, s.duration),
+      brec = recommendSoftwarePlan(s.selected),
+      bplan = s.plan || "starter",
+      bplanPrice = priceSoftware(s.selected, bplan, s.duration),
       bsub = this.MODS.filter((m) => s.selected.indexOf(m.id) >= 0).reduce(
         (t, m) => t + m.monthlyPrice,
         0,
@@ -1371,7 +1042,52 @@ export default class Software extends ReferencePage {
             btnArrowBg: "#EEE3F7",
             btnArrowC: "#190B25",
           };
-    const MULT = [1, 1.2, 1.45];
+    // One card per plan for a selection, priced by the shared catalogue.
+    const planCards = (ids, termId, scopeLabel, scopeName) => {
+      const rec = recommendSoftwarePlan(ids);
+      const productLine =
+        ids.length === 1
+          ? `Full ${byId(ids[0]).formal}: ${byId(ids[0]).tasks.join(", ")}`
+          : `All ${ids.length} products, fully included`;
+      return PLAN_IDS.map((planId, i) => {
+        const price = priceSoftware(ids, planId, termId);
+        const featured = rec?.planId === planId;
+        return Object.assign(
+          {
+            planId,
+            showScope: Boolean(scopeLabel),
+            num: "0" + (i + 1),
+            featured,
+            eyebrow: planSubtitle("software", planId),
+            title: planName(planId),
+            body: planBody("software", planId),
+            scopeLabel,
+            scope: scopeName + " · " + planName(planId),
+            features: i
+              ? [`Everything in ${planName(PLAN_IDS[i - 1])}, plus`].concat(
+                  getSoftwarePlanAdditions(PLAN_IDS[i - 1], ids).items,
+                )
+              : [productLine].concat(
+                  getSoftwarePlanFeatures("starter", ids).slice(ids.length),
+                ),
+            price: this.chf(price.estimate),
+            period: price.term.label,
+            termTotal:
+              price.term.months > 1
+                ? this.chf(price.total) + " over " + price.term.label
+                : "Billed monthly, no fixed term",
+            cartItem: createCartItem({
+              kind: "software",
+              name: nameSoftwareSelection(ids),
+              planId,
+              termId,
+              selections: ids.map((id) => ({ id, name: byId(id).formal })),
+            }),
+          },
+          sty(featured),
+        );
+      });
+    };
     let ps = {
       num: "",
       eyebrow: "",
@@ -1392,17 +1108,15 @@ export default class Software extends ReferencePage {
       edit: () => {},
     };
     if (M) {
-      const pp = this.price([M.id], "single", s.prodDur),
-        T = ["Essential", "Connected", "Partnership"];
       ps = Object.assign(ps, {
         num: "03",
         eyebrow: M.formal + " plans",
         l1: "Choose the right",
         acc: M.formal + " plan.",
         body:
-          "You have already chosen " +
+          "Every plan includes the full " +
           M.formal +
-          ". Compare the setup and support levels for this product, then carry the preferred option into the conversation.",
+          " product. Plans differ in how much setup and support you get.",
         lockup: true,
         duration: true,
         hasCards: true,
@@ -1413,74 +1127,33 @@ export default class Software extends ReferencePage {
           "Prototype CHF estimates for " +
           M.formal +
           ". Final limits, taxes, availability and contractual terms require confirmation.",
-        cards: this.REC.map((p, i) =>
-          Object.assign(
-            {
-              showScope: false,
-              num: p.number,
-              featured: !!p.featured,
-              eyebrow: M.formal,
-              title: T[i],
-              body:
-                i === 0
-                  ? "Start " +
-                    M.formal +
-                    " with the essential setup and a guided team handover."
-                  : i === 1
-                    ? "Shape " +
-                      M.formal +
-                      " around the workflows, roles and adoption support your team needs."
-                    : "Keep " +
-                      M.formal +
-                      " supported, reviewed and improving after launch.",
-              scopeLabel: "Product scope",
-              scope: M.formal + " · " + T[i],
-              features:
-                i === 0
-                  ? [M.tasks[0], M.tasks[1], "Guided setup and handover"]
-                  : i === 1
-                    ? M.tasks.concat(["Workflow and role mapping"])
-                    : M.tasks.concat([
-                        "Ongoing support",
-                        "Improvement roadmap",
-                      ]),
-              price: this.chf(pp.monthly * MULT[i]),
-              period: pp.d.label,
-              cta: "Choose " + T[i],
-              cartItem: createCartItem({
-                kind: "software",
-                name: M.formal + " · " + T[i],
-                selections: [{ id: M.id, name: M.formal }],
-                plan: T[i],
-                duration: pp.d.label,
-                billing: "monthly",
-                commitmentMonths: pp.d.months,
-                estimate: this.onReq()
-                  ? null
-                  : Math.round(pp.monthly * MULT[i]),
-                sourceHref:
-                  "/software?duration=" + s.prodDur + "#/product/" + M.id,
-              }),
+        compare: () =>
+          this.setState({
+            compare: {
+              ids: [M.id],
+              termId: s.prodDur,
+              title: M.formal + " plans",
             },
-            sty(!!p.featured),
-          ),
-        ),
+          }),
+        combineHref: "/software?modules=" + M.id + "#plan-builder",
+        cards: planCards([M.id], s.prodDur, "", M.formal),
       });
     } else if (v === "plans") {
       const sel = r.modules.map(byId),
         k = sel.length,
-        wp = this.price(r.modules, r.mode, r.duration);
+        scopeName = nameSoftwareSelection(r.modules);
       ps = Object.assign(ps, {
         num: "01",
         eyebrow: "Your selected workspace",
         l1: k ? k + " product" + (k === 1 ? "" : "s") + "," : "Choose your",
         acc: k ? "three ways forward." : "systems first.",
         body: k
-          ? modeName(r.mode) +
+          ? scopeName +
             " · " +
             durLabel(r.duration) +
-            " · Your products stay consistent while onboarding and support change by plan."
-          : "Return to the plan builder and select at least one system before comparing plans.",
+            " · Every plan includes the same products. Setup and support change by plan."
+          : "Return to the plan builder and select at least one product before comparing plans.",
+        duration: k > 0,
         chips: k > 0,
         hasCards: k > 0,
         empty: k === 0,
@@ -1491,44 +1164,17 @@ export default class Software extends ReferencePage {
         })),
         note: "Prototype CHF pricing for product review. Final limits, contractual terms, taxes and availability require approval.",
         edit: () => this.goBuilder(r.mode, r.modules, r.duration),
-        cards: this.REC.map((p, i) =>
-          Object.assign(
-            {
-              showScope: true,
-              num: p.number,
-              featured: !!p.featured,
-              eyebrow: p.eyebrow,
-              title: p.title,
-              body: p.body,
-              scopeLabel: "Workspace scope",
-              scope: p.scope,
-              features: p.features,
-              price: this.chf(wp.monthly * MULT[i]),
-              period: wp.d.label,
-              cta: "Choose " + p.title.replace(" plan", ""),
-              cartItem: createCartItem({
-                kind: "software",
-                name: modeName(r.mode) + " · " + p.title,
-                selections: sel.map((m) => ({ id: m.id, name: m.formal })),
-                plan: p.title,
-                duration: wp.d.label,
-                billing: "monthly",
-                commitmentMonths: wp.d.months,
-                estimate: this.onReq()
-                  ? null
-                  : Math.round(wp.monthly * MULT[i]),
-                sourceHref:
-                  "/software#/plans/" +
-                  r.mode +
-                  "/" +
-                  r.duration +
-                  "/" +
-                  r.modules.join(","),
-              }),
+        compare: () =>
+          this.setState({
+            compare: {
+              ids: r.modules,
+              termId: r.duration,
+              title: scopeName + " plans",
             },
-            sty(!!p.featured),
-          ),
-        ),
+          }),
+        cards: k
+          ? planCards(r.modules, r.duration, "Workspace scope", scopeName)
+          : [],
       });
     }
     const toContact = () => {
@@ -1593,11 +1239,9 @@ export default class Software extends ReferencePage {
       hero: hero,
       tickerLabel: "Software",
       tickerList: [0, 1].map(() =>
-        this.MODS.map((m) => m.formal).concat([
-          "Operations bundle",
-          "Growth bundle",
-          "Complete suite",
-        ]),
+        this.MODS.map((m) => m.formal).concat(
+          SOFTWARE_BUNDLES.map((bundle) => bundle.name),
+        ),
       ),
       rowCols: s.narrow
         ? "46px minmax(0,1fr) 40px"
@@ -1756,7 +1400,8 @@ export default class Software extends ReferencePage {
         };
       }),
       pdurs: this.DURATIONS.map((d) => {
-        const on = s.prodDur === d.id;
+        const plans = v === "plans";
+        const on = (plans ? r.duration : s.prodDur) === d.id;
         return {
           label: d.label,
           note: d.discount
@@ -1765,7 +1410,17 @@ export default class Software extends ReferencePage {
           bg: on ? "#190B25" : "transparent",
           c: on ? "#F6F1FA" : "#190B25",
           sub: on ? "#D4B7EC" : "#6C3CAA",
-          pick: () => this.setState({ prodDur: d.id }),
+          pick: () => {
+            if (!plans) return this.setState({ prodDur: d.id });
+            const hash =
+              "#/plans/" + r.mode + "/" + d.id + "/" + r.modules.join(",");
+            history.replaceState(
+              history.state,
+              "",
+              location.pathname + location.search + hash,
+            );
+            this.setState({ route: { ...r, duration: d.id } });
+          },
         };
       }),
       countLabel: n + (n === 1 ? " product" : " products"),
@@ -1797,63 +1452,57 @@ export default class Software extends ReferencePage {
         }),
       ),
       hint: (() => {
-        const B = [
-          ["Operations bundle", ["hr", "tasks", "files"]],
-          ["Growth bundle", ["crm", "marketing", "website"]],
-        ];
-        let h = { show: false, text: "", label: "", add: () => {} };
-        if (n === 2)
-          B.forEach((x) => {
-            if (s.selected.every((id) => x[1].indexOf(id) >= 0)) {
-              const miss = x[1].find((id) => s.selected.indexOf(id) < 0),
-                mm = byId(miss);
-              h = {
-                show: true,
-                text:
-                  "Add " +
-                  mm.formal +
-                  " to complete the " +
-                  x[0] +
-                  " and save 15% instead of 10%.",
-                label: "Add " + mm.formal,
-                add: () => this.toggleMod(miss),
-              };
+        const next = getSoftwareSavingHint(s.selected);
+        return next
+          ? {
+              show: true,
+              text: next.text,
+              label: next.label,
+              add: next.addId ? () => this.toggleMod(next.addId) : null,
             }
-          });
-        if (n === 5) {
-          const mm = this.MODS.find((m) => s.selected.indexOf(m.id) < 0);
-          h = {
-            show: true,
-            text:
-              "Add " +
-              mm.formal +
-              " to get the Complete suite and save 25% instead of 10%.",
-            label: "Add " + mm.formal,
-            add: () => this.toggleMod(mm.id),
-          };
-        }
-        return h;
+          : { show: false, text: "", label: "", add: null };
       })(),
       sum: {
         cartItem: createCartItem({
           kind: "software",
-          name: modeName(bmode),
+          name: nameSoftwareSelection(s.selected),
+          planId: bplan,
+          termId: s.duration,
           selections: this.MODS.filter((m) => s.selected.includes(m.id)).map(
             (m) => ({ id: m.id, name: m.formal }),
           ),
-          duration: bp.d.label,
-          billing: "monthly",
-          commitmentMonths: bp.d.months,
-          estimate: this.onReq() ? null : bp.monthly,
-          sourceHref:
-            "/software?mode=" +
-            bmode +
-            "&duration=" +
-            s.duration +
-            "&modules=" +
-            s.selected.join(",") +
-            "#plan-builder",
         }),
+        plan: bplan,
+        plans: PLAN_IDS.map((id) => ({
+          planId: id,
+          name: planName(id),
+          subtitle: planSubtitle("software", id),
+          price: n
+            ? this.chf(priceSoftware(s.selected, id, s.duration).estimate)
+            : "—",
+          note: n
+            ? id === "starter"
+              ? "per month, subscription only"
+              : "per month, incl. +" +
+                this.chf(
+                  priceSoftware(s.selected, id, s.duration).estimate -
+                    bp.monthly,
+                ) +
+                " support"
+            : "per month",
+          recommended: brec?.planId === id,
+        })),
+        why: brec?.why || "",
+        pickPlan: (id) => this.pickPlan(id),
+        compare: () =>
+          n &&
+          this.setState({
+            compare: {
+              ids: s.selected,
+              termId: s.duration,
+              title: nameSoftwareSelection(s.selected) + " plans",
+            },
+          }),
         mode: n ? modeName(bmode) : "",
         empty: n === 0,
         subtotal: n ? this.chf(bsub) : "—",
@@ -1862,8 +1511,8 @@ export default class Software extends ReferencePage {
             ? "Operations bundle"
             : bmode === "growth"
               ? "Growth bundle"
-              : bmode === "complete"
-                ? "Complete suite"
+              : bmode === "suite"
+                ? "All-in-one suite"
                 : bmode === "custom"
                   ? "Multi-product saving"
                   : "Bundle saving",
@@ -1878,18 +1527,22 @@ export default class Software extends ReferencePage {
           ? "−" + Math.round(bp.d.discount * 100) + "%"
           : "—",
         billC: bp.d.discount ? "#D4B7EC" : "#B5A6C4",
-        total: n ? this.chf(bp.monthly) : "—",
+        total: n ? this.chf(bplanPrice.estimate) : "—",
         billed: this.onReq()
           ? "Final pricing is confirmed with the OrgTik team"
           : !n
             ? "per workspace / month"
-            : bp.d.months > 1
-              ? this.chf(bp.total) + " billed for " + bp.d.label
-              : "Billed monthly",
+            : (bplan === "starter"
+                ? "Subscription only"
+                : planName(bplan) + " plan incl. support") +
+              " · " +
+              (bp.d.months > 1
+                ? this.chf(bplanPrice.total) + " over " + bp.d.label
+                : "billed monthly"),
         ctaO: n ? 1 : 0.45,
         ctaCursor: n ? "pointer" : "not-allowed",
         helper: n
-          ? "Next: compare Launch, Connected and Partnership for this selection. Prototype pricing — nothing is charged."
+          ? "Prototype pricing, nothing is charged. You can change your plan in the cart or before you sign."
           : "Select at least one product to continue.",
         go: () => {
           if (!s.selected.length) return;
@@ -1942,6 +1595,7 @@ export default class Software extends ReferencePage {
       ].map(([label, href]) => ({ label, href })),
       footStart: [
         ["Build a software plan", "/software#plan-builder"],
+        ["Plans & pricing", "/plans"],
         ["Tell us about your project", "/contact"],
         ["Roadmap", "/roadmap"],
         ["Sitemap", "/legal#/sitemap"],
@@ -3929,21 +3583,23 @@ export default class Software extends ReferencePage {
                                 >
                                   {v.hint.text}
                                 </span>
-                                <button
-                                  onClick={v.hint.add}
-                                  style={{
-                                    padding: "10px 16px",
-                                    borderRadius: "999px",
-                                    background: "#6C3CAA",
-                                    color: "#FFFFFF",
-                                    fontSize: "13px",
-                                    fontWeight: "600",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                  className={"reference-state-44"}
-                                >
-                                  {v.hint.label}
-                                </button>
+                                {v.hint.add && (
+                                  <button
+                                    onClick={v.hint.add}
+                                    style={{
+                                      padding: "10px 16px",
+                                      borderRadius: "999px",
+                                      background: "#6C3CAA",
+                                      color: "#FFFFFF",
+                                      fontSize: "13px",
+                                      fontWeight: "600",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                    className={"reference-state-44"}
+                                  >
+                                    {v.hint.label}
+                                  </button>
+                                )}
                               </div>
                             </>
                           )}
@@ -4286,6 +3942,18 @@ export default class Software extends ReferencePage {
                             </span>
                           </div>
                         </div>
+                        <PlanPicker
+                          tone="dark"
+                          label={
+                            v.sum.empty
+                              ? "Plans"
+                              : "Every plan for this selection"
+                          }
+                          options={v.sum.plans}
+                          value={v.sum.plan}
+                          onChange={v.sum.pickPlan}
+                          why={v.sum.why}
+                        />
                         <div
                           style={{
                             paddingTop: "18px",
@@ -4326,50 +3994,27 @@ export default class Software extends ReferencePage {
                         </div>
                         <AddToCartButton
                           item={v.sum.cartItem}
+                          editable
                           disabled={v.sum.empty}
                           className="commerce-action--light"
                         />
-                        <button
-                          onClick={v.sum.go}
-                          disabled={v.sum.empty}
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            gap: "20px",
-                            minHeight: "52px",
-                            padding: "7px 7px 7px 24px",
-                            borderRadius: "999px",
-                            background: "#EEE3F7",
-                            color: "#28123B",
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            opacity: String(v.sum.ctaO),
-                            cursor: String(v.sum.ctaCursor),
-                            transition:
-                              "background .3s, transform .45s cubic-bezier(.22,1,.36,1)",
-                          }}
-                          className={"reference-state-47"}
-                        >
-                          {"Compare plans"}
-                          <span
-                            style={{
-                              display: "grid",
-                              placeItems: "center",
-                              width: "38px",
-                              height: "38px",
-                              borderRadius: "50%",
-                              background: "#28123B",
-                              color: "#EEE3F7",
-                            }}
+                        <div className="plan-links plan-links--dark">
+                          <button
+                            type="button"
+                            onClick={v.sum.go}
+                            disabled={v.sum.empty}
                           >
+                            <i className="ph ph-columns" aria-hidden="true" />
+                            Compare the plans in detail
+                          </button>
+                          <a href="/plans">
+                            See all plans and prices
                             <i
-                              aria-hidden={true}
-                              style={{ fontSize: "16px" }}
-                              className={"ph ph-arrow-right"}
-                            ></i>
-                          </span>
-                        </button>
+                              className="ph ph-arrow-right"
+                              aria-hidden="true"
+                            />
+                          </a>
+                        </div>
                         <p
                           style={{
                             fontFamily: "Arial,Helvetica,sans-serif",
@@ -5705,27 +5350,35 @@ export default class Software extends ReferencePage {
                                 <ul style={{ display: "grid", gap: "10px" }}>
                                   {(k.features || []).map((f, fIndex) => (
                                     <React.Fragment key={fIndex}>
-                                      <li
-                                        style={{
-                                          display: "flex",
-                                          alignItems: "flex-start",
-                                          gap: "10px",
-                                          fontSize: "14px",
-                                          fontWeight: "500",
-                                          lineHeight: "1.4",
-                                        }}
-                                      >
-                                        <i
-                                          aria-hidden={true}
+                                      {/^Everything in /.test(f) ? (
+                                        <li className="service-plan__lead">
+                                          {f}
+                                        </li>
+                                      ) : (
+                                        <li
                                           style={{
-                                            fontSize: "16px",
-                                            color: String(k.acc),
-                                            flexShrink: "0",
+                                            display: "flex",
+                                            alignItems: "flex-start",
+                                            gap: "10px",
+                                            fontSize: "14px",
+                                            fontWeight: "500",
+                                            lineHeight: "1.4",
                                           }}
-                                          className={"ph-fill ph-check-circle"}
-                                        ></i>
-                                        {f}
-                                      </li>
+                                        >
+                                          <i
+                                            aria-hidden={true}
+                                            style={{
+                                              fontSize: "16px",
+                                              color: String(k.acc),
+                                              flexShrink: "0",
+                                            }}
+                                            className={
+                                              "ph-fill ph-check-circle"
+                                            }
+                                          ></i>
+                                          {f}
+                                        </li>
+                                      )}
                                     </React.Fragment>
                                   ))}
                                 </ul>
@@ -5785,6 +5438,16 @@ export default class Software extends ReferencePage {
                                     </span>
                                   </span>
                                 </div>
+                                <p
+                                  style={{
+                                    marginTop: "-6px",
+                                    fontFamily: "Arial,Helvetica,sans-serif",
+                                    fontSize: "13px",
+                                    color: String(k.sub),
+                                  }}
+                                >
+                                  {k.termTotal}
+                                </p>
                                 <AddToCartButton
                                   item={k.cartItem}
                                   style={{ background: k.btnBg, color: k.btnC }}
@@ -5793,6 +5456,28 @@ export default class Software extends ReferencePage {
                               </article>
                             </React.Fragment>
                           ))}
+                        </div>
+                        <div className="plan-links">
+                          <button type="button" onClick={v.ps.compare}>
+                            <i className="ph ph-columns" aria-hidden="true" />
+                            Compare all features side by side
+                          </button>
+                          {v.ps.combineHref && (
+                            <a href={v.ps.combineHref}>
+                              Combine with other products
+                              <i
+                                className="ph ph-arrow-right"
+                                aria-hidden="true"
+                              />
+                            </a>
+                          )}
+                          <a href="/plans">
+                            See every service and software plan
+                            <i
+                              className="ph ph-arrow-right"
+                              aria-hidden="true"
+                            />
+                          </a>
                         </div>
                       </>
                     )}
@@ -6543,6 +6228,39 @@ export default class Software extends ReferencePage {
               </div>
             </section>
           </main>
+          <PlanCompareDialog
+            open={Boolean(this.state.compare)}
+            onClose={() => this.setState({ compare: null })}
+            title={this.state.compare?.title || "Compare plans"}
+            description="Every plan includes the same products. Setup and support change by plan."
+          >
+            {this.state.compare &&
+              (() => {
+                const { ids, termId, title } = this.state.compare;
+                const comparison = getPlanComparison("software", ids, {
+                  termId,
+                });
+                return (
+                  <PlanCompareTable
+                    caption={title}
+                    plans={comparison.plans}
+                    groups={comparison.groups}
+                    renderAction={(plan) => (
+                      <AddToCartButton
+                        onAction={() => this.setState({ compare: null })}
+                        item={createCartItem({
+                          kind: "software",
+                          name: nameSoftwareSelection(ids),
+                          planId: plan.planId,
+                          termId,
+                          selections: ids.map((id) => ({ id, name: id })),
+                        })}
+                      />
+                    )}
+                  />
+                );
+              })()}
+          </PlanCompareDialog>
           <footer
             style={{
               position: "relative",

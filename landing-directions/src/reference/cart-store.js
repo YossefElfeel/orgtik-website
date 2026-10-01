@@ -1,5 +1,8 @@
 import { useSyncExternalStore } from "react";
-import { withServiceDuration } from "./service-duration.js";
+import { SERVICE_DURATIONS, getServiceDuration } from "./service-duration.js";
+import { SOFTWARE_TERMS, getSoftwareTerm } from "./software-catalog.js";
+import { formatCHF, isPlanId, planBilling, planName } from "./plan-ladder.js";
+import { normalizePlanItem, serviceCommitmentFrom } from "./plan-pricing.js";
 
 export const CART_STORAGE_KEY = "orgtik.cart.v1";
 const listeners = new Set();
@@ -43,46 +46,66 @@ export function createCartItem(input) {
         ? input.sourceHref
         : "/" + (input.kind === "software" ? "software" : "services"),
   };
-  item.id = JSON.stringify([
-    item.kind,
-    item.selections.map((entry) => entry.id).sort(),
-    item.plan,
-    item.duration,
-    item.billing,
+  // Known selections are always priced from the catalogue, never from saved numbers.
+  const priced = normalizePlanItem(item, input);
+  priced.id = JSON.stringify([
+    priced.kind,
+    priced.selections.map((entry) => entry.id).sort(),
+    priced.planId,
+    priced.duration,
+    priced.billing,
   ]);
-  return item;
+  return priced;
+}
+
+export function itemLabel(item) {
+  return item.plan ? `${item.name} · ${item.plan}` : item.name;
 }
 
 function readCart(value) {
   try {
     const parsed = JSON.parse(value || "[]");
-    if (!Array.isArray(parsed)) return [];
-    return [
-      ...new Map(
-        parsed
-          .slice(0, 100)
-          .map(createCartItem)
-          .filter(Boolean)
-          .map((item) => [item.id, item]),
-      ).values(),
-    ];
+    if (!Array.isArray(parsed)) return { items: [], repriced: [] };
+    const repriced = [];
+    const items = parsed
+      .slice(0, 100)
+      .map((entry) => {
+        const item = createCartItem(entry);
+        if (
+          item &&
+          Number.isFinite(entry?.estimate) &&
+          Math.round(entry.estimate) !== item.estimate
+        )
+          repriced.push(item.id);
+        return item;
+      })
+      .filter(Boolean);
+    const unique = [...new Map(items.map((item) => [item.id, item])).values()];
+    return {
+      items: unique,
+      repriced: unique
+        .filter((item) => repriced.includes(item.id))
+        .map((item) => item.id),
+    };
   } catch {
-    return [];
+    return { items: [], repriced: [] };
   }
 }
 
-let initialItems = [];
+let initial = { items: [], repriced: [] };
 let persistent = true;
 try {
-  initialItems = readCart(window.localStorage.getItem(CART_STORAGE_KEY));
+  initial = readCart(window.localStorage.getItem(CART_STORAGE_KEY));
 } catch {
   persistent = false;
 }
 let snapshot = {
-  items: initialItems,
+  items: initial.items,
   notice: null,
   persistent,
   editingId: null,
+  // Saved items whose price changed when the current plan rules were applied.
+  repriced: initial.repriced,
 };
 
 function publish(
@@ -90,6 +113,9 @@ function publish(
   notice = null,
   persist = true,
   editingId = snapshot.editingId,
+  repriced = snapshot.repriced.filter((id) =>
+    items.some((item) => item.id === id),
+  ),
 ) {
   if (persist) {
     try {
@@ -98,16 +124,23 @@ function publish(
       persistent = false;
     }
   }
-  snapshot = { items, notice, persistent, editingId };
+  snapshot = { items, notice, persistent, editingId, repriced };
   listeners.forEach((listener) => listener());
 }
 
-export function addCartItem(input) {
+export function dismissRepricedNote() {
+  if (snapshot.repriced.length)
+    publish(snapshot.items, snapshot.notice, false, snapshot.editingId, []);
+}
+
+export function addCartItem(input, { replace = true } = {}) {
   const item = createCartItem(input);
   if (!item) return;
-  const editing = snapshot.items.find(
-    (entry) => entry.id === snapshot.editingId && entry.kind === item.kind,
-  );
+  const editing =
+    replace &&
+    snapshot.items.find(
+      (entry) => entry.id === snapshot.editingId && entry.kind === item.kind,
+    );
   if (editing) {
     const index = snapshot.items.indexOf(editing);
     const items = snapshot.items.filter((entry) => entry.id !== editing.id);
@@ -119,7 +152,7 @@ export function addCartItem(input) {
         key: performance.now(),
         type: "updated",
         item,
-        text: `${editing.name} updated in your cart.`,
+        text: `${itemLabel(editing)} updated in your cart.`,
       },
       true,
       null,
@@ -132,8 +165,8 @@ export function addCartItem(input) {
     type: existing ? "existing" : "added",
     item,
     text: existing
-      ? `${item.name} is already in your cart.`
-      : `${item.name} added to your cart.`,
+      ? `${itemLabel(item)} is already in your cart.`
+      : `${itemLabel(item)} added to your cart.`,
   });
 }
 
@@ -142,10 +175,61 @@ export function beginCartEdit(id) {
     publish(snapshot.items, null, false, id);
 }
 
-export function updateServicePeriod(id, value) {
+// Change an item's plan, Ongoing commitment or software billing term in place.
+export function updateCartItem(id, changes = {}) {
   const original = snapshot.items.find((item) => item.id === id);
-  const input = withServiceDuration(original, value);
-  const item = input && createCartItem(input);
+  if (!original) return null;
+  const input = { ...original };
+  let summary = "";
+  if (changes.planId !== undefined) {
+    if (!isPlanId(changes.planId)) return null;
+    input.planId = changes.planId;
+    input.plan = planName(changes.planId);
+    if (original.kind === "service") {
+      input.billing = planBilling("service", changes.planId);
+      if (changes.planId === "ongoing" && !serviceCommitmentFrom(original)) {
+        input.commitmentMonths = 1;
+        input.duration = getServiceDuration(1).label;
+      }
+    }
+    summary = `${input.plan} plan selected`;
+  }
+  if (changes.commitmentMonths !== undefined) {
+    const months = Number(changes.commitmentMonths);
+    if (
+      original.kind !== "service" ||
+      input.planId !== "ongoing" ||
+      !SERVICE_DURATIONS.includes(months)
+    )
+      return null;
+    input.commitmentMonths = months;
+    input.duration = getServiceDuration(months).label;
+    summary = `${input.duration} saved`;
+  }
+  if (changes.removeSelectionIds !== undefined) {
+    const remaining = original.selections.filter(
+      (entry) => !changes.removeSelectionIds.includes(entry.id),
+    );
+    if (!remaining.length || remaining.length === original.selections.length)
+      return null;
+    input.selections = remaining;
+    const removed = original.selections
+      .filter((entry) => changes.removeSelectionIds.includes(entry.id))
+      .map((entry) => entry.name)
+      .join(", ");
+    summary = `${removed} removed, price updated`;
+  }
+  if (changes.termId !== undefined) {
+    if (
+      original.kind !== "software" ||
+      !SOFTWARE_TERMS.some((term) => term.id === changes.termId)
+    )
+      return null;
+    input.termId = changes.termId;
+    input.duration = getSoftwareTerm(changes.termId).label;
+    summary = `${input.duration} billing selected`;
+  }
+  const item = createCartItem(input);
   if (!item) return null;
   if (item.id === original.id) return original;
   const duplicate = snapshot.items.some((entry) => entry.id === item.id);
@@ -157,11 +241,11 @@ export function updateServicePeriod(id, value) {
     items,
     {
       key: performance.now(),
-      type: "period-updated",
+      type: "item-updated",
       item,
       originalItem: original,
       previousItems,
-      text: `${item.name}: ${item.duration} saved.${duplicate ? " Matching selections combined." : ""}`,
+      text: `${original.name}: ${summary}.${duplicate ? " Matching selections combined." : ""}`,
     },
     true,
     null,
@@ -169,16 +253,22 @@ export function updateServicePeriod(id, value) {
   return item;
 }
 
-export function undoServicePeriod() {
+export function undoCartUpdate() {
   const notice = snapshot.notice;
-  if (notice?.type !== "period-updated") return;
+  if (notice?.type !== "item-updated") return;
   publish(notice.previousItems, {
     key: performance.now(),
-    type: "period-restored",
+    type: "item-restored",
     item: notice.originalItem,
-    text: `${notice.originalItem.name}: previous period restored.`,
+    text: `${itemLabel(notice.originalItem)} restored.`,
   });
 }
+
+export function updateServicePeriod(id, value) {
+  return updateCartItem(id, { commitmentMonths: value });
+}
+
+export const undoServicePeriod = undoCartUpdate;
 
 export function cancelCartEdit() {
   if (snapshot.editingId) publish(snapshot.items, snapshot.notice, false, null);
@@ -210,7 +300,7 @@ export function removeCartItem(id) {
       type: "removed",
       item,
       index,
-      text: `${item.name} removed from your cart.`,
+      text: `${itemLabel(item)} removed from your cart.`,
     },
     true,
     snapshot.editingId === id ? null : snapshot.editingId,
@@ -235,13 +325,17 @@ export function undoCartRemoval() {
     key: performance.now(),
     type: "restored",
     item: notice.item,
-    text: `${notice.item.name} restored to your cart.`,
+    text: `${itemLabel(notice.item)} restored to your cart.`,
   });
 }
 
 export function dismissCartNotice() {
   snapshot = { ...snapshot, notice: null };
   listeners.forEach((listener) => listener());
+}
+
+export function getCartSnapshot() {
+  return snapshot;
 }
 
 export function useCart() {
@@ -256,31 +350,104 @@ export function useCart() {
 
 window.addEventListener("storage", (event) => {
   if (event.key === CART_STORAGE_KEY || event.key === null) {
-    publish(
-      readCart(event.key === null ? null : event.newValue),
-      null,
-      false,
-      null,
-    );
+    const next = readCart(event.key === null ? null : event.newValue);
+    publish(next.items, null, false, null, next.repriced);
   }
 });
 
+const periodMonths = (item) =>
+  item.billing === "monthly" ? item.commitmentMonths || 1 : 1;
+
 export function cartTotals(items) {
+  const priced = items.filter((item) => item.estimate !== null);
+  const sum = (list, value) =>
+    list.reduce((total, item) => total + value(item), 0);
   return {
-    monthly: items
-      .filter((item) => item.billing === "monthly")
-      .reduce((sum, item) => sum + (item.estimate || 0), 0),
-    project: items
-      .filter((item) => item.billing === "project")
-      .reduce((sum, item) => sum + (item.estimate || 0), 0),
+    monthly: sum(
+      priced.filter((item) => item.billing === "monthly"),
+      (item) => item.estimate,
+    ),
+    project: sum(
+      priced.filter((item) => item.billing === "project"),
+      (item) => item.estimate,
+    ),
+    // Monthly items × their commitment or term, plus one-off projects.
+    periodTotal: sum(priced, (item) => item.estimate * periodMonths(item)),
+    savings: sum(
+      priced,
+      (item) =>
+        Math.max(0, (item.listPrice ?? item.estimate) - item.estimate) *
+        periodMonths(item),
+    ),
     onRequest: items.some((item) => item.estimate === null),
   };
 }
 
-export function formatCHF(amount) {
-  return "CHF " + new Intl.NumberFormat("de-CH").format(amount);
+const PLAN_RANK = { starter: 1, complete: 2, ongoing: 3 };
+
+// Overlapping selections and missing choices, each with a suggested fix that never loses a higher plan.
+export function getCartChecks(items) {
+  const checks = [];
+  items.forEach((a, index) => {
+    items.slice(index + 1).forEach((b) => {
+      if (a.kind !== b.kind) return;
+      const aIds = a.selections.map((entry) => entry.id);
+      const bIds = b.selections.map((entry) => entry.id);
+      const shared = a.selections.filter((entry) => bIds.includes(entry.id));
+      if (!shared.length) return;
+      const aInB = aIds.every((id) => bIds.includes(id));
+      const bInA = bIds.every((id) => aIds.includes(id));
+      let fix;
+      if (aInB && bInA) fix = { action: "choose", itemIds: [a.id, b.id] };
+      else if (aInB || bInA) {
+        const [small, big] = aInB ? [a, b] : [b, a];
+        fix =
+          (PLAN_RANK[small.planId] || 0) <= (PLAN_RANK[big.planId] || 0)
+            ? { action: "remove-item", itemId: small.id, keepId: big.id }
+            : {
+                action: "remove-selection",
+                itemId: big.id,
+                selectionIds: shared.map((entry) => entry.id),
+              };
+      } else {
+        // Partial overlap: take the shared services out of the lower plan.
+        const lower =
+          (PLAN_RANK[a.planId] || 0) < (PLAN_RANK[b.planId] || 0) ? a : b;
+        fix = {
+          action: "remove-selection",
+          itemId: lower.id,
+          selectionIds: shared.map((entry) => entry.id),
+        };
+      }
+      checks.push({
+        type: "overlap",
+        key: `overlap:${a.id}:${b.id}`,
+        itemIds: [a.id, b.id],
+        names: shared.map((entry) => entry.name),
+        fix,
+      });
+    });
+    if (
+      a.kind === "service" &&
+      a.planId === "ongoing" &&
+      !SERVICE_DURATIONS.includes(
+        a.duration === getServiceDuration(a.commitmentMonths).label
+          ? a.commitmentMonths
+          : null,
+      )
+    )
+      checks.push({
+        type: "commitment",
+        key: `commitment:${a.id}`,
+        itemIds: [a.id],
+      });
+  });
+  return checks;
 }
 
+export { formatCHF };
+
+// Service prices are "from" estimates; software subscriptions are exact.
 export function formatItemEstimate(item) {
   if (item.estimate === null) return "On request";
   return `${item.kind === "service" ? "From " : ""}${formatCHF(item.estimate)}${item.billing === "monthly" ? " / month" : " / project"}`;

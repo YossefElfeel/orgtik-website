@@ -15,18 +15,20 @@ The static build is written to `landing-directions/dist/client`. Hosts must serv
 
 ## Pages
 
-| Route | Content |
-| --- | --- |
-| `/` | Homepage, services accordion, software explorer, selected work, process |
-| `/services` | Five service families, service details, configurable service bundle |
-| `/software` | Six products, product details, workspace builder, plan comparison |
-| `/work` | Filterable projects and project stories |
-| `/about` | Studio story, mission, journey, capabilities |
-| `/insights` | Searchable and filterable insights and articles |
-| `/contact` | Project, software, and ongoing-care enquiry previews |
-| `/roadmap` | Roadmap filters, local voting, suggestion preview |
-| `/legal` | Imprint, privacy, terms, sitemap previews |
-| `/sign-in` | Sign-in and account recovery previews |
+| Route                | Content                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| `/`                  | Homepage, services accordion, software explorer, selected work, process                     |
+| `/services`          | Five service families, service details, service builder with Starter/Complete/Ongoing plans |
+| `/software`          | Six products, product details, workspace builder with inline plan choice, plan comparison   |
+| `/plans`             | Plans & pricing: every service and software plan with its price, compare and choose         |
+| `/cart`, `/checkout` | Editable cart with plan switching, live totals and cart check; enquiry preview              |
+| `/work`              | Filterable projects and project stories                                                     |
+| `/about`             | Studio story, mission, journey, capabilities                                                |
+| `/insights`          | Searchable and filterable insights and articles                                             |
+| `/contact`           | Project, software, and ongoing-care enquiry previews                                        |
+| `/roadmap`           | Roadmap filters, local voting, suggestion preview                                           |
+| `/legal`             | Imprint, privacy, terms, sitemap previews                                                   |
+| `/sign-in`           | Sign-in and account recovery previews                                                       |
 
 Detail views retain the reference's hash routes, for example `/software#/product/hr` and `/services#/family/design`. Previous `/platform`, `/projects`, service-detail, insight-detail, pricing, and legal URLs resolve to the corresponding new journeys.
 

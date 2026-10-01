@@ -12,6 +12,7 @@ const pages = {
   "/contact": lazy(() => import("./reference/Contact")),
   "/cart": lazy(() => import("./reference/Cart")),
   "/checkout": lazy(() => import("./reference/Checkout")),
+  "/plans": lazy(() => import("./reference/Plans")),
   "/roadmap": lazy(() => import("./reference/Roadmap")),
   "/legal": lazy(() => import("./reference/Legal")),
   "/sign-in": lazy(() => import("./reference/SignIn")),
@@ -80,7 +81,7 @@ export function App() {
     };
   }, []);
   useEffect(() => {
-    document.title = `${path === "/" ? "Digital studio + business software" : path.slice(1).replace(/-/g, " ")} | OrgTik`;
+    document.title = `${path === "/" ? "Digital studio + business software" : path === "/plans" ? "Plans & pricing" : path.slice(1).replace(/-/g, " ")} | OrgTik`;
   }, [path]);
   const Page = pages[path];
   return (

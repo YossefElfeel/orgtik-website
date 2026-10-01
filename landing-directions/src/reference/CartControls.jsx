@@ -6,6 +6,7 @@ import {
   dismissCartNotice,
   formatCHF,
   formatItemEstimate,
+  itemLabel,
   removeCartItem,
   undoCartRemoval,
   useCart,
@@ -36,11 +37,14 @@ export function AddToCartButton({
   disabled = false,
   removable = false,
   describedBy,
+  // Only the builder that opened an edit may replace the edited item.
+  editable = false,
+  onAction,
 }) {
   const { items, editingId } = useCart();
-  const editing = items.find(
-    (entry) => entry.id === editingId && entry.kind === item?.kind,
-  );
+  const editing = editable
+    ? items.find((entry) => entry.id === editingId && entry.kind === item?.kind)
+    : null;
   const inCart =
     !editing && item && items.some((entry) => entry.id === item.id);
   const actionRef = useRef(null);
@@ -51,6 +55,19 @@ export function AddToCartButton({
       preserveFocus.current = false;
     }
   }, [inCart]);
+  // While editing, mark the choice that is already saved instead of offering to save it again.
+  if (editing && item && editing.id === item.id)
+    return (
+      <span
+        className={`commerce-action commerce-action--current ${className}`}
+        aria-describedby={describedBy}
+      >
+        <span>Your current choice</span>
+        <span className="commerce-action__arrow">
+          <i className="ph ph-check" aria-hidden="true" />
+        </span>
+      </span>
+    );
   if (inCart && !disabled && !removable)
     return (
       <a
@@ -58,7 +75,7 @@ export function AddToCartButton({
         href="/cart"
         style={style}
         className={`commerce-action commerce-action--in-cart ${className}`}
-        aria-label={`View ${item.name} in cart`}
+        aria-label={`View ${itemLabel(item)} in cart`}
         aria-describedby={describedBy}
         data-cart-item-id={item.id}
       >
@@ -77,15 +94,18 @@ export function AddToCartButton({
       onClick={() => {
         preserveFocus.current = document.activeElement === actionRef.current;
         if (inCart && removable) removeCartItem(item.id);
-        else addCartItem(item);
+        else addCartItem(item, { replace: Boolean(editing) });
+        onAction?.();
       }}
       style={style}
       className={`commerce-action${inCart && removable ? " commerce-action--remove" : ""} ${className}`}
       aria-label={
         item
           ? inCart && removable
-            ? `Remove ${item.name} from cart`
-            : `${editing ? "Save" : "Add"} ${item.name} to cart`
+            ? `Remove ${itemLabel(item)} from cart`
+            : editing
+              ? `Save changes: ${itemLabel(item)}`
+              : `Add ${itemLabel(item)} to cart`
           : "Add to cart"
       }
       aria-describedby={describedBy}
@@ -107,13 +127,15 @@ export function AddToCartButton({
   );
 }
 
+// Some actions are rendered twice for different layouts; return the visible one.
 function findCartItemAction(id) {
   return (
     document
       .getElementById(`cart-item-${encodeURIComponent(id)}`)
       ?.querySelector("button") ||
     [...document.querySelectorAll("[data-cart-item-id]")].find(
-      (element) => element.dataset.cartItemId === id,
+      (element) =>
+        element.dataset.cartItemId === id && element.getClientRects().length,
     )
   );
 }
@@ -140,8 +162,10 @@ export function CartEditBar({ path }) {
     <aside className="cart-edit-bar" aria-label="Editing cart selection">
       <i className="ph ph-pencil-simple" aria-hidden="true" />
       <div>
-        <strong>Editing {item.name}</strong>
-        <p>Choose your new option, then save changes to replace this item.</p>
+        <strong>Editing {itemLabel(item)}</strong>
+        <p>
+          Choose the services and plan you want, then save to replace this item.
+        </p>
       </div>
       <a href="/cart" onClick={cancelCartEdit}>
         Cancel
@@ -232,8 +256,12 @@ export function CartNotice({ path }) {
           <div className="cart-notice__item">
             <strong>{notice.item.name}</strong>
             <span>
-              {notice.item.duration}
-              {notice.item.plan && ` · ${notice.item.plan}`}
+              {[
+                notice.item.plan && `${notice.item.plan} plan`,
+                notice.item.duration,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </span>
             {!removed && (
               <p>
@@ -313,7 +341,7 @@ export function CartNotice({ path }) {
                   <button
                     type="button"
                     className="cart-notice__remove"
-                    aria-label={`Remove ${notice.item.name} from cart`}
+                    aria-label={`Remove ${itemLabel(notice.item)} from cart`}
                     onClick={() => {
                       removeCartItem(notice.item.id);
                       requestAnimationFrame(() => {

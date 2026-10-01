@@ -94,6 +94,68 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+/* Inside a plan card or cart row: one even row, or an even 2 × 2 grid when the card is narrow.
+   Never auto-fit, which leaves one option alone on a second row. */
+.service-duration--compact,
+.service-duration--compact-dark {
+  container-type: inline-size;
+  align-items: stretch;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 0;
+  padding-block: 0;
+  border-block: 0;
+}
+.service-duration--compact fieldset,
+.service-duration--compact-dark fieldset {
+  width: 100%;
+  border-radius: 18px;
+}
+.service-duration--compact .service-duration__options,
+.service-duration--compact-dark .service-duration__options {
+  grid-template-columns: repeat(var(--duration-count, 4), minmax(0, 1fr));
+}
+.service-duration--compact .service-duration__option span,
+.service-duration--compact-dark .service-duration__option span {
+  padding-inline: 8px;
+  text-align: center;
+}
+@container (max-width: 380px) {
+  .service-duration__options[data-count="4"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (max-width: 460px) {
+  .service-duration__options[data-count="3"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.service-duration--compact-dark {
+  color: #f6f1fa;
+}
+.service-duration--compact-dark p {
+  color: #cfc2db;
+}
+.service-duration--compact-dark fieldset {
+  border-color: #ffffff2e;
+  background: #ffffff0a;
+}
+.service-duration--compact-dark .service-duration__option span {
+  color: #eee3f7;
+}
+.service-duration--compact-dark .service-duration__option:hover span {
+  background: #ffffff14;
+}
+.service-duration--compact-dark .service-duration__option input:checked + span {
+  background: #eee3f7;
+  color: #190b25;
+}
+.service-duration--compact-dark
+  .service-duration__option
+  input:focus-visible
+  + span {
+  outline-color: #d4b7ec;
+}
 @media (prefers-reduced-motion: reduce) {
   .service-duration__option span {
     transition: none;

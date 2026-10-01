@@ -933,6 +933,7 @@ export default class Work extends ReferencePage {
         ].map((x) => ({ label: x[0], href: x[1] })),
         footStart: [
           ["Build a software plan", "Software.dc.html"],
+          ["Plans & pricing", "/plans"],
           ["Tell us about your project", "Contact.dc.html"],
           ["Roadmap", "Roadmap.dc.html"],
           ["Sitemap", "Legal.dc.html#/sitemap"],

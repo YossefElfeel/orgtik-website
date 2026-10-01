@@ -101,3 +101,44 @@ Department comparisons with multiple services now have a native Filter by servic
 Verified Design's department overview, Graphic design and Brand development comparisons at twelve months, including matching Focus/Connected/Partnership scope and published features. Native keyboard navigation changed the overview to Graphic design without changing duration. Added a temporary Brand development Focus plan, changed twelve months to three in the cart, refreshed, and reopened the department comparison with Brand development and three months restored on all cards. Cancel preserved it. The empty checkout form carried only the chosen service at CHF 1'800/project and three months. Removed the temporary plan and restored the original four QA cart items. Confirmed that Hosting and Graphic design detail show no filter; no customer details were entered.
 
 Inspected 1440px, 768px, 390px and 320px. Client and scroll widths matched (1425px, 753px, 375px and 305px). The native dropdown measured 54px high; mobile duration targets remained 44px. Full selected service names remain visible in the scope lockup beneath the compact dropdown. Captures are `department-plan-filter-{1440,390,320}.jpg`. All seventeen cart tests, formatting, the production build and whitespace checks passed; browser error logs were empty. The new test covers catalogue scope resolution, invalid/cross-department fallback, matching plan features and preservation of the service filter during cart period updates.
+
+## Refined service dropdown — 2026-10-01
+
+Filter by service now uses a branded select-only combobox and rounded listbox instead of the browser's operating-system menu. Full names wrap naturally; each option includes existing catalogue capability hints, and the saved selection has a checkmark. The panel opens above or below the control to fit the viewport and scrolls when needed.
+
+Arrow keys, Home/End, type-ahead, Enter/Space and Tab support selection. Escape, outside click and focus departure dismiss the panel; Escape and outside click preserve the saved choice. DOM focus stays on the control during list navigation and pointer selection. Changing department or the saved service closes the panel. Existing duration, plan updates and URL restoration remain intact.
+
+Desktop, 390px and 320px captures are `refined-service-dropdown-{desktop,390,320}.png`. The cart regression suite, production build, formatting and whitespace checks passed.
+
+## One plan system, comparison and live cart — 2026-10-01
+
+Starter, Complete and Ongoing replace Focus/Connected/Partnership, Essential and Launch everywhere. Prices come only from `service-catalog.js` and `software-catalog.js` (per-service plan price plus a saving that never drops). The cart suite now has 26 tests covering:
+
+- legacy migration;
+- an exhaustive check that savings never drop across every service and software subset;
+- builder, plan card and cart producing the same item and price;
+- plan, commitment and term switching with merge and Undo;
+- totals, including the total for chosen periods and savings;
+- overlap fixes that keep the higher plan;
+- checkout preferences.
+
+Verified in the browser (local preview only; test contact values; nothing sent):
+
+- **Services builder:** for brand + web development it shows Starter CHF 3'420, Complete CHF 7'980 (recommended) and Ongoing CHF 2'755/month. Switching to Ongoing shows the Monthly commitment and the period total, and writes `services`/`plan` to the URL. The compare dialog opens with focus on Close, locks scrolling, closes on Escape and returns focus to its trigger.
+- **Graphic design plan cards:** Starter is recommended for a single service. The cards show "Everything in Starter, plus…", Ongoing carries the commitment pills, and Compare and all-plans links follow the cards.
+- **Software:** the builder shows HR Starter CHF 33 (recommended), Complete CHF 40 and Ongoing CHF 48, matching the product page. The compare view `#/plans/suite/…` shows Complete recommended. Switching the term to 12 months gives CHF 125/150/181, with 12-month totals, without scrolling.
+- **Cart:**
+  - Plan switches (real click) keep focus on the chosen radio. Undo restores the item and focus.
+  - Compare plans marks the current plan, and "Switch to Starter" closes the dialog and updates the item.
+  - Changing Care to 12 months gives CHF 45'936, and the total for chosen periods updates.
+  - The cart check flagged Website management inside the Care bundle; its fix removed the separate item and focused Undo.
+  - Refresh keeps plans, terms and commitments.
+- **Checkout:** choosing Phone without a number shows an error and focuses the phone field. The preview shows the preferences, each plan and period, and the totals.
+- **`/plans`:**
+  - The desktop table keeps prices on one line.
+  - Below 900px each row becomes a card.
+  - Compare-and-choose adds Website management on Ongoing (recommended).
+- **Compact duration pills** show one even row or an even 2 × 2 grid at card widths of 285–461px. Cart terms stack evenly on mobile.
+- **No horizontal overflow** at 320, 390, 768 and 1440px on `/services`, a family and a service view, `/software`, a product page, the compare view, `/cart`, `/checkout` and `/plans`.
+
+The in-app browser pane was narrow, so desktop layouts were checked by measurement rather than full-size screenshots.

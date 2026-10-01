@@ -25,33 +25,35 @@ The ten page components in `src/reference` contain each page's content, presenta
 
 The import utility converts the supplied export into regular React source. It is a migration tool, not a build step. Do not rerun it over subsequent manual changes without reviewing the diff. The bundled document runtime and editable image-upload widget are not shipped. `image-slot.js` is a display-only image element preserving the reference's image framing and logo mirrors.
 
+## Plans
+
+Services and software share one plan ladder: **Starter**, **Complete** and **Ongoing** (`src/reference/plan-ladder.js`).
+
+- `service-catalog.js` holds the services, the ready-made bundles (Launch, Visibility, Care) and the price rule. Each service costs its plan price, then a multi-service saving applies: 5% for two, 10% for three or four, 15% for five or more, and at least 12% when a ready-made bundle is included. A department overview is all of its services under the same rule.
+- `software-catalog.js` holds the six products, billing terms, bundles (Operations, Growth, All-in-one suite) and the subscription price. Plans add setup and support at ×1, ×1.2 and ×1.45.
+- `plan-pricing.js` connects cart items to both catalogues: legacy plan names, re-pricing, plan options, comparison data and "what you get".
+
+Prices are never stored as the source of truth. The builders, plan cards, cart, checkout and `/plans` all compute them from the catalogues, so the same selection shows the same price everywhere. Adding a service or product never lowers the saving.
+
+Each builder recommends a plan by fit and explains why. It pre-selects that plan once on arrival, shows all three plan totals for the exact selection, and writes its state to the URL. `PlanPicker.jsx` is the shared plan chooser. `PlanCompare.jsx` is the shared comparison table and native dialog, with "Show differences only".
+
+`/plans` (Plans & pricing) lists every service, department overview, bundle and software product with its three prices, a software billing-term switch, and compare-and-choose dialogs. It is linked from the builders, plan sections, cart, footers and sitemap, not from the top navigation.
+
 ## Cart and checkout
 
-Software bundles, workspace plans, product plans, service bundles and service plans can be added to the shared `/cart`. Selections persist in browser local storage, including scope, plan, duration and prototype estimates. Identical configurations are added once; distinct plans or durations remain separate. Monthly and project estimates are shown separately.
+Selections persist in browser local storage (`orgtik.cart.v1`). Saved items are migrated on load: Focus, Essential and Launch become Starter; Connected becomes Complete; Partnership becomes Ongoing. Every known item is then re-priced from the catalogue, and the cart check notes any item whose price changed. Identical configurations are combined.
 
-Adding an item shows a dismissible selection preview with its scope, estimate and cart/checkout actions. Added software configurations show “View in cart.” Added service plans and bundles instead show “Remove from cart” on the same button; removing stays on Services, returns the button to “Add to cart” and offers Undo. Service notifications also offer “Remove item” for immediate correction on mobile. Editing an existing item still uses “Save changes.” The cart provides All items/Software/Services filters, expandable scope details, and an estimate breakdown by billing type and category. The cart estimate overview prefixes billing-period totals containing priced services, and each service breakdown, with “From”. Filters affect the visible list only; checkout includes every cart item. Mobile keeps checkout and a direct estimate link available.
+Each cart item shows its plan with a Starter/Complete/Ongoing switcher and the price difference for each option. Changes are instant and can be undone; identical results are merged. Ongoing services have a 1-, 3-, 6- or 12-month Monthly commitment. Projects state that their timeline is agreed in the brief and does not change the price. Software items have an inline billing term.
 
-Each service item has a “View service features” disclosure. Bundles group the features under each selected service; individual and family plans show the published scope for Focus, Connected or Partnership. The cart and Services page share `src/reference/service-catalog.js`, so existing saved selections resolve current features without being added again. Unrecognized service IDs show a confirmation message instead of invented feature details.
+"What you get" is visible by default, with a factual hint of what the next plan adds and for how much. "Compare plans" opens the shared comparison with the current plan marked and "Switch to" buttons. "Edit services" or "Edit products" opens the builder, where only the main button replaces the edited item.
 
-Service and family plan comparisons offer 1-, 3-, 6- and 12-month durations above the cards. The selected term appears on each plan, persists in its configuration URL and is included in cart and checkout data. Edit selection restores the saved duration. Different durations remain distinct cart configurations. Monthly rates and project estimates retain their published amounts; existing selections keep their saved duration.
+The cart check flags overlapping selections with a one-click fix that never drops a higher plan, and flags Ongoing items without a commitment. The estimate overview shows monthly and one-off estimates, the total for the chosen periods (monthly items × their commitment or term, plus projects) and the savings included. Changes are announced politely to screen readers. The mobile bar shows the amounts.
 
-Department comparisons with multiple services also offer Filter by service. Choose the department overview or a specific service; all three cards update their scope, features and cart selection without changing the duration or published prices. The plan-service query parameter preserves the filter on refresh and when reopening Edit plan from the cart. Single-service departments and service-detail comparisons retain their fixed scope.
+Promises are limited to those OrgTik has confirmed (`PlanPromises.jsx`): reply within 1 business day, free scoping call, change anything before you sign, and nothing is charged.
 
-Plan cards display a calendar period tag, explicit per-month or per-project pricing, and the estimated full-period amount for monthly plans. Saved service periods are also highlighted in the cart, where multi-month estimates appear above the feature disclosure. These totals use the existing monthly rate; project estimates are not multiplied by duration.
+`/checkout` carries the selection into a contact form. Name and a valid email are required. Two optional one-tap questions ask when to start and the best way to reach you; choosing phone requires a phone number. The summary and the enquiry preview show each item's plan and period with all totals. Submitting creates a clearly labelled local enquiry preview: no payment, server request or contact-data storage occurs.
 
-The bundle builder filters service choices by department while retaining all selections. Counts identify selected services in other departments, and quick-start bundles return the filter to All. Both individual plans and bundles carry a numeric service period.
-
-The builder begins with Choose how we work, then Pick your services. Duration and department filters sit above the service choices in that second step. The visible and keyboard order follow the same sequence.
-
-Every service cart row uses the builder's shared native duration radios, saving immediately without navigation. Each row has its own labelled radio group. It updates the item, edit URL and checkout payload while retaining its scope, billing and price. Changing to an already-saved configuration combines the selections; Undo restores the original cart, including both items when combined. Older selections retain their current wording and have no numeric term selected until a duration is chosen. Software periods are edited through their existing configurator.
-
-Cart services follow the builder's configuration order: How we work, Service duration and Selected services. Department labels come from the shared catalogue, with the complete selected scope visible before opening features. Edit in builder restores a bundle's work type, period and services; individual selections offer Edit plan. Work type is shown for review and changed through the existing configurator.
-
-“Edit selection” opens the existing configuration with “Save changes” actions. The original stays in the cart until saving replaces it in place, without duplicating an already selected configuration. Cancel returns to the unchanged cart. Editing is temporary and ends on leaving that service/software page. Cart removal and confirmed clear-all actions show inline feedback with undo for the latest action. “Keep items” cancels the clear-all confirmation and returns focus to “Clear cart”. Navigation dismisses feedback; cart contents remain saved.
-
-`/checkout` carries the selected items into a contact form for name, email, phone, company and project notes. Name and a valid email are required. Submitting creates a clearly labelled local enquiry preview; no payment, server request or contact-data storage occurs. The cart stays available because this preview does not deliver an enquiry.
-
-The future CMS integration starts at `src/reference/checkout-enquiry.js`: `createCheckoutEnquiry(items, values)` returns a versioned payload containing the customer, message, item IDs and selections, plan, duration and estimates. Connect delivery in the checkout submit handler when the CMS endpoint is available. The CMS must validate selections against its catalog and calculate commercial prices itself; client estimates are for presentation only. Add pending, failure/retry and actual-success states when connecting that endpoint.
+The future CMS integration starts at `src/reference/checkout-enquiry.js`. `createCheckoutEnquiry(items, values)` returns a versioned payload (schema 2) containing the customer, preferences, message, items with plan IDs, selections, periods and estimates, and the totals. Connect delivery in the checkout submit handler when the CMS endpoint is available. The CMS must validate selections against its own catalogue and calculate commercial prices itself; client estimates are for presentation only.
 
 Previous source remains available in Git history. Planning documents outside this folder describe earlier iterations and are not the current visual specification.
 

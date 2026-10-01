@@ -32,24 +32,32 @@ const assert = require("node:assert/strict"),
   await p.waitForURL("http://127.0.0.1:4173/");
   ok("Desktop navigation and browser Back");
   await go("/software");
-  await p.getByRole("button", { name: /Complete suite/ }).click();
+  await p.getByRole("button", { name: /All-in-one suite/ }).click();
   await p.getByRole("button", { name: /Monthly.*Pay monthly/s }).click();
+  await p.getByRole("radio", { name: /^Complete/ }).check();
   await p
     .locator("#plan-builder")
     .screenshot({ path: "qa/software-builder.png" });
-  await p.getByRole("button", { name: "Compare plans", exact: true }).click();
-  await p.waitForURL("**/software#/plans/complete/monthly/**");
+  await p
+    .getByRole("button", { name: "Compare the plans in detail", exact: true })
+    .click();
+  await p.waitForURL("**/software#/plans/suite/monthly/**");
   await p.getByText("6 products,", { exact: true }).waitFor();
-  ok("Six-product bundle and billing flow to plan comparison");
+  ok(
+    "Six-product bundle, inline plan choice and billing flow to plan comparison",
+  );
   await go("/software#/product/crm");
   await p.getByRole("button", { name: /24 months/ }).click();
   assert.match(await p.locator("body").innerText(), /CRM/);
   ok("Product detail and billing selector");
   await go("/services");
   await p.getByRole("button", { name: /Care bundle/ }).click();
-  await p.getByRole("button", { name: /Ongoing partnership/ }).click();
+  await p.getByRole("button", { name: /^Ongoing/ }).click();
   await p
-    .getByRole("button", { name: "Add Care bundle to cart", exact: true })
+    .getByRole("button", {
+      name: "Add Care bundle · Ongoing to cart",
+      exact: true,
+    })
     .click();
   await p.getByRole("link", { name: /^Cart,/ }).click();
   await p.waitForURL("**/cart");

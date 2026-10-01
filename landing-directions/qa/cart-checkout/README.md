@@ -43,3 +43,27 @@ Service rows now expose “View service features” through the existing native 
 Verified the existing Graphic design Focus selection and every service in the Care and Launch bundles, mouse and keyboard opening/closing, visible keyboard focus, and preserved selections after cancelling an edit. The Services configurator still shows the matching Focus, Connected and Partnership features. Checkout still carries all four saved items into the empty contact form. No customer data was entered.
 
 Checked 1440px, 1024px, 390px and 320px layouts. Client and scroll widths matched at 1024px (1009px), 390px (375px) and 320px (305px). Captures are `service-features-{1440,390,320}.jpg` and `service-bundle-features-1440.jpg`. All ten `test:cart` checks, the production build, formatting and whitespace checks passed. The two new tests cover catalogue lookup for saved selections, non-mutation, unknown IDs, and service/family plan scope. No separate agent review or interactions-suite rerun is claimed for this narrow addition.
+
+## Reversible service-plan buttons — 2026-10-01
+
+Service plans and bundles now keep their action on the Services page: adding changes it to “Remove from cart,” and removal returns it to “Add to cart.” The notification offers immediate service removal and Undo. Undo and notification removal return focus to the matching source control. Cart editing retains Save changes; software controls retain View in cart.
+
+Browser verification covered the existing Graphic design Focus selection, adding/removing Connected, removal directly from the notification, keyboard removal/Undo/Escape, Care bundle removal/Undo, refresh persistence and saving the unchanged Focus configuration through Edit selection. The original four QA cart items were restored; no customer details were entered. All ten cart data tests, formatting, the production build and whitespace checks passed.
+
+Inspected 1440px, 390px and 320px views. The narrow client and scroll widths matched at 305px. The selected plan control retained a 54px height; its label fits on one line after reducing the gap beside the minus icon. Focus on light cards uses dark purple and focus on the plum card uses lilac. Final captures are `service-plan-remove-{1440,390,320}.jpg` and `service-plan-notice-remove-390.jpg`.
+
+## Service-plan duration selector — 2026-10-01
+
+Service and service-family plan cards now have a 1-, 3-, 6- or 12-month duration selector above them. Native radios support arrow-key selection and visible focus. The chosen term updates every card and is stored in the configuration URL, cart item and checkout payload. Project estimates and monthly rates keep their existing amounts and have explicit billing labels.
+
+Verified keyboard and pointer selection, a three-month Focus plan, a twelve-month Partnership plan, cart and checkout terms, editing Focus from three to six months, refresh restoration, and removal of only the currently selected duration. Both temporary selections were removed afterward, restoring the original four QA cart items. A twelve-month Design family comparison also showed the correct term on all three cards. Existing saved selections were retained and no customer data was entered.
+
+Inspected 1440px, 768px, 390px and 320px layouts. Client and scroll widths matched at 768px (753px), 390px (375px) and 320px (305px); all four duration controls measured 44px high on narrow mobile. Captures are `service-duration-{1440,768,390,320}.jpg`. All twelve cart tests, formatting, the production build and whitespace checks passed. The new data checks cover supported/invalid duration input, distinct configurations, removal/undo, billing and checkout payloads.
+
+## Service cards with periods — 2026-10-01
+
+Service and family plan cards now display the chosen period in a calendar tag, explicit monthly/project billing beside the rate, and a period estimate for monthly plans. Project prices keep their existing amounts. Cart rows highlight saved periods and show multi-month estimates above the features disclosure. Period-specific Edit and Remove labels distinguish otherwise identical selections.
+
+Verified six-month Partnership at CHF 1'450/month and CHF 8'700 for the period, then edited it to twelve months and confirmed CHF 17'400 with five total items. Undo restored the twelve-month item correctly. Removed the temporary selection and restored the original four QA items. No customer data was entered. All thirteen cart tests, formatting, the production build and whitespace checks passed; browser error logs were empty.
+
+Inspected desktop, tablet and narrow mobile. Client and scroll widths matched at 768px (753px), 390px (375px) and 320px (305px). The final mobile adjustment keeps the calendar tag compact and allows the billing suffix to wrap separately from the price. Captures are `service-period-cards-{1440,390,320}.jpg` and `cart-service-period-{1440,390,320}.jpg`; these are viewport captures rather than full-page images.

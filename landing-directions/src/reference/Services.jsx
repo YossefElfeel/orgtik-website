@@ -6,6 +6,10 @@ import { LanguageMenu } from "./LanguageMenu";
 import { CartLink } from "./CartControls";
 import { AddToCartButton } from "./CartControls";
 import { createCartItem } from "./cart-store";
+import { dismissCartNotice } from "./cart-store";
+import { ServiceDuration } from "./ServiceDuration";
+import { ServicePlanPrice } from "./ServicePlanPrice";
+import { getServiceDuration } from "./service-duration";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
 import { SERVICE_FAMILIES, getServicePlanFeatures } from "./service-catalog";
@@ -96,11 +100,24 @@ export default class Services extends ReferencePage {
       ),
     ];
     return {
+      serviceMonths: getServiceDuration(query.get("duration")).months,
       ...(selected.length ? { sel: selected } : {}),
       ...(["project", "partner"].includes(query.get("engagement"))
         ? { mode: query.get("engagement") }
         : {}),
     };
+  }
+  pickServiceDuration(value) {
+    const { months } = getServiceDuration(value);
+    const url = new URL(window.location.href);
+    url.searchParams.set("duration", months);
+    window.history.replaceState(
+      window.history.state,
+      "",
+      url.pathname + url.search + url.hash,
+    );
+    dismissCartNotice();
+    this.setState({ serviceMonths: months });
   }
   state = {
     route: this.parseRoute(location.hash) || { view: "overview" },
@@ -174,6 +191,9 @@ export default class Services extends ReferencePage {
       if (r)
         this.setState({
           route: r,
+          serviceMonths: getServiceDuration(
+            new URLSearchParams(window.location.search).get("duration"),
+          ).months,
           menuOpen: false,
           svcOpen: 0,
           svcHover: null,
@@ -1180,6 +1200,7 @@ export default class Services extends ReferencePage {
     if (F) {
       const caps = C ? C.capabilities : F.children.map((x) => x.name),
         host = F.slug === "hosting";
+      const duration = getServiceDuration(s.serviceMonths);
       ps = Object.assign(ps, {
         eyebrow: name + " packages",
         l1: "Choose the engagement",
@@ -1189,6 +1210,7 @@ export default class Services extends ReferencePage {
           name +
           ". Compare three clear ways to begin, then bring the preferred shape into the conversation.",
         lockup: true,
+        duration: true,
         hasCards: true,
         icon: F.icon,
         name: name,
@@ -1198,11 +1220,10 @@ export default class Services extends ReferencePage {
           "Indicative CHF estimates for " +
           name +
           ". Final scope, timing, availability, taxes and contractual terms require confirmation.",
-        cards: this.PACKS.map((p, i) =>
+        cards: this.PACKS.map((p) =>
           Object.assign(
             {
               showScope: true,
-              num: "0" + (i + 1),
               featured: !!p.featured,
               eyebrow: F.kicker,
               title: p.name,
@@ -1210,10 +1231,7 @@ export default class Services extends ReferencePage {
               scopeLabel: "Service scope",
               scope: name + " · " + p.name,
               features: getServicePlanFeatures(p.id, caps),
-              priceLabel: "Prototype estimate",
-              price: this.onReq() ? "On request" : "From " + this.chf(p.price),
-              periodLabel: "Engagement rhythm",
-              period: p.recurring ? "Monthly" : "Defined scope",
+              period: duration.label,
               cta: host ? "Continue to hosting" : "Choose " + p.name,
               href: host ? "https://orgtik.ch" : "Contact.dc.html",
               hosting: host,
@@ -1222,11 +1240,14 @@ export default class Services extends ReferencePage {
                 name: name + " · " + p.name,
                 selections: [{ id: F.slug + (C ? "/" + C.slug : ""), name }],
                 plan: p.name,
-                duration: p.recurring ? "Ongoing partnership" : "Defined scope",
+                duration: duration.label,
+                commitmentMonths: duration.months,
                 billing: p.recurring ? "monthly" : "project",
                 estimate: this.onReq() ? null : p.price,
                 sourceHref:
-                  "/services#/" +
+                  "/services?duration=" +
+                  duration.months +
+                  "#/" +
                   (C ? "service/" + F.slug + "/" + C.slug : "family/" + F.slug),
               }),
             },
@@ -1568,7 +1589,8 @@ export default class Services extends ReferencePage {
       bn: bn,
       bentoCols: s.narrow ? "minmax(0,1fr)" : "repeat(12,minmax(0,1fr))",
       ps: ps,
-      pdurs: [],
+      serviceMonths: s.serviceMonths,
+      pickServiceDuration: (months) => this.pickServiceDuration(months),
       rel: rel,
       cta: cta,
       apNum: "03",
@@ -4747,6 +4769,7 @@ export default class Services extends ReferencePage {
                         </div>
                         <AddToCartButton
                           item={v.sum.cartItem}
+                          removable
                           disabled={v.sum.empty}
                           className="commerce-action--light"
                         />
@@ -5873,92 +5896,10 @@ export default class Services extends ReferencePage {
                       </>
                     )}
                     {v.ps.duration && (
-                      <>
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            marginTop: "14px",
-                            display: "flex",
-                            flexWrap: "wrap",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: "16px 40px",
-                            padding: "14px 14px 14px 24px",
-                            borderRadius: "22px",
-                            background: "#FFFFFF99",
-                            border: "1px solid #190B251a",
-                          }}
-                        >
-                          <div>
-                            <div
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "600",
-                                letterSpacing: ".14em",
-                                textTransform: "uppercase",
-                                color: "#6E6178",
-                              }}
-                            >
-                              {"Subscription duration"}
-                            </div>
-                            <div
-                              style={{
-                                marginTop: "4px",
-                                fontSize: "16px",
-                                fontWeight: "500",
-                              }}
-                            >
-                              {"Choose your billing commitment"}
-                            </div>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              gap: "6px",
-                            }}
-                          >
-                            {(v.pdurs || []).map((d, dIndex) => (
-                              <React.Fragment key={dIndex}>
-                                <button
-                                  onClick={d.pick}
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "flex-start",
-                                    gap: "3px",
-                                    minWidth: "132px",
-                                    padding: "11px 16px",
-                                    borderRadius: "13px",
-                                    background: String(d.bg),
-                                    color: String(d.c),
-                                    textAlign: "left",
-                                    transition: "background .35s, color .35s",
-                                  }}
-                                >
-                                  <span
-                                    style={{
-                                      fontSize: "15px",
-                                      fontWeight: "600",
-                                    }}
-                                  >
-                                    {d.label}
-                                  </span>
-                                  <span
-                                    style={{
-                                      fontSize: "12px",
-                                      fontWeight: "500",
-                                      color: String(d.sub),
-                                    }}
-                                  >
-                                    {d.note}
-                                  </span>
-                                </button>
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
-                      </>
+                      <ServiceDuration
+                        months={v.serviceMonths}
+                        onChange={v.pickServiceDuration}
+                      />
                     )}
                     {v.ps.chips && (
                       <>
@@ -6060,6 +6001,7 @@ export default class Services extends ReferencePage {
                           {(v.ps.cards || []).map((k, kIndex) => (
                             <React.Fragment key={kIndex}>
                               <article
+                                aria-labelledby={`service-plan-title-${kIndex}`}
                                 style={{
                                   position: "relative",
                                   display: "flex",
@@ -6073,24 +6015,19 @@ export default class Services extends ReferencePage {
                                   boxShadow: String(k.shadow),
                                   transition:
                                     "transform .6s cubic-bezier(.22,1,.36,1)",
+                                  "--service-plan-muted": k.sub,
+                                  "--service-plan-accent": k.acc,
+                                  "--service-plan-line": k.line,
                                 }}
-                                className={"reference-state-96"}
+                                className="reference-state-96 service-plan"
                               >
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <span
-                                    style={{
-                                      fontSize: "13px",
-                                      fontWeight: "600",
-                                      color: String(k.sub),
-                                    }}
-                                  >
-                                    {k.num}
+                                <div className="service-plan__header">
+                                  <span className="service-plan__duration">
+                                    <i
+                                      className="ph ph-calendar-blank"
+                                      aria-hidden="true"
+                                    />
+                                    {k.period}
                                   </span>
                                   {k.featured && (
                                     <>
@@ -6122,6 +6059,7 @@ export default class Services extends ReferencePage {
                                     {k.eyebrow}
                                   </div>
                                   <h3
+                                    id={`service-plan-title-${kIndex}`}
                                     data-hw={""}
                                     style={{
                                       marginTop: "10px",
@@ -6204,65 +6142,19 @@ export default class Services extends ReferencePage {
                                     </React.Fragment>
                                   ))}
                                 </ul>
-                                <div
-                                  style={{
-                                    marginTop: "auto",
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    gap: "16px",
-                                    paddingTop: "18px",
-                                    borderTop: "1px solid " + k.line,
-                                  }}
-                                >
-                                  <span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        fontSize: "12px",
-                                        fontWeight: "600",
-                                        color: String(k.sub),
-                                      }}
-                                    >
-                                      {k.priceLabel}
-                                    </span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        marginTop: "4px",
-                                        fontSize: "27px",
-                                        fontWeight: "500",
-                                        letterSpacing: "-.04em",
-                                      }}
-                                    >
-                                      {k.price}
-                                    </span>
-                                  </span>
-                                  <span style={{ textAlign: "right" }}>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        fontSize: "12px",
-                                        fontWeight: "600",
-                                        color: String(k.sub),
-                                      }}
-                                    >
-                                      {k.periodLabel}
-                                    </span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        marginTop: "6px",
-                                        fontSize: "16px",
-                                        fontWeight: "600",
-                                      }}
-                                    >
-                                      {k.period}
-                                    </span>
-                                  </span>
-                                </div>
+                                <ServicePlanPrice
+                                  item={k.cartItem}
+                                  id={`service-plan-price-${kIndex}`}
+                                />
                                 <AddToCartButton
                                   item={k.cartItem}
-                                  style={{ background: k.btnBg, color: k.btnC }}
+                                  removable
+                                  describedBy={`service-plan-price-${kIndex}`}
+                                  style={{
+                                    background: k.btnBg,
+                                    color: k.btnC,
+                                    "--commerce-action-focus": k.acc,
+                                  }}
                                   className="reference-state-97"
                                 />
                                 {k.hosting && (

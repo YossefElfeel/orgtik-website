@@ -137,3 +137,13 @@ The top navigation includes an English/Arabic/German language selector as UI onl
 ## Department case studies — 2026-09-30
 
 Project detail pages are full case studies built by `src/reference/CaseStudy.jsx` from `src/reference/case-studies.js`. Every project shares one brief (challenge, goal, our role, facts, headline result), followed by (02) how we got there, (03) what we delivered, and (04) the results, then the existing gallery (05) and more work (06). Each department keeps its own presentation style: Design uses an editorial design journal on paper with a system board; Development uses a blueprint sprint build log, an architecture diagram, and audit gauges; Marketing uses a performance report with a campaign timeline, weekly rhythm, KPI tiles, monthly chart, funnel, and channel mix; IT support uses a service-desk ticket log, a priority matrix, and before/after bars; Hosting uses a migration runbook, a status view, and a load-time chart. Keep figures in the data file and keep the visible sample-figure labels until approved project results are supplied.
+
+## Reversible service selections — 2026-10-01
+
+On Services, adding a plan or bundle changes that same action to “Remove from cart.” Removing stays on the current page, returns the action to “Add to cart,” and offers Undo. The add notification also offers removal so mobile visitors can correct an accidental selection immediately. Preserve Save changes while editing an existing cart item and the software pages' View in cart behavior. Use the existing plum/lilac pill-button design, specific accessible labels and visible keyboard focus.
+
+## Service-plan duration — 2026-10-01
+
+Place a native radio duration selector above the service and service-family plan cards, with 1 month, 3 months, 6 months and 12 months. Show the chosen term on every plan and carry it into the cart, checkout and configuration link. Reopening Edit selection and refreshing the service page restore the saved term. Keep existing project estimates and monthly rates, label their billing clearly, and preserve add/remove/undo and Save changes. Use a compact pill row on desktop and a two-by-two layout on narrow mobile, with visible keyboard focus and 44px touch targets.
+
+Service plan cards make the selected period prominent with a calendar tag, explicit per-month or per-project pricing, and a full-period estimate for monthly plans. Cart service rows show the saved period separately from the plan and display multi-month estimates without opening features. Calculate full-period estimates from the existing monthly rate only; never multiply project prices or invent duration discounts.

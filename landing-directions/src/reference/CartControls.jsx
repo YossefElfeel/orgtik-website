@@ -6,6 +6,7 @@ import {
   dismissCartNotice,
   formatCHF,
   formatItemEstimate,
+  removeCartItem,
   undoCartRemoval,
   useCart,
 } from "./cart-store";
@@ -33,6 +34,8 @@ export function AddToCartButton({
   style,
   className = "",
   disabled = false,
+  removable = false,
+  describedBy,
 }) {
   const { items, editingId } = useCart();
   const editing = items.find(
@@ -43,12 +46,12 @@ export function AddToCartButton({
   const actionRef = useRef(null);
   const preserveFocus = useRef(false);
   useEffect(() => {
-    if (inCart && preserveFocus.current) {
+    if (preserveFocus.current) {
       actionRef.current?.focus();
       preserveFocus.current = false;
     }
   }, [inCart]);
-  if (inCart && !disabled)
+  if (inCart && !disabled && !removable)
     return (
       <a
         ref={actionRef}
@@ -56,6 +59,8 @@ export function AddToCartButton({
         style={style}
         className={`commerce-action commerce-action--in-cart ${className}`}
         aria-label={`View ${item.name} in cart`}
+        aria-describedby={describedBy}
+        data-cart-item-id={item.id}
       >
         <span>View in cart</span>
         <span className="commerce-action__arrow">
@@ -68,26 +73,48 @@ export function AddToCartButton({
       ref={actionRef}
       type="button"
       disabled={disabled || !item}
+      data-cart-item-id={item?.id}
       onClick={() => {
         preserveFocus.current = document.activeElement === actionRef.current;
-        addCartItem(item);
+        if (inCart && removable) removeCartItem(item.id);
+        else addCartItem(item);
       }}
       style={style}
-      className={`commerce-action ${className}`}
+      className={`commerce-action${inCart && removable ? " commerce-action--remove" : ""} ${className}`}
       aria-label={
         item
-          ? `${editing ? "Save" : "Add"} ${item.name} to cart`
+          ? inCart && removable
+            ? `Remove ${item.name} from cart`
+            : `${editing ? "Save" : "Add"} ${item.name} to cart`
           : "Add to cart"
       }
+      aria-describedby={describedBy}
     >
-      <span>{editing ? "Save changes" : "Add to cart"}</span>
+      <span>
+        {editing
+          ? "Save changes"
+          : inCart && removable
+            ? "Remove from cart"
+            : "Add to cart"}
+      </span>
       <span className="commerce-action__arrow">
         <i
-          className={`ph ${editing ? "ph-check" : "ph-plus"}`}
+          className={`ph ${editing ? "ph-check" : inCart && removable ? "ph-minus" : "ph-plus"}`}
           aria-hidden="true"
         />
       </span>
     </button>
+  );
+}
+
+function findCartItemAction(id) {
+  return (
+    document
+      .getElementById(`cart-item-${encodeURIComponent(id)}`)
+      ?.querySelector("button") ||
+    [...document.querySelectorAll("[data-cart-item-id]")].find(
+      (element) => element.dataset.cartItemId === id,
+    )
   );
 }
 
@@ -141,7 +168,11 @@ export function CartNotice({ path }) {
     }
   };
   useEffect(() => {
-    if (notice && !panelRef.current?.contains(document.activeElement))
+    if (
+      notice &&
+      document.activeElement !== document.body &&
+      !panelRef.current?.contains(document.activeElement)
+    )
       returnFocusRef.current = document.activeElement;
   }, [notice]);
   useEffect(() => {
@@ -220,14 +251,13 @@ export function CartNotice({ path }) {
               className="commerce-action"
               onClick={() => {
                 undoCartRemoval();
-                requestAnimationFrame(() =>
-                  document
-                    .getElementById(
-                      `cart-item-${encodeURIComponent(notice.item.id)}`,
-                    )
-                    ?.querySelector("button")
-                    ?.focus(),
-                );
+                requestAnimationFrame(() => {
+                  const target = findCartItemAction(notice.item.id);
+                  if (target) {
+                    target.focus({ preventScroll: true });
+                    returnFocusRef.current = target;
+                  }
+                });
               }}
             >
               Undo removal{" "}
@@ -271,13 +301,34 @@ export function CartNotice({ path }) {
                   </span>
                 </a>
               </div>
-              <button
-                type="button"
-                className="cart-notice__continue"
-                onClick={closeNotice}
-              >
-                Continue browsing
-              </button>
+              <div className="cart-notice__footer">
+                <button
+                  type="button"
+                  className="cart-notice__continue"
+                  onClick={closeNotice}
+                >
+                  Continue browsing
+                </button>
+                {notice.item.kind === "service" && (
+                  <button
+                    type="button"
+                    className="cart-notice__remove"
+                    aria-label={`Remove ${notice.item.name} from cart`}
+                    onClick={() => {
+                      removeCartItem(notice.item.id);
+                      requestAnimationFrame(() => {
+                        const target = findCartItemAction(notice.item.id);
+                        if (target) {
+                          target.focus({ preventScroll: true });
+                          returnFocusRef.current = target;
+                        }
+                      });
+                    }}
+                  >
+                    Remove item
+                  </button>
+                )}
+              </div>
             </>
           )}
         </>

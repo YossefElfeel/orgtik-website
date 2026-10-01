@@ -1,0 +1,101 @@
+.service-duration {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 24px;
+  padding-block: 20px;
+  border-block: 1px solid #190b251a;
+  color: #190b25;
+}
+.service-duration h3 {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.service-duration p {
+  margin-top: 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4a3a57;
+}
+.service-duration fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid #190b2524;
+  border-radius: 999px;
+  background: #ffffff80;
+}
+.service-duration__legend,
+.service-duration__option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.service-duration__options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+.service-duration__option {
+  position: relative;
+  cursor: pointer;
+}
+.service-duration__option span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  color: #3b1e59;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+.service-duration__option:hover span {
+  background: #eee3f7;
+}
+.service-duration__option input:checked + span {
+  background: #190b25;
+  color: #f6f1fa;
+}
+.service-duration__option input:focus-visible + span {
+  outline: 2px solid #6c3caa;
+  outline-offset: 2px;
+}
+@media (max-width: 700px) {
+  .service-duration {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .service-duration fieldset {
+    width: 100%;
+  }
+  .service-duration__option span {
+    padding-inline: 12px;
+  }
+}
+@media (max-width: 420px) {
+  .service-duration fieldset {
+    border-radius: 18px;
+  }
+  .service-duration__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .service-duration__option span {
+    transition: none;
+  }
+}

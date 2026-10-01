@@ -27,19 +27,17 @@ export default function PurchasePlans() {
   );
   return (
     <CommerceLayout steps={false}>
-      <div className="purchase-surface">
-        <div className="commerce-intro">
-          <span className="purchase-eyebrow">One package. Your duration.</span>
-          <h1>
-            Bundles & pricing.<span>Choose your starting point.</span>
-          </h1>
-          <p>
-            Start with a collection or choose individual packages. Customize
-            every detail before paying.
-          </p>
-        </div>
-        <div className="purchase-entry-links">
-          <span>Start with a bundle below, or choose each item yourself.</span>
+      <div className="purchase-surface purchase-plans">
+        <div className="purchase-directory-intro">
+          <div>
+            <span className="purchase-eyebrow">
+              Flexible plans for your business
+            </span>
+            <h1>Bundles & pricing.</h1>
+            <p>
+              Start with a ready-made bundle, or choose exactly what you need.
+            </p>
+          </div>
           <PurchaseAction
             secondary
             href={
@@ -51,54 +49,63 @@ export default function PurchasePlans() {
             Build your own plan
           </PurchaseAction>
         </div>
-        <div
-          className="purchase-filters"
-          role="group"
-          aria-label="Package type"
-        >
-          <button
-            type="button"
-            aria-pressed={kind === "service"}
-            onClick={() => {
-              setKind("service");
-              setDepartment("all");
-            }}
+        <div className="purchase-browse-toolbar">
+          <div
+            className="purchase-type-switch"
+            role="group"
+            aria-label="Package type"
           >
-            Services
-          </button>
-          <button
-            type="button"
-            aria-pressed={kind === "software"}
-            onClick={() => {
-              setKind("software");
-              setDepartment("all");
-            }}
-          >
-            Software
-          </button>
-        </div>
-        <div className="purchase-filters" role="group" aria-label="Department">
-          <button
-            type="button"
-            aria-pressed={department === "all"}
-            onClick={() => setDepartment("all")}
-          >
-            All departments
-          </button>
-          {departments.map(([id, name]) => (
             <button
-              key={id}
               type="button"
-              aria-pressed={department === id}
-              onClick={() => setDepartment(id)}
+              aria-pressed={kind === "service"}
+              onClick={() => {
+                setKind("service");
+                setDepartment("all");
+              }}
             >
-              {name}
+              Services
             </button>
-          ))}
+            <button
+              type="button"
+              aria-pressed={kind === "software"}
+              onClick={() => {
+                setKind("software");
+                setDepartment("all");
+              }}
+            >
+              Software
+            </button>
+          </div>
+          <div
+            className="purchase-filters"
+            role="group"
+            aria-label="Department"
+          >
+            <button
+              type="button"
+              aria-pressed={department === "all"}
+              onClick={() => setDepartment("all")}
+            >
+              All departments
+            </button>
+            {departments.map(([id, name]) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={department === id}
+                onClick={() => setDepartment(id)}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
         </div>
-        <h2 className="purchase-directory-heading">Ready-made bundles</h2>
+        <div className="purchase-collection-heading">
+          <h2>Ready-made bundles</h2>
+          <p>A starting point you can make your own.</p>
+        </div>
         <BundleCollection kind={kind} department={department} />
-        <div className="purchase-heading">
+        <div className="purchase-heading purchase-individual-heading">
           <div>
             <span className="purchase-eyebrow">
               Pick one. Or bring them together.
@@ -136,8 +143,13 @@ export default function PurchasePlans() {
                   </small>
                 </div>
                 <div>
-                  <AddPackageButton item={group} />
-                  <a href={configurationHref(group)}>Customize selection</a>
+                  <AddPackageButton item={group} removable={false} />
+                  <a
+                    href={configurationHref(group)}
+                    aria-label={`Customize ${item.name}`}
+                  >
+                    Customize selection
+                  </a>
                 </div>
               </article>
             );

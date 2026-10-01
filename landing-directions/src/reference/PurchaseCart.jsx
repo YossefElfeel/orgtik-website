@@ -83,7 +83,8 @@ function CartGroup({ group, onEditState }) {
             recoverRemovalFocus();
           }}
         >
-          Remove plan <i className="ph ph-trash" aria-hidden="true" />
+          <span className="purchase-remove-label">Remove plan</span>{" "}
+          <i className="ph ph-trash" aria-hidden="true" />
         </button>
       </header>
       {draft ? (
@@ -199,12 +200,18 @@ export default function PurchaseCart() {
   );
   const editing = editingIds.some((id) => items.some((g) => g.id === id));
   const quote = quoteCart(items);
-  const checkoutAction =
+  const checkoutAction = (compact = false) =>
     quote.valid && !editing ? (
-      <PurchaseAction href="/checkout">Continue to checkout</PurchaseAction>
+      <PurchaseAction href="/checkout" aria-label="Continue to checkout">
+        {compact ? "Checkout" : "Continue to checkout"}
+      </PurchaseAction>
     ) : (
       <PurchaseAction disabled>
-        {editing ? "Finish editing first" : "Review selections"}
+        {editing
+          ? compact
+            ? "Save edits first"
+            : "Finish editing first"
+          : "Review selections"}
       </PurchaseAction>
     );
   return (
@@ -245,12 +252,12 @@ export default function PurchaseCart() {
         ) : (
           <div className="purchase-layout">
             <div>
-              <div className="purchase-toolbar">
+              <div className="purchase-toolbar purchase-cart-toolbar">
                 <span>
                   {items.length} configured{" "}
                   {items.length === 1 ? "plan" : "plans"}
                   <small className="purchase-autosave">
-                    Duration and renewal changes save automatically.
+                    Duration and renewal save automatically.
                   </small>
                 </span>
                 <button type="button" onClick={() => setClear(true)}>
@@ -270,7 +277,7 @@ export default function PurchaseCart() {
               </div>
             </div>
             <QuoteSummary groups={items} title="Order summary">
-              {checkoutAction}
+              {checkoutAction()}
               {editing ? (
                 <p role="status">
                   Save or cancel your content edits before continuing. This
@@ -295,7 +302,7 @@ export default function PurchaseCart() {
               editing ? "Saved cart · edits pending" : "Due today · upfront"
             }
           >
-            {checkoutAction}
+            {checkoutAction(true)}
           </MobilePurchaseBar>
         )}
         <PurchaseDialog

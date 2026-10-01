@@ -126,13 +126,13 @@ export function QuoteSummary({
         </div>
       </dl>
       <p className="purchase-summary__equivalent">
-        {money(Math.round(quote.monthlyEquivalent))} monthly equivalent across
-        selected items. Individual periods may differ.
+        {money(Math.round(quote.monthlyEquivalent))}/month equivalent.
+        {groups.some((g) => groupTerm(g) === "Mixed durations") &&
+          " Items have different periods."}
       </p>
       {children}
       <p className="purchase-summary__foot">
-        Your purchase includes an OrgTik account for payments, invoices, and
-        purchased services.
+        Includes your OrgTik account for purchases, payments, and invoices.
       </p>
       <a href="/plans">
         Explore all bundles & pricing{" "}
@@ -198,6 +198,7 @@ export function PackageLines({
             {onChange ? (
               <DurationPicker
                 label={`Duration for ${item.name}`}
+                displayLabel="Duration"
                 months={line.months}
                 onChange={(months) => onChange(line.catalogId, { months })}
               />
@@ -234,16 +235,21 @@ export function PackageLines({
               <label className="purchase-check">
                 <input
                   type="checkbox"
+                  aria-label={`Automatically renew ${item.name}`}
                   checked={line.autoRenew}
                   onChange={(e) =>
                     onChange(line.catalogId, { autoRenew: e.target.checked })
                   }
                 />
                 <span>
-                  Automatically renew {item.name}
-                  {line.months
-                    ? ` every ${termLabel(line.months)} at ${money(line.total)}`
-                    : ""}
+                  Automatic renewal
+                  {line.months ? (
+                    <small>
+                      Every {termLabel(line.months)} at {money(line.total)}
+                    </small>
+                  ) : (
+                    ""
+                  )}
                 </span>
               </label>
             )}
@@ -443,34 +449,37 @@ export function BundleCard({ bundle, onCustomize }) {
         ))}
       </ul>
       <div className="purchase-bundle__pricing">
-        <strong>
-          {money(Math.round(quote.monthlyEquivalent))}
-          <small> / month equivalent</small>
-        </strong>
+        <small>{termLabel(months)} · paid upfront</small>
+        <strong>{money(quote.total)}</strong>
         <span>
-          {money(quote.total)} upfront · Save {money(quote.saving)}
+          {money(Math.round(quote.monthlyEquivalent))}/month equivalent
         </span>
+        <span className="purchase-saving">Save {money(quote.saving)}</span>
       </div>
       <DurationPicker
         label={`Duration for ${bundle.name}`}
+        displayLabel="Choose your duration"
         months={months}
         onChange={setMonths}
       />
       <div className="purchase-bundle__actions">
-        <AddPackageButton item={group} />
+        <AddPackageButton item={group} removable={false} />
         {onCustomize ? (
           <button
             type="button"
             onClick={() => onCustomize(group)}
             className="purchase-text-button"
+            aria-label={`Customize ${bundle.name}`}
           >
-            Customize bundle{" "}
-            <i className="ph ph-arrow-right" aria-hidden="true" />
+            Customize <i className="ph ph-arrow-right" aria-hidden="true" />
           </button>
         ) : (
-          <a href={configurationHref(group)} className="purchase-text-button">
-            Customize bundle{" "}
-            <i className="ph ph-arrow-right" aria-hidden="true" />
+          <a
+            href={configurationHref(group)}
+            className="purchase-text-button"
+            aria-label={`Customize ${bundle.name}`}
+          >
+            Customize <i className="ph ph-arrow-right" aria-hidden="true" />
           </a>
         )}
       </div>
@@ -555,12 +564,11 @@ export function PurchasingOverview({ kind, initialIds, initialDuration }) {
       <section className="purchase-section" id={`${kind}-bundles`}>
         <div className="purchase-container">
           <PurchaseHeading
-            eyebrow="A considered starting point"
+            eyebrow="Start with a bundle"
             title="Ready-made bundles."
-            accent="Built to work together."
           >
-            Choose a curated collection, or shape your own. Every package keeps
-            the same features at every duration.
+            A curated collection you can make your own. Every package keeps the
+            same features at every duration.
           </PurchaseHeading>
           <div className="purchase-entry-links">
             <span>Prefer to choose each item?</span>
@@ -601,7 +609,7 @@ export function PurchasingOverview({ kind, initialIds, initialDuration }) {
       </section>
       <section
         ref={builder}
-        className="purchase-section purchase-section--tint purchase-with-mobile-bar"
+        className="purchase-section purchase-section--tint purchase-with-mobile-bar purchase-builder"
         id={kind === "software" ? "plan-builder" : "svc-builder"}
       >
         <div className="purchase-container">
@@ -613,8 +621,7 @@ export function PurchasingOverview({ kind, initialIds, initialDuration }) {
                 : "Build your service plan."
             }
           >
-            Choose exactly what you need, for as long as you need it. Pay for
-            the full selected periods upfront.
+            Choose your items, set their durations, and review your plan.
           </PurchaseHeading>
           <div className="purchase-toolbar">
             <button
@@ -648,7 +655,6 @@ export function PurchasingOverview({ kind, initialIds, initialDuration }) {
                   <p>Choose an item to see your plan here.</p>
                 )}
               </details>
-              <p>You can edit everything in your cart before paying.</p>
             </QuoteSummary>
           </div>
           <PreviewNote />

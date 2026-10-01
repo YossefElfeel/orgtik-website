@@ -198,3 +198,11 @@ This supersedes the earlier tier ladder, project estimates, enquiry checkout, Ho
 - Cart capabilities use native disclosures to keep names, terms, renewal, and prices easy to scan. Duration/renewal edits save immediately with Undo. Content edits display their draft amount; checkout stays disabled until every draft is saved or cancelled. Clear old notifications when entering content editing so they cannot cover Save.
 - On mobile/tablet, put a keyboard-accessible order disclosure with the upfront total before checkout choices and billing. Optional company details stay collapsed initially. Keep guest verification and CRM setup separate from successful payment.
 - Current browser review and screenshots: `qa/journey-review/README.md`. This evidence supplements the broader `qa/purchasing/README.md` acceptance pass.
+
+### Purchasing visual corrections — 2026-10-01
+
+- Commerce pages use one warm paper background; do not reintroduce a contrasting unpadded rectangle behind the main content. Keep the directory introduction compact, with one H1 and its builder action.
+- Services/Software is a distinct segmented switch; department filters remain separate. Mobile filters scroll horizontally without a decorative scrollbar. Bundle titles, prices, durations, and actions align within each row.
+- Bundle cards emphasize the full selected-period upfront amount, with monthly equivalents and savings subordinate. Use the concise approved package names in purchasing UI while retaining published capabilities and stable IDs.
+- Duration controls display compact month abbreviations and expose full month/discount labels to assistive technology. Mobile Checkout is a short visible label with the full accessible action name. Keep cart and billing toolbars on one row where practical.
+- Follow-up visual verification and current screenshots: `qa/design-fixes/README.md`.

@@ -40,6 +40,7 @@ Checkout offers guest or demo sign-in, minimal billing details, and a simulated 
 See [PURCHASING.md](PURCHASING.md) for the contract, storage, legacy-link behavior, integration configuration, and QA scenarios. Older tier and enquiry documents describe previous iterations.
 
 The [purchasing journey review](qa/journey-review/README.md) records the latest UX changes, before/after screenshots, and browser checks.
+The follow-up [design corrections](qa/design-fixes/README.md) address pricing hierarchy, spacing, card alignment, and mobile controls.
 
 ## Browser verification
 

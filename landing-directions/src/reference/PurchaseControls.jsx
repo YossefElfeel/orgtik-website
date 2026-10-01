@@ -101,12 +101,13 @@ export function DurationPicker({
   months,
   onChange,
   label = "Duration",
+  displayLabel,
   showSavings = false,
 }) {
   const id = useId();
   return (
-    <fieldset className="purchase-duration">
-      <legend>{label}</legend>
+    <fieldset className="purchase-duration" aria-label={label}>
+      <legend>{displayLabel || label}</legend>
       <div>
         {MONTHS.map((m) => (
           <label key={m}>
@@ -114,11 +115,12 @@ export function DurationPicker({
               type="radio"
               name={id}
               value={m}
+              aria-label={`${termLabel(m)}${showSavings && m > 1 ? ` Save ${TERM_SAVINGS[m]}%` : ""}`}
               checked={months === m}
               onChange={() => onChange(m)}
             />
             <span>
-              {termLabel(m)}
+              {m} mo
               {showSavings && m > 1 && <small>Save {TERM_SAVINGS[m]}%</small>}
             </span>
           </label>

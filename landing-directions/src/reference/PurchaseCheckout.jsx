@@ -309,14 +309,11 @@ export default function PurchaseCheckout() {
           <span className="purchase-eyebrow">
             {order ? "Your purchase" : "The next step"}
           </span>
-          <h1>
-            {order ? "Purchase confirmed." : "Checkout."}
-            {!order && <span>One last step.</span>}
-          </h1>
+          <h1>{order ? "Purchase confirmed." : "Checkout."}</h1>
           <p>
             {order
               ? "Your payment is complete. Continue to your account for purchases, payments, and invoices."
-              : "Pay for your selected periods upfront. Manage purchases, payments, and invoices in your OrgTik account."}
+              : "Review your order and complete your demo payment."}
           </p>
         </div>
         {!sessionSaved && (
@@ -360,7 +357,7 @@ export default function PurchaseCheckout() {
             <section ref={panel} className="purchase-checkout-panel">
               {!channel ? (
                 <>
-                  <h2>How would you like to continue?</h2>
+                  <h2>Continue to payment</h2>
                   <p>
                     Your purchase includes an OrgTik customer account where you
                     can view purchases, payments, and invoices.

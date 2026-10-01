@@ -25,6 +25,18 @@ const softwarePrices = {
   marketing: 39,
   website: 29,
 };
+const serviceNames = {
+  "design/graphic-design": "Graphic design",
+  "design/brand-development": "Branding",
+  "design/web-and-app-design": "Web & app design",
+  "development/web-development": "Web development",
+  "development/custom-app-development": "Custom app development",
+  "marketing/social-media-marketing": "Social media",
+  "marketing/digital-advertising-switzerland": "Advertising management",
+  "marketing/seo-services": "SEO",
+  "it-support/website-management": "Website management",
+  "it-support/software-support": "Software support",
+};
 export const CATALOG = [
   ...SERVICE_FAMILIES.filter((f) => f.slug !== "hosting")
     .flatMap((f) =>
@@ -33,7 +45,7 @@ export const CATALOG = [
         kind: "service",
         department: f.slug,
         departmentName: f.short,
-        name: c.name,
+        name: serviceNames[`${f.slug}/${c.slug}`] || c.name,
         description: c.summary,
         capabilities: c.capabilities,
         icon: f.icon,

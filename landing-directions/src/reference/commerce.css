@@ -292,7 +292,7 @@
   background: #eee3f7;
 }
 .commerce-page {
-  --commerce-paper: #f4eff8;
+  --commerce-paper: #fbf8fc;
   --commerce-ink: #190b25;
   --commerce-muted: #4a3a57;
   --commerce-accent: #6c3caa;
@@ -316,7 +316,7 @@
   border: 1px solid #ffffff1f;
   background: #120a1b;
   color: #f6f1fa;
-  box-shadow: 0 20px 50px #09041126;
+  box-shadow: 0 8px 24px #09041114;
 }
 .commerce-logo {
   flex-shrink: 0;
@@ -376,7 +376,7 @@
   font-size: 22px;
 }
 .commerce-main {
-  max-width: 1312px;
+  max-width: 1440px;
   margin: auto;
   min-height: calc(100svh - 144px);
   padding: 130px clamp(20px, 4.4vw, 64px) 80px;

@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { CartLink } from "./CartControls";
 import { LanguageMenu } from "./LanguageMenu";
 
-export function CommerceLayout({ checkout = false, className = "", children }) {
+export function CommerceLayout({
+  checkout = false,
+  steps = true,
+  className = "",
+  children,
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     const keydown = (event) => {
@@ -66,15 +71,17 @@ export function CommerceLayout({ checkout = false, className = "", children }) {
         </div>
       </header>
       <main id="top" className="commerce-main">
-        <nav aria-label="Checkout steps" className="commerce-steps">
-          <a href="/cart" aria-current={!checkout ? "step" : undefined}>
-            <span>1</span> Your cart
-          </a>
-          <i className="ph ph-arrow-right" aria-hidden="true" />
-          <span aria-current={checkout ? "step" : undefined}>
-            <span>2</span> Contact details
-          </span>
-        </nav>
+        {steps && (
+          <nav aria-label="Checkout steps" className="commerce-steps">
+            <a href="/cart" aria-current={!checkout ? "step" : undefined}>
+              <span>1</span> Your cart
+            </a>
+            <i className="ph ph-arrow-right" aria-hidden="true" />
+            <span aria-current={checkout ? "step" : undefined}>
+              <span>2</span> Contact details
+            </span>
+          </nav>
+        )}
         {children}
       </main>
       <footer className="commerce-footer">
@@ -92,6 +99,7 @@ export function CommerceLayout({ checkout = false, className = "", children }) {
         </a>
         <p>Strategy. Design. Technology.</p>
         <div>
+          <a href="/plans">Plans &amp; pricing</a>
           <a href="/contact">Talk to us</a>
           <a href="/legal#/privacy">Privacy policy</a>
         </div>

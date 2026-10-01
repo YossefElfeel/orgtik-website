@@ -62,9 +62,11 @@ export function normalizeLocation() {
 export function readWorkspaceQuery(search = window.location.search) {
   const query = new URLSearchParams(search);
   const ids = ["hr", "crm", "files", "tasks", "marketing", "website"];
+  // "complete" is the older name for the all-in-one suite.
   const presets = {
     operations: ["hr", "tasks", "files"],
     growth: ["crm", "marketing", "website"],
+    suite: ids,
     complete: ids,
   };
   const raw = query.get("modules") || query.get("module");
@@ -72,10 +74,12 @@ export function readWorkspaceQuery(search = window.location.search) {
     ? [...new Set(raw.split(",").filter((id) => ids.includes(id)))]
     : presets[query.get("mode")];
   const duration = query.get("duration");
+  const plan = query.get("plan");
   return {
     ...(selected?.length ? { selected } : {}),
     ...(["monthly", "annual", "biennial"].includes(duration)
       ? { duration, prodDur: duration }
       : {}),
+    ...(["starter", "complete", "ongoing"].includes(plan) ? { plan } : {}),
   };
 }

@@ -6,16 +6,26 @@ export function ServiceDuration({
   months,
   onChange,
   groupLabel,
-  hint = "Included with your selected plan.",
+  label = "Monthly commitment",
+  hint = "Applies to the Ongoing plan. Projects follow the timeline agreed in your brief.",
   headingLevel = 3,
+  variant = "",
+  // Software billing terms reuse the same radios with their own values.
+  options = SERVICE_DURATIONS.map((value) => ({
+    value,
+    label: getServiceDuration(value).label,
+  })),
 }) {
   const id = useId();
   const Heading = `h${headingLevel}`;
   return (
-    <div className="service-duration" data-reveal="up">
+    <div
+      className={`service-duration${variant ? ` service-duration--${variant}` : ""}`}
+      data-reveal={variant ? undefined : "up"}
+    >
       <div>
         <Heading className="service-duration__heading" id={`${id}-label`}>
-          Service duration
+          {label}
         </Heading>
         <p id={`${id}-hint`}>{hint}</p>
       </div>
@@ -24,18 +34,22 @@ export function ServiceDuration({
         aria-labelledby={groupLabel ? undefined : `${id}-label`}
         aria-describedby={`${id}-hint`}
       >
-        <legend className="service-duration__legend">Service duration</legend>
-        <div className="service-duration__options">
-          {SERVICE_DURATIONS.map((value) => (
-            <label key={value} className="service-duration__option">
+        <legend className="service-duration__legend">{label}</legend>
+        <div
+          className="service-duration__options"
+          data-count={options.length}
+          style={{ "--duration-count": options.length }}
+        >
+          {options.map((option) => (
+            <label key={option.value} className="service-duration__option">
               <input
                 type="radio"
                 name={`${id}-duration`}
-                value={value}
-                checked={months === value}
-                onChange={() => onChange(value)}
+                value={option.value}
+                checked={months === option.value}
+                onChange={() => onChange(option.value)}
               />
-              <span>{getServiceDuration(value).label}</span>
+              <span>{option.label}</span>
             </label>
           ))}
         </div>

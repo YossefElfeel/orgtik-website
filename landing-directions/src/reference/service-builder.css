@@ -93,6 +93,18 @@
     flex-shrink: 0;
   }
 }
+.service-builder-plan__badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #6c3caa1f;
+  color: #5a2f92;
+  font-size: 11px;
+  font-weight: 600;
+}
+[aria-pressed="true"] .service-builder-plan__badge {
+  background: #eee3f7;
+  color: #28123b;
+}
 @media (prefers-reduced-motion: reduce) {
   .service-builder-filter__options button {
     transition: none;

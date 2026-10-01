@@ -1,8 +1,45 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CommerceLayout } from "./CommerceLayout";
 import { CartSummary, EmptyCart } from "./CartSummary";
-import { formatItemEstimate, useCart } from "./cart-store";
-import { createCheckoutEnquiry, validateCheckout } from "./checkout-enquiry";
+import { formatCHF, formatItemEstimate, useCart } from "./cart-store";
+import {
+  CONTACT_OPTIONS,
+  START_OPTIONS,
+  createCheckoutEnquiry,
+  validateCheckout,
+} from "./checkout-enquiry";
+
+const NEXT_STEPS = [
+  ["ph-chat-circle-text", "We reply within 1 business day."],
+  ["ph-phone-call", "A free scoping call confirms the scope and price."],
+  ["ph-arrows-clockwise", "You can change anything before you sign."],
+];
+
+// Optional one-tap answers; a second tap on the chosen pill clears it.
+function ChoiceGroup({ name, legend, options, value, onChange }) {
+  return (
+    <fieldset className="commerce-choice">
+      <legend>
+        {legend} <small>(optional)</small>
+      </legend>
+      <div>
+        {options.map((option) => (
+          <label key={option.id}>
+            <input
+              type="radio"
+              name={name}
+              value={option.id}
+              checked={value === option.id}
+              onChange={() => onChange(option.id)}
+              onClick={() => value === option.id && onChange("")}
+            />
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
 
 export default function Checkout() {
   const { items } = useCart();
@@ -12,6 +49,8 @@ export default function Checkout() {
     company: "",
     phone: "",
     message: "",
+    start: "",
+    contact: "",
   });
   const [errors, setErrors] = useState({});
   const [enquiry, setEnquiry] = useState(null);
@@ -117,6 +156,35 @@ export default function Checkout() {
                   </div>
                 )}
               </dl>
+              {(enquiry.preferences.start || enquiry.preferences.contact) && (
+                <dl className="commerce-contact-details">
+                  {enquiry.preferences.start && (
+                    <div>
+                      <dt>Ideal start</dt>
+                      <dd>
+                        {
+                          START_OPTIONS.find(
+                            (option) => option.id === enquiry.preferences.start,
+                          ).label
+                        }
+                      </dd>
+                    </div>
+                  )}
+                  {enquiry.preferences.contact && (
+                    <div>
+                      <dt>Best way to reach you</dt>
+                      <dd>
+                        {
+                          CONTACT_OPTIONS.find(
+                            (option) =>
+                              option.id === enquiry.preferences.contact,
+                          ).label
+                        }
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              )}
               {enquiry.message && (
                 <>
                   <h3>About your project</h3>
@@ -130,7 +198,11 @@ export default function Checkout() {
                 {enquiry.items.map((item) => (
                   <li key={item.id}>
                     <strong>{item.name}</strong>
-                    <span>{item.duration}</span>
+                    <span>
+                      {[item.plan && `${item.plan} plan`, item.duration]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </span>
                     <span>
                       {item.selections
                         .map((selection) => selection.name)
@@ -140,6 +212,30 @@ export default function Checkout() {
                   </li>
                 ))}
               </ul>
+              <dl className="commerce-totals commerce-totals--light">
+                {enquiry.estimate.monthly > 0 && (
+                  <div>
+                    <dt>Monthly</dt>
+                    <dd>
+                      {enquiry.items.some(
+                        (item) =>
+                          item.kind === "service" && item.billing === "monthly",
+                      ) && "From "}
+                      {formatCHF(enquiry.estimate.monthly)} / month
+                    </dd>
+                  </div>
+                )}
+                {enquiry.estimate.project > 0 && (
+                  <div>
+                    <dt>One-off projects</dt>
+                    <dd>From {formatCHF(enquiry.estimate.project)}</dd>
+                  </div>
+                )}
+                <div>
+                  <dt>Total for your chosen periods</dt>
+                  <dd>From {formatCHF(enquiry.estimate.periodTotal)}</dd>
+                </div>
+              </dl>
             </div>
           </div>
           <div className="commerce-confirmation__actions">
@@ -192,6 +288,34 @@ export default function Checkout() {
                 }
               />
             </label>
+            <ChoiceGroup
+              name="start"
+              legend="When would you like to start?"
+              options={START_OPTIONS}
+              value={values.start}
+              onChange={(start) => setValues({ ...values, start })}
+            />
+            <ChoiceGroup
+              name="contact"
+              legend="Best way to reach you"
+              options={CONTACT_OPTIONS}
+              value={values.contact}
+              onChange={(contact) => {
+                setValues({ ...values, contact });
+                if (errors.phone) setErrors({ ...errors, phone: "" });
+              }}
+            />
+            <div className="commerce-next-steps">
+              <h3>What happens next</h3>
+              <ol>
+                {NEXT_STEPS.map(([icon, text]) => (
+                  <li key={text}>
+                    <i className={`ph ${icon}`} aria-hidden="true" />
+                    {text}
+                  </li>
+                ))}
+              </ol>
+            </div>
             <div className="commerce-preview-note">
               <i className="ph ph-info" aria-hidden="true" />
               <p>

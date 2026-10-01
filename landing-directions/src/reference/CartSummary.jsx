@@ -1,5 +1,48 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cartTotals, formatCHF, formatItemEstimate } from "./cart-store";
+import { getServicePeriodEstimate } from "./service-duration";
+import "./plan-picker.css";
+
+// Briefly highlight a total when it changes, and say what changed for screen readers.
+function useTotalsFeedback(totals) {
+  const previous = useRef(totals);
+  const [changed, setChanged] = useState([]);
+  const [announcement, setAnnouncement] = useState("");
+  useEffect(() => {
+    const before = previous.current;
+    previous.current = totals;
+    const keys = ["monthly", "project", "periodTotal"].filter(
+      (key) => before[key] !== totals[key],
+    );
+    if (!keys.length) return undefined;
+    setChanged(keys);
+    setAnnouncement(
+      [
+        totals.monthly ? `Monthly from ${formatCHF(totals.monthly)}` : "",
+        totals.project ? `one-off from ${formatCHF(totals.project)}` : "",
+        `total for your chosen periods from ${formatCHF(totals.periodTotal)}`,
+      ]
+        .filter(Boolean)
+        .join(", ") + ".",
+    );
+    const timer = setTimeout(() => setChanged([]), 900);
+    return () => clearTimeout(timer);
+  }, [totals.monthly, totals.project, totals.periodTotal]);
+  return { changed, announcement };
+}
+
+function periodLabel(item) {
+  if (item.billing !== "monthly" || item.estimate === null) return "";
+  const total =
+    item.kind === "service"
+      ? getServicePeriodEstimate(item)
+      : item.commitmentMonths > 1
+        ? item.estimate * item.commitmentMonths
+        : null;
+  return total && item.commitmentMonths > 1
+    ? `${item.duration}: ${item.kind === "service" ? "from " : ""}${formatCHF(total)}`
+    : "";
+}
 
 export function CartSummary({
   items,
@@ -8,6 +51,14 @@ export function CartSummary({
   cart = false,
 }) {
   const totals = cartTotals(items);
+  const { changed, announcement } = useTotalsFeedback(totals);
+  const hasService = (billing) =>
+    items.some(
+      (item) =>
+        item.kind === "service" &&
+        item.billing === billing &&
+        item.estimate !== null,
+    );
   if (cart)
     return (
       <aside
@@ -20,17 +71,22 @@ export function CartSummary({
           All {items.length} {items.length === 1 ? "item is" : "items are"}{" "}
           included
         </p>
+        <p className="plan-sr-only" aria-live="polite">
+          {announcement}
+        </p>
         <div className="cart-estimate__totals">
           {[
             {
               billing: "monthly",
-              label: "Monthly estimate",
+              key: "monthly",
+              label: "Monthly",
               suffix: "/ month",
               total: totals.monthly,
             },
             {
               billing: "project",
-              label: "Project estimate",
+              key: "project",
+              label: "One-off projects",
               suffix: "one-off",
               total: totals.project,
             },
@@ -48,10 +104,10 @@ export function CartSummary({
               >
                 <dl>
                   <dt>{period.label}</dt>
-                  <dd>
-                    {selected.some((item) => item.kind === "service") && (
-                      <small>From</small>
-                    )}
+                  <dd
+                    className={changed.includes(period.key) ? "is-updated" : ""}
+                  >
+                    {hasService(period.billing) && <small>From</small>}
                     {formatCHF(period.total)}
                     <span>{period.suffix}</span>
                   </dd>
@@ -89,6 +145,32 @@ export function CartSummary({
               </section>
             );
           })}
+          <section
+            className="cart-estimate__period cart-estimate__period--total"
+            aria-label="Total for your chosen periods"
+          >
+            <dl>
+              <dt>Total for your chosen periods</dt>
+              <dd
+                className={changed.includes("periodTotal") ? "is-updated" : ""}
+              >
+                {items.some((item) => item.kind === "service") && (
+                  <small>From</small>
+                )}
+                {formatCHF(totals.periodTotal)}
+              </dd>
+            </dl>
+            <p className="cart-estimate__explain">
+              Monthly items × their commitment or billing term, plus one-off
+              projects.
+            </p>
+            {totals.savings > 0 && (
+              <p className="cart-estimate__savings">
+                <i className="ph ph-seal-percent" aria-hidden="true" />
+                Includes {formatCHF(totals.savings)} in bundle and term savings
+              </p>
+            )}
+          </section>
           {totals.onRequest && (
             <div className="cart-estimate__request">
               <span>Items priced on request</span>
@@ -118,32 +200,47 @@ export function CartSummary({
             <li key={item.id}>
               <strong>{item.name}</strong>
               <span>
+                {[item.plan && `${item.plan} plan`, item.duration]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+              <span>
                 {item.selections.map((selection) => selection.name).join(", ")}
               </span>
-              <span>{item.duration}</span>
               <span>{formatItemEstimate(item)}</span>
+              {periodLabel(item) && <span>{periodLabel(item)}</span>}
             </li>
           ))}
         </ul>
       )}
       <dl className="commerce-totals">
-        {items.some(
-          (item) => item.billing === "monthly" && item.estimate !== null,
-        ) && (
+        {totals.monthly > 0 && (
           <div>
-            <dt>Monthly estimate</dt>
+            <dt>Monthly</dt>
             <dd>
+              {hasService("monthly") && "From "}
               {formatCHF(totals.monthly)}
               <small> / month</small>
             </dd>
           </div>
         )}
-        {items.some(
-          (item) => item.billing === "project" && item.estimate !== null,
-        ) && (
+        {totals.project > 0 && (
           <div>
-            <dt>Project estimate</dt>
+            <dt>One-off projects</dt>
             <dd>From {formatCHF(totals.project)}</dd>
+          </div>
+        )}
+        <div>
+          <dt>Total for your chosen periods</dt>
+          <dd>
+            {items.some((item) => item.kind === "service") && "From "}
+            {formatCHF(totals.periodTotal)}
+          </dd>
+        </div>
+        {totals.savings > 0 && (
+          <div>
+            <dt>Savings included</dt>
+            <dd>{formatCHF(totals.savings)}</dd>
           </div>
         )}
         {totals.onRequest && (
@@ -190,6 +287,10 @@ export function EmptyCart({ checkout = false }) {
           </span>
         </a>
       </div>
+      <a href="/plans" className="commerce-empty__plans">
+        Or compare every plan and price in one place
+        <i className="ph ph-arrow-right" aria-hidden="true" />
+      </a>
     </div>
   );
 }

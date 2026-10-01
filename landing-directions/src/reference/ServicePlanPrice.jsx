@@ -3,7 +3,7 @@ import { formatCHF } from "./cart-store";
 import { getServicePeriodEstimate } from "./service-duration";
 import "./service-plan.css";
 
-export function ServicePlanPrice({ item, id }) {
+export function ServicePlanPrice({ item, id, saving = 0 }) {
   const monthly = item.billing === "monthly";
   const periodEstimate = getServicePeriodEstimate(item);
   return (
@@ -27,22 +27,33 @@ export function ServicePlanPrice({ item, id }) {
       </p>
       <dl className="service-plan-price__period">
         <dt>
-          {periodEstimate !== null
-            ? `Estimate for ${item.duration}`
-            : "Selected period"}
+          {monthly
+            ? periodEstimate !== null
+              ? `Estimate for ${item.duration}`
+              : "Monthly commitment"
+            : "Timeline"}
         </dt>
         <dd>
-          {periodEstimate !== null
-            ? `From ${formatCHF(periodEstimate)}`
-            : item.duration}
+          {monthly
+            ? periodEstimate !== null
+              ? `From ${formatCHF(periodEstimate)}`
+              : "Choose 1–12 months"
+            : "Agreed in your brief"}
         </dd>
       </dl>
       <p className="service-plan-price__note">
         {item.estimate === null
           ? "Estimate confirmed with the team."
-          : monthly
-            ? `Monthly rate × ${item.commitmentMonths} month${item.commitmentMonths === 1 ? "" : "s"}.`
-            : "Project estimate for the selected period."}
+          : [
+              monthly
+                ? `Monthly rate × ${item.commitmentMonths} month${item.commitmentMonths === 1 ? "" : "s"}.`
+                : "One project price, whatever the timeline.",
+              saving
+                ? `Includes a ${Math.round(saving * 100)}% multi-service saving.`
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
       </p>
     </div>
   );

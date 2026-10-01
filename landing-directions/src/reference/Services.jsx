@@ -15,36 +15,35 @@ import { getServiceDuration } from "./service-duration";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
 import {
+  SERVICE_BUNDLES,
   SERVICE_FAMILIES,
-  getServicePlanFeatures,
+  SERVICE_PLAN_LEADS,
+  SERVICE_PLAN_PRICES,
+  getServiceBundle,
   getServiceChoices,
+  getServicePlanAdditions,
+  getServicePlanFeatures,
   getServicePlanSelection,
+  getServiceSavingHint,
+  nameServiceSelection,
+  priceServices,
+  recommendServicePlan,
 } from "./service-catalog";
+import {
+  PLAN_IDS,
+  formatCHF,
+  isPlanId,
+  planBody,
+  planIdFromLabel,
+  planName,
+  planSubtitle,
+} from "./plan-ladder";
+import { getPlanComparison } from "./plan-pricing";
+import { PlanPicker } from "./PlanPicker";
+import { PlanCompareDialog, PlanCompareTable } from "./PlanCompare";
 
 export default class Services extends ReferencePage {
   FAM = SERVICE_FAMILIES;
-  PACKS = [
-    {
-      id: "focus",
-      name: "Focus",
-      note: "One service, one clear outcome and a defined delivery window.",
-      price: 1800,
-    },
-    {
-      id: "connected",
-      name: "Connected",
-      note: "A coordinated bundle for two adjacent capabilities that need to move together.",
-      price: 4200,
-      featured: true,
-    },
-    {
-      id: "partnership",
-      name: "Partnership",
-      note: "An ongoing service rhythm with delivery, support and measured improvement.",
-      price: 1450,
-      recurring: true,
-    },
-  ];
   STORIES = [
     [
       "A clear starting point",
@@ -106,13 +105,41 @@ export default class Services extends ReferencePage {
           .filter((id) => ids.includes(id)),
       ),
     ];
+    // Older links use engagement=project|partner instead of a plan.
+    const plan = isPlanId(query.get("plan"))
+      ? query.get("plan")
+      : planIdFromLabel(query.get("plan")) ||
+        { project: "starter", partner: "ongoing" }[query.get("engagement")];
     return {
       serviceMonths: getServiceDuration(query.get("duration")).months,
       ...(selected.length ? { sel: selected } : {}),
-      ...(["project", "partner"].includes(query.get("engagement"))
-        ? { mode: query.get("engagement") }
-        : {}),
+      // Start on the recommended plan; it never switches by itself afterwards.
+      builderPlan:
+        plan ||
+        recommendServicePlan(selected.length ? selected : this.DEFAULT_SEL)
+          ?.planId ||
+        "starter",
     };
+  }
+  DEFAULT_SEL = ["design/brand-development", "development/web-development"];
+  pickBuilderPlan(planId) {
+    dismissCartNotice();
+    this.setState({ builderPlan: planId });
+  }
+  // Keep the builder shareable and restorable after refresh.
+  syncBuilderUrl() {
+    if (this.state.route.view !== "overview") return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("engagement");
+    if (this.state.sel.length)
+      url.searchParams.set("services", this.state.sel.join(","));
+    else url.searchParams.delete("services");
+    url.searchParams.set("plan", this.state.builderPlan);
+    const next = (url.pathname + url.search + url.hash)
+      .replaceAll("%2C", ",")
+      .replaceAll("%2F", "/");
+    if (next !== location.pathname + location.search + location.hash)
+      window.history.replaceState(window.history.state, "", next);
   }
   pickServiceDuration(value) {
     const { months } = getServiceDuration(value);
@@ -156,9 +183,10 @@ export default class Services extends ReferencePage {
     route: this.parseRoute(location.hash) || { view: "overview" },
     proc: 0,
     famActive: 0,
-    sel: ["design/brand-development", "development/web-development"],
-    mode: "project",
+    sel: this.DEFAULT_SEL,
+    builderPlan: "starter",
     builderDepartment: "all",
+    compare: null,
     planService: this.readPlanService(),
     ...this.readBundleQuery(),
     svcOpen: 0,
@@ -275,6 +303,8 @@ export default class Services extends ReferencePage {
     }
     this.applyDataSrc();
     if (pp.screen !== this.props.screen) this.applyScreen();
+    if (ps.sel !== this.state.sel || ps.builderPlan !== this.state.builderPlan)
+      this.syncBuilderUrl();
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -652,32 +682,7 @@ export default class Services extends ReferencePage {
     const monthly = Math.round(sub * (1 - bd) * (1 - d.discount));
     return { d: d, bd: bd, monthly: monthly, total: monthly * d.months };
   }
-  BUNDLES = [
-    {
-      name: "Launch bundle",
-      ids: [
-        "design/brand-development",
-        "development/web-development",
-        "marketing/seo-services",
-      ],
-    },
-    {
-      name: "Growth bundle",
-      ids: [
-        "design/graphic-design",
-        "marketing/social-media-marketing",
-        "marketing/digital-advertising-switzerland",
-      ],
-    },
-    {
-      name: "Care bundle",
-      ids: [
-        "it-support/website-management",
-        "it-support/software-support",
-        "hosting/managed-hosting",
-      ],
-    },
-  ];
+  BUNDLES = SERVICE_BUNDLES;
   same(a, b) {
     return a.length === b.length && a.every((x) => b.indexOf(x) >= 0);
   }
@@ -760,7 +765,9 @@ export default class Services extends ReferencePage {
       meta: b.ids.length + " services · save 12%",
       go: (e) => {
         if (e) e.preventDefault();
-        this.setState({ sel: b.ids.slice() }, () => this.go("svc-builder"));
+        this.setState({ sel: b.ids.slice(), builderDepartment: "all" }, () =>
+          this.go("svc-builder"),
+        );
       },
     }));
   }
@@ -1232,23 +1239,29 @@ export default class Services extends ReferencePage {
           F.slug,
           C ? C.slug : s.planService,
         ),
-        planName = selection.name,
-        caps = selection.capabilities,
-        host = F.slug === "hosting";
+        scopeName = selection.name,
+        ids = selection.ids,
+        host = F.slug === "hosting",
+        rec = recommendServicePlan(ids),
+        saving = priceServices(ids, "starter").rate;
       const duration = getServiceDuration(s.serviceMonths);
       ps = Object.assign(ps, {
-        eyebrow: name + " packages",
-        l1: "Choose the engagement",
+        eyebrow: name + " plans",
+        l1: "Choose the plan",
         acc: "that fits the work.",
         body:
           "You’ve chosen " +
-          planName +
-          ". Compare three clear ways to begin, then bring the preferred shape into the conversation.",
+          scopeName +
+          ". Compare Starter, Complete and Ongoing, then add the one that fits to your cart.",
         lockup: true,
-        duration: true,
+        duration: false,
         hasCards: true,
+        compare: () =>
+          this.setState({
+            compare: { ids, title: `${scopeName} plans` },
+          }),
         icon: F.icon,
-        name: planName,
+        name: scopeName,
         short: selection.service ? selection.service.summary : F.intro,
         lockLabel:
           selection.service || C ? "Selected service" : "Selected department",
@@ -1266,45 +1279,52 @@ export default class Services extends ReferencePage {
             : null,
         note:
           "Indicative CHF estimates for " +
-          planName +
+          scopeName +
+          (ids.length > 1
+            ? ` (${ids.length} services with a ${Math.round(saving * 100)}% multi-service saving)`
+            : "") +
           ". Final scope, timing, availability, taxes and contractual terms require confirmation.",
-        cards: this.PACKS.map((p) =>
-          Object.assign(
+        cards: PLAN_IDS.map((planId, index) => {
+          const ongoing = planId === "ongoing";
+          const featured = rec?.planId === planId;
+          // Higher plans list only what they add, so nothing appears to be lost.
+          const features =
+            index === 0
+              ? getServicePlanFeatures(planId, ids)
+              : [SERVICE_PLAN_LEADS[planId]].concat(
+                  getServicePlanAdditions(PLAN_IDS[index - 1], ids).items,
+                );
+          return Object.assign(
             {
+              planId,
+              ongoing,
               showScope: true,
-              featured: !!p.featured,
-              eyebrow: F.kicker,
-              title: p.name,
-              body: p.note,
+              featured,
+              eyebrow: planSubtitle("service", planId),
+              title: planName(planId),
+              body: planBody("service", planId),
               scopeLabel: "Service scope",
-              scope: planName + " · " + p.name,
-              features: getServicePlanFeatures(p.id, caps),
-              period: duration.label,
-              cta: host ? "Continue to hosting" : "Choose " + p.name,
+              scope:
+                scopeName + (ids.length > 1 ? ` · ${ids.length} services` : ""),
+              features,
+              period: ongoing ? duration.label : "Project",
+              periodIcon: ongoing ? "ph-calendar-blank" : "ph-briefcase",
+              cta: host ? "Continue to hosting" : "Choose " + planName(planId),
               href: host ? "https://orgtik.ch" : "Contact.dc.html",
               hosting: host,
+              saving,
               cartItem: createCartItem({
                 kind: "service",
-                name: planName + " · " + p.name,
-                selections: [{ id: selection.id, name: planName }],
-                plan: p.name,
-                duration: duration.label,
-                commitmentMonths: duration.months,
-                billing: p.recurring ? "monthly" : "project",
-                estimate: this.onReq() ? null : p.price,
-                sourceHref:
-                  "/services?duration=" +
-                  duration.months +
-                  (!C && selection.service
-                    ? "&plan-service=" + selection.service.slug
-                    : "") +
-                  "#/" +
-                  (C ? "service/" + F.slug + "/" + C.slug : "family/" + F.slug),
+                name: scopeName,
+                planId,
+                selections: ids.map((id) => ({ id, name: id })),
+                duration: ongoing ? duration.label : "",
+                commitmentMonths: ongoing ? duration.months : 1,
               }),
             },
-            sty(!!p.featured),
-          ),
-        ),
+            sty(featured),
+          );
+        }),
       });
     }
     let rel = { eyebrow: "", l1: "", acc: "", body: "", rows: [] };
@@ -1412,32 +1432,25 @@ export default class Services extends ReferencePage {
         const all = this.allSvc(),
           sel = s.sel,
           n = sel.length,
-          bnd = this.BUNDLES.find((x) => this.same(sel, x.ids)),
-          rate = bnd ? 0.12 : n >= 5 ? 0.15 : n >= 3 ? 0.1 : n === 2 ? 0.05 : 0,
-          part = s.mode === "partner",
-          unit = part ? 1450 : 1800,
+          planId = s.builderPlan,
+          price = priceServices(sel, planId),
+          bnd = getServiceBundle(sel),
+          rate = price.rate,
+          part = planId === "ongoing",
+          unit = price.unit,
           per = part ? "/mo" : "",
           duration = getServiceDuration(s.serviceMonths),
-          tot = Math.round(n * unit * (1 - rate));
-        let hint = { show: false, text: "", label: "", add: () => {} };
-        if (n === 2)
-          this.BUNDLES.forEach((x) => {
-            if (sel.every((id) => x.ids.indexOf(id) >= 0)) {
-              const miss = x.ids.find((id) => sel.indexOf(id) < 0),
-                mm = all.find((a) => a.id === miss);
-              hint = {
-                show: true,
-                text:
-                  "Add " +
-                  mm.c.name +
-                  " to complete the " +
-                  x.name +
-                  " and save 12% instead of 5%.",
-                label: "Add " + mm.c.name,
-                add: () => this.toggleSvc(miss),
-              };
+          tot = price.estimate,
+          rec = recommendServicePlan(sel),
+          next = getServiceSavingHint(sel);
+        const hint = next
+          ? {
+              show: true,
+              text: next.text,
+              label: next.label,
+              add: next.addId ? () => this.toggleSvc(next.addId) : null,
             }
-          });
+          : { show: false, text: "", label: "", add: null };
         return {
           countLabel: n + (n === 1 ? " service" : " services"),
           clearSel: () => this.setState({ sel: [] }),
@@ -1470,9 +1483,7 @@ export default class Services extends ReferencePage {
               category: x.f.short,
               price: this.onReq()
                 ? "On request"
-                : part
-                  ? this.chf(1450) + "/mo"
-                  : "From " + this.chf(1800),
+                : "From " + this.chf(unit) + per,
               border: on ? "#6C3CAA" : "#190B251a",
               bg: on ? "#FFFFFF" : "#FFFFFF80",
               ring: on ? "0 0 0 1px #6C3CAA, 0 16px 36px #6C3CAA1f" : "none",
@@ -1484,24 +1495,30 @@ export default class Services extends ReferencePage {
             };
           }),
           hint: hint,
-          bdurs: [
-            ["project", "One-off project", "Defined scope"],
-            ["partner", "Ongoing partnership", "Monthly rhythm"],
-          ].map((d) => {
-            const on = s.mode === d[0];
+          // Step 1: the plan replaces the old project/partnership choice.
+          bdurs: PLAN_IDS.map((id) => {
+            const on = planId === id;
             return {
               on,
-              label: d[1],
-              note: d[2],
+              planId: id,
+              label: planName(id),
+              note:
+                formatCHF(SERVICE_PLAN_PRICES[id]) +
+                (id === "ongoing" ? " per service / month" : " per service"),
+              detail: planSubtitle("service", id),
+              recommended: rec?.planId === id,
               bg: on ? "#190B25" : "#FFFFFF",
               c: on ? "#F6F1FA" : "#190B25",
               sub: on ? "#D4B7EC" : "#6C3CAA",
+              muted: on ? "#CFC2DB" : "#4A3A57",
               border: on ? "#190B25" : "#190B251f",
               radioB: on ? "#D4B7EC" : "#190B2540",
               radioDot: on ? "#D4B7EC" : "transparent",
-              pick: () => this.setState({ mode: d[0] }),
+              pick: () => this.pickBuilderPlan(id),
             };
           }),
+          builderOngoing: part,
+          builderPlan: planId,
           lines: all
             .filter((x) => sel.indexOf(x.id) >= 0)
             .map((x) => ({
@@ -1513,36 +1530,17 @@ export default class Services extends ReferencePage {
           sum: {
             cartItem: createCartItem({
               kind: "service",
-              name: bnd
-                ? bnd.name
-                : n > 1
-                  ? "Custom service bundle"
-                  : "Single service",
+              name: nameServiceSelection(sel),
+              planId,
               selections: all
                 .filter((x) => sel.includes(x.id))
                 .map((x) => ({ id: x.id, name: x.c.name })),
-              duration: duration.label,
-              commitmentMonths: duration.months,
-              billing: part ? "monthly" : "project",
-              estimate: this.onReq() ? null : tot,
-              sourceHref:
-                "/services?services=" +
-                sel.join(",") +
-                "&engagement=" +
-                s.mode +
-                "&duration=" +
-                duration.months +
-                "#svc-builder",
+              duration: part ? duration.label : "",
+              commitmentMonths: part ? duration.months : 1,
             }),
-            mode: bnd
-              ? bnd.name
-              : n > 1
-                ? "Custom bundle"
-                : n
-                  ? "Single service"
-                  : "",
+            mode: n ? nameServiceSelection(sel) : "",
             empty: n === 0,
-            subtotal: n ? this.chf(n * unit) + per : "—",
+            subtotal: n ? this.chf(price.subtotal) + per : "—",
             bundleLabel: bnd ? bnd.name : "Multi-service saving",
             bundleVal: rate
               ? "−" + Math.round(rate * 100) + "%"
@@ -1550,9 +1548,44 @@ export default class Services extends ReferencePage {
                 ? "Add a 2nd service"
                 : "—",
             bundleC: rate ? "#D4B7EC" : "#B5A6C4",
-            billLabel: "Engagement",
-            billVal: part ? "Ongoing partnership" : "One-off project",
+            billLabel: "Plan",
+            billVal: planName(planId) + (part ? " · monthly" : " · project"),
             billC: "#D4B7EC",
+            periodLabel: part ? "Monthly commitment" : "Timeline",
+            periodValue: part ? duration.label : "Agreed in your brief",
+            // Every plan's total for this exact selection.
+            plans: PLAN_IDS.map((id) => {
+              const option = priceServices(sel, id);
+              return {
+                planId: id,
+                name: planName(id),
+                subtitle: planSubtitle("service", id),
+                price: formatCHF(n ? option.estimate : SERVICE_PLAN_PRICES[id]),
+                note: n
+                  ? id === "ongoing"
+                    ? "per month"
+                    : "per project"
+                  : id === "ongoing"
+                    ? "per service / month"
+                    : "per service",
+                recommended: rec?.planId === id,
+              };
+            }),
+            why: rec?.why || "",
+            pickPlan: (id) => this.pickBuilderPlan(id),
+            compare: () =>
+              n &&
+              this.setState({
+                compare: {
+                  ids: sel,
+                  title:
+                    n > 1 &&
+                    !bnd &&
+                    nameServiceSelection(sel).startsWith("Custom")
+                      ? `Plans for your ${n} services`
+                      : `Plans for ${nameServiceSelection(sel)}`,
+                },
+              }),
             totalLabel: part ? "Estimated monthly" : "Estimated project",
             total: n ? this.chf(tot) + per : "—",
             billed: this.onReq()
@@ -1560,9 +1593,10 @@ export default class Services extends ReferencePage {
               : !n
                 ? "Pick services to see an estimate"
                 : part
-                  ? "One monthly rhythm across " +
-                    n +
-                    (n === 1 ? " service" : " services")
+                  ? duration.label +
+                    ": from " +
+                    this.chf(tot * duration.months) +
+                    " in total"
                   : "From-prices per service · final quote after a short brief",
             ctaLabel: "Request this bundle",
             ctaO: n ? 1 : 0.45,
@@ -1717,6 +1751,7 @@ export default class Services extends ReferencePage {
       ].map((x) => ({ label: x[0], href: x[1] })),
       footStart: [
         ["Build a software plan", "Software.dc.html"],
+        ["Plans & pricing", "/plans"],
         ["Tell us about your project", "Contact.dc.html"],
         ["Roadmap", "Roadmap.dc.html"],
         ["Sitemap", "Legal.dc.html#/sitemap"],
@@ -4105,7 +4140,7 @@ export default class Services extends ReferencePage {
                           }}
                         >
                           {
-                            "Choose how we work together, pick services from any department, and watch the bundle saving apply as you go."
+                            "Choose a plan, pick services from any department, and see every plan’s total for your selection as you go."
                           }
                         </p>
                       </div>
@@ -4179,7 +4214,7 @@ export default class Services extends ReferencePage {
                                     letterSpacing: "-.03em",
                                   }}
                                 >
-                                  {"Choose how we work"}
+                                  {"Choose your plan"}
                                 </span>
                                 <span
                                   style={{
@@ -4191,7 +4226,7 @@ export default class Services extends ReferencePage {
                                   }}
                                 >
                                   {
-                                    "A defined project, or an ongoing monthly partnership."
+                                    "Starter and Complete are one-off projects. Ongoing is a monthly rhythm. You can change this at any time."
                                   }
                                 </span>
                               </span>
@@ -4213,7 +4248,7 @@ export default class Services extends ReferencePage {
                                   style={{
                                     display: "flex",
                                     justifyContent: "space-between",
-                                    alignItems: "center",
+                                    alignItems: "flex-start",
                                     gap: "14px",
                                     padding: "14px 16px",
                                     borderRadius: "16px",
@@ -4229,12 +4264,20 @@ export default class Services extends ReferencePage {
                                   <span>
                                     <span
                                       style={{
-                                        display: "block",
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        alignItems: "center",
+                                        gap: "6px 8px",
                                         fontSize: "16px",
                                         fontWeight: "600",
                                       }}
                                     >
                                       {d.label}
+                                      {d.recommended && (
+                                        <span className="service-builder-plan__badge">
+                                          Recommended
+                                        </span>
+                                      )}
                                     </span>
                                     <span
                                       style={{
@@ -4246,6 +4289,19 @@ export default class Services extends ReferencePage {
                                       }}
                                     >
                                       {d.note}
+                                    </span>
+                                    <span
+                                      style={{
+                                        display: "block",
+                                        marginTop: "4px",
+                                        fontFamily:
+                                          "Arial,Helvetica,sans-serif",
+                                        fontSize: "13px",
+                                        lineHeight: "1.45",
+                                        color: String(d.muted),
+                                      }}
+                                    >
+                                      {d.detail}
                                     </span>
                                   </span>
                                   <span
@@ -4436,10 +4492,13 @@ export default class Services extends ReferencePage {
                               {"Clear"}
                             </button>
                           </div>
-                          <ServiceDuration
-                            months={v.serviceMonths}
-                            onChange={v.pickServiceDuration}
-                          />
+                          {v.builderOngoing && (
+                            <ServiceDuration
+                              months={v.serviceMonths}
+                              onChange={v.pickServiceDuration}
+                              hint="How many months of Ongoing help to plan for. You can change it in your cart."
+                            />
+                          )}
                           <ServiceDepartmentFilter
                             department={v.builderDepartment}
                             selections={v.builderSelections}
@@ -4590,21 +4649,23 @@ export default class Services extends ReferencePage {
                                 >
                                   {v.hint.text}
                                 </span>
-                                <button
-                                  onClick={v.hint.add}
-                                  style={{
-                                    padding: "10px 16px",
-                                    borderRadius: "999px",
-                                    background: "#6C3CAA",
-                                    color: "#FFFFFF",
-                                    fontSize: "13px",
-                                    fontWeight: "600",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                  className={"reference-state-87"}
-                                >
-                                  {v.hint.label}
-                                </button>
+                                {v.hint.add && (
+                                  <button
+                                    onClick={v.hint.add}
+                                    style={{
+                                      padding: "10px 16px",
+                                      borderRadius: "999px",
+                                      background: "#6C3CAA",
+                                      color: "#FFFFFF",
+                                      fontSize: "13px",
+                                      fontWeight: "600",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                    className={"reference-state-87"}
+                                  >
+                                    {v.hint.label}
+                                  </button>
+                                )}
                               </div>
                             </>
                           )}
@@ -4802,13 +4863,22 @@ export default class Services extends ReferencePage {
                             </span>
                           </div>
                           <div className="service-builder-period-summary">
-                            <span>Service period</span>
-                            <strong>
-                              {v.sum.cartItem?.duration ||
-                                getServiceDuration(v.serviceMonths).label}
-                            </strong>
+                            <span>{v.sum.periodLabel}</span>
+                            <strong>{v.sum.periodValue}</strong>
                           </div>
                         </div>
+                        <PlanPicker
+                          tone="dark"
+                          label={
+                            v.sum.empty
+                              ? "Plans per service"
+                              : "Every plan for this selection"
+                          }
+                          options={v.sum.plans}
+                          value={v.builderPlan}
+                          onChange={v.sum.pickPlan}
+                          why={v.sum.why}
+                        />
                         <div
                           style={{
                             paddingTop: "18px",
@@ -4850,9 +4920,27 @@ export default class Services extends ReferencePage {
                         <AddToCartButton
                           item={v.sum.cartItem}
                           removable
+                          editable
                           disabled={v.sum.empty}
                           className="commerce-action--light"
                         />
+                        <div className="plan-links plan-links--dark">
+                          <button
+                            type="button"
+                            onClick={v.sum.compare}
+                            disabled={v.sum.empty}
+                          >
+                            <i className="ph ph-columns" aria-hidden="true" />
+                            Compare what each plan includes
+                          </button>
+                          <a href="/plans">
+                            See all plans and prices
+                            <i
+                              className="ph ph-arrow-right"
+                              aria-hidden="true"
+                            />
+                          </a>
+                        </div>
                         <p
                           style={{
                             fontFamily: "Arial,Helvetica,sans-serif",
@@ -6108,7 +6196,7 @@ export default class Services extends ReferencePage {
                                 <div className="service-plan__header">
                                   <span className="service-plan__duration">
                                     <i
-                                      className="ph ph-calendar-blank"
+                                      className={"ph " + k.periodIcon}
                                       aria-hidden="true"
                                     />
                                     {k.period}
@@ -6202,32 +6290,52 @@ export default class Services extends ReferencePage {
                                 <ul style={{ display: "grid", gap: "10px" }}>
                                   {(k.features || []).map((f, fIndex) => (
                                     <React.Fragment key={fIndex}>
-                                      <li
-                                        style={{
-                                          display: "flex",
-                                          alignItems: "flex-start",
-                                          gap: "10px",
-                                          fontSize: "14px",
-                                          fontWeight: "500",
-                                          lineHeight: "1.4",
-                                        }}
-                                      >
-                                        <i
-                                          aria-hidden={true}
+                                      {/^Everything in /.test(f) ? (
+                                        <li className="service-plan__lead">
+                                          {f}
+                                        </li>
+                                      ) : (
+                                        <li
                                           style={{
-                                            fontSize: "16px",
-                                            color: String(k.acc),
-                                            flexShrink: "0",
+                                            display: "flex",
+                                            alignItems: "flex-start",
+                                            gap: "10px",
+                                            fontSize: "14px",
+                                            fontWeight: "500",
+                                            lineHeight: "1.4",
                                           }}
-                                          className={"ph-fill ph-check-circle"}
-                                        ></i>
-                                        {f}
-                                      </li>
+                                        >
+                                          <i
+                                            aria-hidden={true}
+                                            style={{
+                                              fontSize: "16px",
+                                              color: String(k.acc),
+                                              flexShrink: "0",
+                                            }}
+                                            className={
+                                              "ph-fill ph-check-circle"
+                                            }
+                                          ></i>
+                                          {f}
+                                        </li>
+                                      )}
                                     </React.Fragment>
                                   ))}
                                 </ul>
+                                {k.ongoing && (
+                                  <ServiceDuration
+                                    months={v.serviceMonths}
+                                    onChange={v.pickServiceDuration}
+                                    variant={
+                                      k.featured ? "compact-dark" : "compact"
+                                    }
+                                    headingLevel={4}
+                                    hint="How many months of Ongoing help to plan for."
+                                  />
+                                )}
                                 <ServicePlanPrice
                                   item={k.cartItem}
+                                  saving={k.saving}
                                   id={`service-plan-price-${kIndex}`}
                                 />
                                 <AddToCartButton
@@ -6256,6 +6364,19 @@ export default class Services extends ReferencePage {
                               </article>
                             </React.Fragment>
                           ))}
+                        </div>
+                        <div className="plan-links">
+                          <button type="button" onClick={v.ps.compare}>
+                            <i className="ph ph-columns" aria-hidden="true" />
+                            Compare all features side by side
+                          </button>
+                          <a href="/plans">
+                            See every service and software plan
+                            <i
+                              className="ph ph-arrow-right"
+                              aria-hidden="true"
+                            />
+                          </a>
                         </div>
                       </>
                     )}
@@ -6985,6 +7106,42 @@ export default class Services extends ReferencePage {
               </div>
             </section>
           </main>
+          <PlanCompareDialog
+            open={Boolean(this.state.compare)}
+            onClose={() => this.setState({ compare: null })}
+            title={this.state.compare?.title || "Compare plans"}
+            description="All three plans for the same services. Prices already include any multi-service saving."
+          >
+            {this.state.compare &&
+              (() => {
+                const { ids, title } = this.state.compare;
+                const comparison = getPlanComparison("service", ids);
+                const months = getServiceDuration(this.state.serviceMonths);
+                return (
+                  <PlanCompareTable
+                    caption={title}
+                    plans={comparison.plans}
+                    groups={comparison.groups}
+                    renderAction={(plan) => (
+                      <AddToCartButton
+                        removable
+                        onAction={() => this.setState({ compare: null })}
+                        item={createCartItem({
+                          kind: "service",
+                          name: nameServiceSelection(ids),
+                          planId: plan.planId,
+                          selections: ids.map((id) => ({ id, name: id })),
+                          duration:
+                            plan.planId === "ongoing" ? months.label : "",
+                          commitmentMonths:
+                            plan.planId === "ongoing" ? months.months : 1,
+                        })}
+                      />
+                    )}
+                  />
+                );
+              })()}
+          </PlanCompareDialog>
           <footer
             style={{
               position: "relative",

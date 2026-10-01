@@ -3,6 +3,11 @@ import { CommerceLayout } from "./CommerceLayout";
 import { CartSummary, EmptyCart } from "./CartSummary";
 import { getServiceFeatures } from "./service-catalog";
 import {
+  SERVICE_DURATIONS,
+  getServiceDuration,
+  getServicePeriodEstimate,
+} from "./service-duration";
+import {
   beginCartEdit,
   cancelCartEdit,
   clearCart,
@@ -20,6 +25,14 @@ function CartItem({ item }) {
       ? item.name.slice(0, -(item.plan.length + 3))
       : item.name;
   const scope = item.kind === "software" ? "product" : "service";
+  const hasServicePeriod =
+    item.kind === "service" &&
+    SERVICE_DURATIONS.includes(item.commitmentMonths) &&
+    item.duration === getServiceDuration(item.commitmentMonths).label;
+  const periodEstimate = getServicePeriodEstimate(item);
+  const actionName = hasServicePeriod
+    ? `${item.name} · ${item.duration}`
+    : item.name;
   return (
     <li className="cart-row" id={`cart-item-${encodeURIComponent(item.id)}`}>
       <div className="cart-row__main">
@@ -32,8 +45,14 @@ function CartItem({ item }) {
           <h3>{name}</h3>
           <p className="cart-row__meta">
             {item.plan && <strong>{item.plan}</strong>}
-            <span>{item.duration}</span>
+            {!hasServicePeriod && <span>{item.duration}</span>}
           </p>
+          {hasServicePeriod && (
+            <span className="cart-row__duration">
+              <i className="ph ph-calendar-blank" aria-hidden="true" />
+              <span>{item.duration}</span>
+            </span>
+          )}
         </div>
         <div className="cart-row__estimate">
           {item.estimate === null ? (
@@ -51,6 +70,14 @@ function CartItem({ item }) {
           )}
         </div>
       </div>
+      {hasServicePeriod &&
+        periodEstimate !== null &&
+        item.commitmentMonths > 1 && (
+          <div className="cart-row__period-estimate">
+            <span>Estimate for {item.duration}</span>
+            <strong>From {formatCHF(periodEstimate)}</strong>
+          </div>
+        )}
       <details className="cart-row__details">
         <summary
           aria-label={
@@ -115,13 +142,15 @@ function CartItem({ item }) {
               ))}
             </ul>
           )}
-          {item.billing === "monthly" && item.commitmentMonths > 1 && (
-            <p>
-              {item.commitmentMonths}-month duration
-              {item.estimate !== null &&
-                ` · ${formatCHF(item.estimate * item.commitmentMonths)} estimated over the full duration`}
-            </p>
-          )}
+          {!hasServicePeriod &&
+            item.billing === "monthly" &&
+            item.commitmentMonths > 1 && (
+              <p>
+                {item.commitmentMonths}-month duration
+                {item.estimate !== null &&
+                  ` · ${formatCHF(item.estimate * item.commitmentMonths)} estimated over the full duration`}
+              </p>
+            )}
         </div>
       </details>
       <div className="cart-row__actions">
@@ -137,14 +166,14 @@ function CartItem({ item }) {
             )
               beginCartEdit(item.id);
           }}
-          aria-label={`Edit ${item.name}`}
+          aria-label={`Edit ${actionName}`}
         >
           <i className="ph ph-pencil-simple" aria-hidden="true" /> Edit
           selection
         </a>
         <button
           type="button"
-          aria-label={`Remove ${item.name}`}
+          aria-label={`Remove ${actionName}`}
           onClick={() => {
             removeCartItem(item.id);
             requestAnimationFrame(() =>

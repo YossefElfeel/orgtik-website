@@ -1,0 +1,72 @@
+.service-plan-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  margin-bottom: 20px;
+  color: #190b25;
+}
+.service-plan-filter label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.service-plan-filter p {
+  margin-top: 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4a3a57;
+}
+.service-plan-filter__field {
+  position: relative;
+  flex: 1 1 360px;
+  max-width: 640px;
+  min-width: 0;
+}
+.service-plan-filter select {
+  appearance: none;
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 42px 12px 18px;
+  border: 1px solid #190b2526;
+  border-radius: 999px;
+  background: #ffffff80;
+  color: #3b1e59;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.service-plan-filter select:hover {
+  border-color: #6c3caa;
+}
+.service-plan-filter select:focus-visible {
+  outline: 2px solid #6c3caa;
+  outline-offset: 3px;
+}
+.service-plan-filter__field > i {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%);
+  color: #6c3caa;
+  font-size: 16px;
+  pointer-events: none;
+}
+@media (max-width: 700px) {
+  .service-plan-filter {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .service-plan-filter__field {
+    flex-basis: auto;
+    max-width: none;
+  }
+  .service-plan-filter select {
+    font-size: 13px;
+  }
+}

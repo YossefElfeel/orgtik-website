@@ -9,10 +9,17 @@ import { createCartItem } from "./cart-store";
 import { dismissCartNotice } from "./cart-store";
 import { ServiceDuration } from "./ServiceDuration";
 import { ServicePlanPrice } from "./ServicePlanPrice";
+import { ServiceDepartmentFilter } from "./ServiceDepartmentFilter";
+import { ServicePlanFilter } from "./ServicePlanFilter";
 import { getServiceDuration } from "./service-duration";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
-import { SERVICE_FAMILIES, getServicePlanFeatures } from "./service-catalog";
+import {
+  SERVICE_FAMILIES,
+  getServicePlanFeatures,
+  getServiceChoices,
+  getServicePlanSelection,
+} from "./service-catalog";
 
 export default class Services extends ReferencePage {
   FAM = SERVICE_FAMILIES;
@@ -119,12 +126,40 @@ export default class Services extends ReferencePage {
     dismissCartNotice();
     this.setState({ serviceMonths: months });
   }
+  readPlanService() {
+    const route = this.parseRoute(location.hash);
+    if (route?.view !== "family") return "all";
+    const selection = getServicePlanSelection(
+      route.fam,
+      new URLSearchParams(window.location.search).get("plan-service"),
+    );
+    return selection?.family.children.length > 1
+      ? selection.service?.slug || "all"
+      : "all";
+  }
+  pickPlanService(value) {
+    const selection = getServicePlanSelection(this.state.route.fam, value);
+    if (!selection || selection.family.children.length < 2) return;
+    const slug = selection.service?.slug || "all";
+    const url = new URL(window.location.href);
+    if (slug === "all") url.searchParams.delete("plan-service");
+    else url.searchParams.set("plan-service", slug);
+    window.history.replaceState(
+      window.history.state,
+      "",
+      url.pathname + url.search + url.hash,
+    );
+    dismissCartNotice();
+    this.setState({ planService: slug });
+  }
   state = {
     route: this.parseRoute(location.hash) || { view: "overview" },
     proc: 0,
     famActive: 0,
     sel: ["design/brand-development", "development/web-development"],
     mode: "project",
+    builderDepartment: "all",
+    planService: this.readPlanService(),
     ...this.readBundleQuery(),
     svcOpen: 0,
     svcHover: null,
@@ -191,6 +226,7 @@ export default class Services extends ReferencePage {
       if (r)
         this.setState({
           route: r,
+          planService: this.readPlanService(),
           serviceMonths: getServiceDuration(
             new URLSearchParams(window.location.search).get("duration"),
           ).months,
@@ -646,13 +682,7 @@ export default class Services extends ReferencePage {
     return a.length === b.length && a.every((x) => b.indexOf(x) >= 0);
   }
   allSvc() {
-    return this.FAM.reduce(
-      (a, f) =>
-        a.concat(
-          f.children.map((c) => ({ id: f.slug + "/" + c.slug, f: f, c: c })),
-        ),
-      [],
-    );
+    return getServiceChoices();
   }
   toggleSvc(id) {
     const ids = this.allSvc().map((x) => x.id);
@@ -666,7 +696,7 @@ export default class Services extends ReferencePage {
   }
   goBundle(ids) {
     this.pendingScroll = "svc-builder";
-    this.setState({ sel: ids });
+    this.setState({ sel: ids, builderDepartment: "all" });
     if (this.state.route.view === "overview") {
       this.pendingScroll = null;
       requestAnimationFrame(() => this.go("svc-builder"));
@@ -1198,7 +1228,12 @@ export default class Services extends ReferencePage {
       edit: () => {},
     };
     if (F) {
-      const caps = C ? C.capabilities : F.children.map((x) => x.name),
+      const selection = getServicePlanSelection(
+          F.slug,
+          C ? C.slug : s.planService,
+        ),
+        planName = selection.name,
+        caps = selection.capabilities,
         host = F.slug === "hosting";
       const duration = getServiceDuration(s.serviceMonths);
       ps = Object.assign(ps, {
@@ -1207,18 +1242,31 @@ export default class Services extends ReferencePage {
         acc: "that fits the work.",
         body:
           "You’ve chosen " +
-          name +
+          planName +
           ". Compare three clear ways to begin, then bring the preferred shape into the conversation.",
         lockup: true,
         duration: true,
         hasCards: true,
         icon: F.icon,
-        name: name,
-        short: C ? C.summary : F.intro,
-        lockLabel: "Selected service",
+        name: planName,
+        short: selection.service ? selection.service.summary : F.intro,
+        lockLabel:
+          selection.service || C ? "Selected service" : "Selected department",
+        comparisonLabel:
+          v === "family" && F.children.length > 1
+            ? "Current comparison"
+            : "Fixed for this comparison",
+        serviceFilter:
+          v === "family" && F.children.length > 1
+            ? {
+                family: F,
+                value: selection.service?.slug || "all",
+                onChange: (slug) => this.pickPlanService(slug),
+              }
+            : null,
         note:
           "Indicative CHF estimates for " +
-          name +
+          planName +
           ". Final scope, timing, availability, taxes and contractual terms require confirmation.",
         cards: this.PACKS.map((p) =>
           Object.assign(
@@ -1229,7 +1277,7 @@ export default class Services extends ReferencePage {
               title: p.name,
               body: p.note,
               scopeLabel: "Service scope",
-              scope: name + " · " + p.name,
+              scope: planName + " · " + p.name,
               features: getServicePlanFeatures(p.id, caps),
               period: duration.label,
               cta: host ? "Continue to hosting" : "Choose " + p.name,
@@ -1237,8 +1285,8 @@ export default class Services extends ReferencePage {
               hosting: host,
               cartItem: createCartItem({
                 kind: "service",
-                name: name + " · " + p.name,
-                selections: [{ id: F.slug + (C ? "/" + C.slug : ""), name }],
+                name: planName + " · " + p.name,
+                selections: [{ id: selection.id, name: planName }],
                 plan: p.name,
                 duration: duration.label,
                 commitmentMonths: duration.months,
@@ -1247,6 +1295,9 @@ export default class Services extends ReferencePage {
                 sourceHref:
                   "/services?duration=" +
                   duration.months +
+                  (!C && selection.service
+                    ? "&plan-service=" + selection.service.slug
+                    : "") +
                   "#/" +
                   (C ? "service/" + F.slug + "/" + C.slug : "family/" + F.slug),
               }),
@@ -1366,6 +1417,7 @@ export default class Services extends ReferencePage {
           part = s.mode === "partner",
           unit = part ? 1450 : 1800,
           per = part ? "/mo" : "",
+          duration = getServiceDuration(s.serviceMonths),
           tot = Math.round(n * unit * (1 - rate));
         let hint = { show: false, text: "", label: "", add: () => {} };
         if (n === 2)
@@ -1399,13 +1451,19 @@ export default class Services extends ReferencePage {
               badgeBg: on ? "#EEE3F7" : "#6C3CAA14",
               badgeC: on ? "#28123B" : "#6C3CAA",
               border: on ? "#190B25" : "#190B251f",
-              pick: () => this.setState({ sel: x.ids.slice() }),
+              pick: () =>
+                this.setState({ sel: x.ids.slice(), builderDepartment: "all" }),
             };
           }),
-          prods: all.map((x) => {
+          builderDepartment: s.builderDepartment,
+          builderSelections: sel,
+          pickBuilderDepartment: (department) =>
+            this.setState({ builderDepartment: department }),
+          prods: getServiceChoices(s.builderDepartment).map((x) => {
             const on = sel.indexOf(x.id) >= 0;
             return {
               on: on,
+              id: x.id,
               icon: x.f.icon,
               formal: x.c.name,
               short: x.c.outcome,
@@ -1432,6 +1490,7 @@ export default class Services extends ReferencePage {
           ].map((d) => {
             const on = s.mode === d[0];
             return {
+              on,
               label: d[1],
               note: d[2],
               bg: on ? "#190B25" : "#FFFFFF",
@@ -1462,7 +1521,8 @@ export default class Services extends ReferencePage {
               selections: all
                 .filter((x) => sel.includes(x.id))
                 .map((x) => ({ id: x.id, name: x.c.name })),
-              duration: part ? "Ongoing partnership" : "One-off project",
+              duration: duration.label,
+              commitmentMonths: duration.months,
               billing: part ? "monthly" : "project",
               estimate: this.onReq() ? null : tot,
               sourceHref:
@@ -1470,6 +1530,8 @@ export default class Services extends ReferencePage {
                 sel.join(",") +
                 "&engagement=" +
                 s.mode +
+                "&duration=" +
+                duration.months +
                 "#svc-builder",
             }),
             mode: bnd
@@ -4043,7 +4105,7 @@ export default class Services extends ReferencePage {
                           }}
                         >
                           {
-                            "Pick services from any department, choose how we work together, and watch the bundle saving apply as you go."
+                            "Choose how we work together, pick services from any department, and watch the bundle saving apply as you go."
                           }
                         </p>
                       </div>
@@ -4106,6 +4168,152 @@ export default class Services extends ReferencePage {
                                 }}
                               >
                                 {"1"}
+                              </span>
+                              <span>
+                                <span
+                                  data-hw={""}
+                                  style={{
+                                    display: "block",
+                                    fontSize: "clamp(19px,1.6vw,23px)",
+                                    fontWeight: "500",
+                                    letterSpacing: "-.03em",
+                                  }}
+                                >
+                                  {"Choose how we work"}
+                                </span>
+                                <span
+                                  style={{
+                                    display: "block",
+                                    marginTop: "3px",
+                                    fontFamily: "Arial,Helvetica,sans-serif",
+                                    fontSize: "14px",
+                                    color: "#4A3A57",
+                                  }}
+                                >
+                                  {
+                                    "A defined project, or an ongoing monthly partnership."
+                                  }
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              display: "grid",
+                              gridTemplateColumns:
+                                "repeat(auto-fit,minmax(min(100%,170px),1fr))",
+                              gap: "10px",
+                            }}
+                          >
+                            {(v.bdurs || []).map((d, dIndex) => (
+                              <React.Fragment key={dIndex}>
+                                <button
+                                  onClick={d.pick}
+                                  aria-pressed={d.on}
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    gap: "14px",
+                                    padding: "14px 16px",
+                                    borderRadius: "16px",
+                                    border: "1px solid " + d.border,
+                                    background: String(d.bg),
+                                    color: String(d.c),
+                                    textAlign: "left",
+                                    transition:
+                                      "all .35s cubic-bezier(.22,1,.36,1)",
+                                  }}
+                                  className={"reference-state-88"}
+                                >
+                                  <span>
+                                    <span
+                                      style={{
+                                        display: "block",
+                                        fontSize: "16px",
+                                        fontWeight: "600",
+                                      }}
+                                    >
+                                      {d.label}
+                                    </span>
+                                    <span
+                                      style={{
+                                        display: "block",
+                                        marginTop: "4px",
+                                        fontSize: "13px",
+                                        fontWeight: "600",
+                                        color: String(d.sub),
+                                      }}
+                                    >
+                                      {d.note}
+                                    </span>
+                                  </span>
+                                  <span
+                                    style={{
+                                      display: "grid",
+                                      placeItems: "center",
+                                      width: "22px",
+                                      height: "22px",
+                                      borderRadius: "50%",
+                                      border: "1.5px solid " + d.radioB,
+                                      flexShrink: "0",
+                                    }}
+                                  >
+                                    <span
+                                      style={{
+                                        width: "10px",
+                                        height: "10px",
+                                        borderRadius: "50%",
+                                        background: String(d.radioDot),
+                                      }}
+                                    ></span>
+                                  </span>
+                                </button>
+                              </React.Fragment>
+                            ))}
+                          </div>
+                        </div>
+                        <div
+                          data-reveal={"up"}
+                          style={{
+                            padding: "clamp(18px,2vw,26px)",
+                            borderRadius: "24px",
+                            background: "#FFFFFFa6",
+                            border: "1px solid #190B2514",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              gap: "12px 24px",
+                              marginBottom: "16px",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "14px",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  display: "grid",
+                                  placeItems: "center",
+                                  width: "38px",
+                                  height: "38px",
+                                  borderRadius: "50%",
+                                  background: "#190B25",
+                                  color: "#F6F1FA",
+                                  fontSize: "15px",
+                                  fontWeight: "600",
+                                  flexShrink: "0",
+                                }}
+                              >
+                                {"2"}
                               </span>
                               <span>
                                 <span
@@ -4228,7 +4436,17 @@ export default class Services extends ReferencePage {
                               {"Clear"}
                             </button>
                           </div>
+                          <ServiceDuration
+                            months={v.serviceMonths}
+                            onChange={v.pickServiceDuration}
+                          />
+                          <ServiceDepartmentFilter
+                            department={v.builderDepartment}
+                            selections={v.builderSelections}
+                            onChange={v.pickBuilderDepartment}
+                          />
                           <div
+                            id="service-builder-options"
                             style={{
                               display: "grid",
                               gridTemplateColumns:
@@ -4236,8 +4454,8 @@ export default class Services extends ReferencePage {
                               gap: "8px",
                             }}
                           >
-                            {(v.prods || []).map((p, pIndex) => (
-                              <React.Fragment key={pIndex}>
+                            {(v.prods || []).map((p) => (
+                              <React.Fragment key={p.id}>
                                 <button
                                   onClick={p.toggle}
                                   aria-pressed={p.on}
@@ -4390,151 +4608,6 @@ export default class Services extends ReferencePage {
                               </div>
                             </>
                           )}
-                        </div>
-                        <div
-                          data-reveal={"up"}
-                          style={{
-                            padding: "clamp(18px,2vw,26px)",
-                            borderRadius: "24px",
-                            background: "#FFFFFFa6",
-                            border: "1px solid #190B2514",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              gap: "12px 24px",
-                              marginBottom: "16px",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "14px",
-                              }}
-                            >
-                              <span
-                                style={{
-                                  display: "grid",
-                                  placeItems: "center",
-                                  width: "38px",
-                                  height: "38px",
-                                  borderRadius: "50%",
-                                  background: "#190B25",
-                                  color: "#F6F1FA",
-                                  fontSize: "15px",
-                                  fontWeight: "600",
-                                  flexShrink: "0",
-                                }}
-                              >
-                                {"2"}
-                              </span>
-                              <span>
-                                <span
-                                  data-hw={""}
-                                  style={{
-                                    display: "block",
-                                    fontSize: "clamp(19px,1.6vw,23px)",
-                                    fontWeight: "500",
-                                    letterSpacing: "-.03em",
-                                  }}
-                                >
-                                  {"Choose how we work"}
-                                </span>
-                                <span
-                                  style={{
-                                    display: "block",
-                                    marginTop: "3px",
-                                    fontFamily: "Arial,Helvetica,sans-serif",
-                                    fontSize: "14px",
-                                    color: "#4A3A57",
-                                  }}
-                                >
-                                  {
-                                    "A defined project, or an ongoing monthly partnership."
-                                  }
-                                </span>
-                              </span>
-                            </div>
-                          </div>
-                          <div
-                            style={{
-                              display: "grid",
-                              gridTemplateColumns:
-                                "repeat(auto-fit,minmax(min(100%,170px),1fr))",
-                              gap: "10px",
-                            }}
-                          >
-                            {(v.bdurs || []).map((d, dIndex) => (
-                              <React.Fragment key={dIndex}>
-                                <button
-                                  onClick={d.pick}
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    gap: "14px",
-                                    padding: "14px 16px",
-                                    borderRadius: "16px",
-                                    border: "1px solid " + d.border,
-                                    background: String(d.bg),
-                                    color: String(d.c),
-                                    textAlign: "left",
-                                    transition:
-                                      "all .35s cubic-bezier(.22,1,.36,1)",
-                                  }}
-                                  className={"reference-state-88"}
-                                >
-                                  <span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        fontSize: "16px",
-                                        fontWeight: "600",
-                                      }}
-                                    >
-                                      {d.label}
-                                    </span>
-                                    <span
-                                      style={{
-                                        display: "block",
-                                        marginTop: "4px",
-                                        fontSize: "13px",
-                                        fontWeight: "600",
-                                        color: String(d.sub),
-                                      }}
-                                    >
-                                      {d.note}
-                                    </span>
-                                  </span>
-                                  <span
-                                    style={{
-                                      display: "grid",
-                                      placeItems: "center",
-                                      width: "22px",
-                                      height: "22px",
-                                      borderRadius: "50%",
-                                      border: "1.5px solid " + d.radioB,
-                                      flexShrink: "0",
-                                    }}
-                                  >
-                                    <span
-                                      style={{
-                                        width: "10px",
-                                        height: "10px",
-                                        borderRadius: "50%",
-                                        background: String(d.radioDot),
-                                      }}
-                                    ></span>
-                                  </span>
-                                </button>
-                              </React.Fragment>
-                            ))}
-                          </div>
                         </div>
                       </div>
                       <aside
@@ -4727,6 +4800,13 @@ export default class Services extends ReferencePage {
                             >
                               {v.sum.billVal}
                             </span>
+                          </div>
+                          <div className="service-builder-period-summary">
+                            <span>Service period</span>
+                            <strong>
+                              {v.sum.cartItem?.duration ||
+                                getServiceDuration(v.serviceMonths).label}
+                            </strong>
                           </div>
                         </div>
                         <div
@@ -5812,6 +5892,9 @@ export default class Services extends ReferencePage {
                         </p>
                       </div>
                     </div>
+                    {v.ps.serviceFilter && (
+                      <ServicePlanFilter {...v.ps.serviceFilter} />
+                    )}
                     {v.ps.lockup && (
                       <>
                         <div
@@ -5890,7 +5973,7 @@ export default class Services extends ReferencePage {
                               color: "#3B1E59",
                             }}
                           >
-                            {"Fixed for this comparison"}
+                            {v.ps.comparisonLabel}
                           </span>
                         </div>
                       </>
@@ -5989,6 +6072,7 @@ export default class Services extends ReferencePage {
                     {v.ps.hasCards && (
                       <>
                         <div
+                          id="service-plan-cards"
                           data-reveal={"stagger"}
                           style={{
                             display: "grid",

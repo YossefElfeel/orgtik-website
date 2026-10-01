@@ -35,7 +35,17 @@ Each service item has a “View service features” disclosure. Bundles group th
 
 Service and family plan comparisons offer 1-, 3-, 6- and 12-month durations above the cards. The selected term appears on each plan, persists in its configuration URL and is included in cart and checkout data. Edit selection restores the saved duration. Different durations remain distinct cart configurations. Monthly rates and project estimates retain their published amounts; existing selections keep their saved duration.
 
+Department comparisons with multiple services also offer Filter by service. Choose the department overview or a specific service; all three cards update their scope, features and cart selection without changing the duration or published prices. The plan-service query parameter preserves the filter on refresh and when reopening Edit plan from the cart. Single-service departments and service-detail comparisons retain their fixed scope.
+
 Plan cards display a calendar period tag, explicit per-month or per-project pricing, and the estimated full-period amount for monthly plans. Saved service periods are also highlighted in the cart, where multi-month estimates appear above the feature disclosure. These totals use the existing monthly rate; project estimates are not multiplied by duration.
+
+The bundle builder filters service choices by department while retaining all selections. Counts identify selected services in other departments, and quick-start bundles return the filter to All. Both individual plans and bundles carry a numeric service period.
+
+The builder begins with Choose how we work, then Pick your services. Duration and department filters sit above the service choices in that second step. The visible and keyboard order follow the same sequence.
+
+Every service cart row uses the builder's shared native duration radios, saving immediately without navigation. Each row has its own labelled radio group. It updates the item, edit URL and checkout payload while retaining its scope, billing and price. Changing to an already-saved configuration combines the selections; Undo restores the original cart, including both items when combined. Older selections retain their current wording and have no numeric term selected until a duration is chosen. Software periods are edited through their existing configurator.
+
+Cart services follow the builder's configuration order: How we work, Service duration and Selected services. Department labels come from the shared catalogue, with the complete selected scope visible before opening features. Edit in builder restores a bundle's work type, period and services; individual selections offer Edit plan. Work type is shown for review and changed through the existing configurator.
 
 “Edit selection” opens the existing configuration with “Save changes” actions. The original stays in the cart until saving replaces it in place, without duplicating an already selected configuration. Cancel returns to the unchanged cart. Editing is temporary and ends on leaving that service/software page. Cart removal and confirmed clear-all actions show inline feedback with undo for the latest action. “Keep items” cancels the clear-all confirmation and returns focus to “Clear cart”. Navigation dismisses feedback; cart contents remain saved.
 

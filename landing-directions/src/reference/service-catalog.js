@@ -204,6 +204,39 @@ export const SERVICE_FAMILIES = [
   },
 ];
 
+export function getServiceChoices(department = "all") {
+  return SERVICE_FAMILIES.filter(
+    (family) => department === "all" || family.slug === department,
+  ).flatMap((f) =>
+    f.children.map((c) => ({ id: `${f.slug}/${c.slug}`, f, c })),
+  );
+}
+
+export function getServiceDepartment(selectionId) {
+  return SERVICE_FAMILIES.find(
+    (family) =>
+      family.slug === selectionId ||
+      family.children.some(
+        (service) => `${family.slug}/${service.slug}` === selectionId,
+      ),
+  );
+}
+
+export function getServicePlanSelection(familySlug, serviceSlug = "all") {
+  const family = SERVICE_FAMILIES.find((entry) => entry.slug === familySlug);
+  if (!family) return null;
+  const service = family.children.find((entry) => entry.slug === serviceSlug);
+  return {
+    family,
+    service: service || null,
+    id: service ? `${family.slug}/${service.slug}` : family.slug,
+    name: service ? service.name : family.name,
+    capabilities: service
+      ? service.capabilities
+      : family.children.map((entry) => entry.name),
+  };
+}
+
 // Keep cart details and service package cards on the same published scope.
 export function getServicePlanFeatures(plan, capabilities) {
   switch (plan.toLowerCase()) {

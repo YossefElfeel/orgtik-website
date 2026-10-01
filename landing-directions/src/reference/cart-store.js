@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { withServiceDuration } from "./service-duration.js";
 
 export const CART_STORAGE_KEY = "orgtik.cart.v1";
 const listeners = new Set();
@@ -139,6 +140,44 @@ export function addCartItem(input) {
 export function beginCartEdit(id) {
   if (snapshot.items.some((item) => item.id === id))
     publish(snapshot.items, null, false, id);
+}
+
+export function updateServicePeriod(id, value) {
+  const original = snapshot.items.find((item) => item.id === id);
+  const input = withServiceDuration(original, value);
+  const item = input && createCartItem(input);
+  if (!item) return null;
+  if (item.id === original.id) return original;
+  const duplicate = snapshot.items.some((entry) => entry.id === item.id);
+  const previousItems = snapshot.items;
+  const items = previousItems
+    .filter((entry) => entry.id !== item.id)
+    .map((entry) => (entry.id === original.id ? item : entry));
+  publish(
+    items,
+    {
+      key: performance.now(),
+      type: "period-updated",
+      item,
+      originalItem: original,
+      previousItems,
+      text: `${item.name}: ${item.duration} saved.${duplicate ? " Matching selections combined." : ""}`,
+    },
+    true,
+    null,
+  );
+  return item;
+}
+
+export function undoServicePeriod() {
+  const notice = snapshot.notice;
+  if (notice?.type !== "period-updated") return;
+  publish(notice.previousItems, {
+    key: performance.now(),
+    type: "period-restored",
+    item: notice.originalItem,
+    text: `${notice.originalItem.name}: previous period restored.`,
+  });
 }
 
 export function cancelCartEdit() {

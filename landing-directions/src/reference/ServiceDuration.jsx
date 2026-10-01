@@ -1,17 +1,28 @@
-import React from "react";
+import React, { useId } from "react";
 import { SERVICE_DURATIONS, getServiceDuration } from "./service-duration";
 import "./service-duration.css";
 
-export function ServiceDuration({ months, onChange }) {
+export function ServiceDuration({
+  months,
+  onChange,
+  groupLabel,
+  hint = "Included with your selected plan.",
+  headingLevel = 3,
+}) {
+  const id = useId();
+  const Heading = `h${headingLevel}`;
   return (
     <div className="service-duration" data-reveal="up">
       <div>
-        <h3 id="service-duration-label">Service duration</h3>
-        <p id="service-duration-hint">Included with your selected plan.</p>
+        <Heading className="service-duration__heading" id={`${id}-label`}>
+          Service duration
+        </Heading>
+        <p id={`${id}-hint`}>{hint}</p>
       </div>
       <fieldset
-        aria-labelledby="service-duration-label"
-        aria-describedby="service-duration-hint"
+        aria-label={groupLabel}
+        aria-labelledby={groupLabel ? undefined : `${id}-label`}
+        aria-describedby={`${id}-hint`}
       >
         <legend className="service-duration__legend">Service duration</legend>
         <div className="service-duration__options">
@@ -19,7 +30,7 @@ export function ServiceDuration({ months, onChange }) {
             <label key={value} className="service-duration__option">
               <input
                 type="radio"
-                name="service-plan-duration"
+                name={`${id}-duration`}
                 value={value}
                 checked={months === value}
                 onChange={() => onChange(value)}

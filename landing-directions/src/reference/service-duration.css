@@ -8,7 +8,7 @@
   border-block: 1px solid #190b251a;
   color: #190b25;
 }
-.service-duration h3 {
+.service-duration__heading {
   font-size: 15px;
   font-weight: 600;
   line-height: 1.5;

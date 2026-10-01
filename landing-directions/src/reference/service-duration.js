@@ -17,3 +17,17 @@ export function getServicePeriodEstimate(item) {
     return null;
   return item.estimate * item.commitmentMonths;
 }
+
+export function withServiceDuration(item, value) {
+  const months = Number(value);
+  if (item?.kind !== "service" || !SERVICE_DURATIONS.includes(months))
+    return null;
+  const url = new URL(item.sourceHref, "https://orgtik.invalid");
+  url.searchParams.set("duration", months);
+  return {
+    ...item,
+    duration: getServiceDuration(months).label,
+    commitmentMonths: months,
+    sourceHref: url.pathname + url.search + url.hash,
+  };
+}

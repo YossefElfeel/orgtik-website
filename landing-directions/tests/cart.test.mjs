@@ -8,6 +8,9 @@ import {
 import {
   SERVICE_FAMILIES,
   getServiceFeatures,
+  getServiceChoices,
+  getServicePlanSelection,
+  getServicePlanFeatures,
 } from "../src/reference/service-catalog.js";
 
 const storage = new Map();
@@ -66,6 +69,8 @@ const {
   clearCart,
   removeCartItem,
   undoCartRemoval,
+  updateServicePeriod,
+  undoServicePeriod,
   cartTotals,
 } = await import("../src/reference/cart-store.js");
 const { createCheckoutEnquiry, validateCheckout } =
@@ -402,4 +407,186 @@ test("Service plan durations stay distinct, undo correctly and reach checkout wi
     ).searchParams.get("duration"),
     "6",
   );
+});
+
+test("department filters resolve every service without changing the shared catalog", () => {
+  const original = JSON.stringify(SERVICE_FAMILIES);
+  const all = getServiceChoices();
+  assert.equal(all.length, 11);
+  assert.equal(new Set(all.map((item) => item.id)).size, 11);
+  for (const family of SERVICE_FAMILIES) {
+    const choices = getServiceChoices(family.slug);
+    assert.equal(choices.length, family.children.length);
+    assert.ok(choices.every((item) => item.id.startsWith(`${family.slug}/`)));
+    assert.deepEqual(
+      choices,
+      all.filter((item) => item.f.slug === family.slug),
+    );
+  }
+  assert.deepEqual(getServiceChoices("unknown"), []);
+  assert.equal(JSON.stringify(SERVICE_FAMILIES), original);
+});
+
+test("cart period changes preserve service scope, billing and prices and update checkout and edit links", () => {
+  clearCart();
+  addCartItem(software);
+  addCartItem({
+    kind: "service",
+    name: "Graphic design · Focus",
+    plan: "Focus",
+    selections: [{ id: "design/graphic-design", name: "Graphic design" }],
+    duration: "Defined scope",
+    billing: "project",
+    estimate: 1800,
+    sourceHref: "/services#/service/design/graphic-design",
+  });
+  addCartItem({
+    kind: "service",
+    name: "Care bundle",
+    plan: "",
+    selections: [
+      { id: "hosting/managed-hosting", name: "Managed website hosting" },
+    ],
+    duration: "Ongoing partnership",
+    billing: "monthly",
+    estimate: 3800,
+    sourceHref:
+      "/services?services=hosting/managed-hosting&engagement=partner#svc-builder",
+  });
+  const original = JSON.parse(storage.get(CART_STORAGE_KEY));
+  const focus = updateServicePeriod(original[1].id, "6");
+  assert.equal(focus.duration, "6 months");
+  assert.equal(focus.commitmentMonths, 6);
+  assert.equal(focus.estimate, 1800);
+  assert.equal(focus.billing, "project");
+  assert.deepEqual(focus.selections, original[1].selections);
+  assert.equal(
+    new URL(focus.sourceHref, "https://example.com").hash,
+    "#/service/design/graphic-design",
+  );
+  const beforeCare = JSON.parse(storage.get(CART_STORAGE_KEY));
+  const care = updateServicePeriod(original[2].id, 3);
+  const link = new URL(care.sourceHref, "https://example.com");
+  assert.equal(link.searchParams.get("duration"), "3");
+  assert.equal(link.searchParams.get("services"), "hosting/managed-hosting");
+  assert.equal(link.searchParams.get("engagement"), "partner");
+  assert.equal(link.hash, "#svc-builder");
+  const saved = JSON.parse(storage.get(CART_STORAGE_KEY));
+  assert.equal(saved.length, 3);
+  assert.deepEqual(saved[0], original[0]);
+  assert.equal(original[1].duration, "Defined scope");
+  assert.equal(getServicePeriodEstimate(care), 11400);
+  assert.deepEqual(cartTotals(saved), {
+    monthly: 3872,
+    project: 1800,
+    onRequest: false,
+  });
+  const enquiry = createCheckoutEnquiry(saved, {
+    name: "QA Preview",
+    email: "qa@example.com",
+    phone: "",
+    company: "",
+    message: "",
+  });
+  assert.deepEqual(
+    enquiry.items
+      .slice(1)
+      .map((item) => [item.duration, item.commitmentMonths]),
+    [
+      ["6 months", 6],
+      ["3 months", 3],
+    ],
+  );
+  undoServicePeriod();
+  assert.deepEqual(JSON.parse(storage.get(CART_STORAGE_KEY)), beforeCare);
+  undoServicePeriod();
+  assert.deepEqual(JSON.parse(storage.get(CART_STORAGE_KEY)), beforeCare);
+  assert.equal(updateServicePeriod(saved[0].id, 3), null);
+  assert.equal(updateServicePeriod(focus.id, 24), null);
+  assert.equal(updateServicePeriod("missing", 3), null);
+  assert.deepEqual(JSON.parse(storage.get(CART_STORAGE_KEY)), beforeCare);
+});
+
+test("changing to an existing period combines identical selections and Undo restores both", () => {
+  clearCart();
+  const item = {
+    kind: "service",
+    name: "Graphic design · Partnership",
+    plan: "Partnership",
+    selections: [{ id: "design/graphic-design", name: "Graphic design" }],
+    billing: "monthly",
+    estimate: 1450,
+    sourceHref: "/services?duration=3#/service/design/graphic-design",
+  };
+  addCartItem({ ...item, duration: "3 months", commitmentMonths: 3 });
+  addCartItem(software);
+  addCartItem({ ...item, duration: "6 months", commitmentMonths: 6 });
+  addCartItem({
+    ...item,
+    plan: "On request",
+    duration: "1 month",
+    commitmentMonths: 1,
+    estimate: null,
+  });
+  const original = JSON.parse(storage.get(CART_STORAGE_KEY));
+  const updated = updateServicePeriod(original[2].id, 3);
+  const combined = JSON.parse(storage.get(CART_STORAGE_KEY));
+  assert.equal(combined.length, 3);
+  assert.equal(combined.filter((entry) => entry.id === updated.id).length, 1);
+  assert.equal(cartTotals(combined).monthly, 1522);
+  undoServicePeriod();
+  assert.deepEqual(JSON.parse(storage.get(CART_STORAGE_KEY)), original);
+  const onRequest = updateServicePeriod(original[3].id, 12);
+  assert.equal(onRequest.estimate, null);
+  assert.equal(getServicePeriodEstimate(onRequest), null);
+  undoServicePeriod();
+  assert.deepEqual(JSON.parse(storage.get(CART_STORAGE_KEY)), original);
+});
+
+test("department plan filters resolve service scope and retain it through cart duration edits", () => {
+  const originalCatalog = JSON.stringify(SERVICE_FAMILIES);
+  for (const family of SERVICE_FAMILIES) {
+    const overview = getServicePlanSelection(family.slug);
+    assert.equal(overview.id, family.slug);
+    assert.equal(overview.service, null);
+    for (const service of family.children) {
+      const selected = getServicePlanSelection(family.slug, service.slug);
+      assert.equal(selected.id, `${family.slug}/${service.slug}`);
+      assert.equal(selected.name, service.name);
+      for (const plan of ["Focus", "Connected", "Partnership"])
+        assert.deepEqual(
+          getServicePlanFeatures(plan, selected.capabilities),
+          getServiceFeatures(selected.id, plan),
+        );
+    }
+    assert.deepEqual(getServicePlanSelection(family.slug, "unknown"), overview);
+  }
+  assert.equal(getServicePlanSelection("unknown", "graphic-design"), null);
+  assert.equal(
+    getServicePlanSelection("marketing", "graphic-design").service,
+    null,
+  );
+  assert.equal(JSON.stringify(SERVICE_FAMILIES), originalCatalog);
+  clearCart();
+  const selected = getServicePlanSelection("design", "brand-development");
+  addCartItem({
+    kind: "service",
+    name: selected.name + " · Focus",
+    plan: "Focus",
+    selections: [{ id: selected.id, name: selected.name }],
+    duration: "3 months",
+    commitmentMonths: 3,
+    billing: "project",
+    estimate: 1800,
+    sourceHref:
+      "/services?duration=3&plan-service=brand-development#/family/design",
+  });
+  const item = JSON.parse(storage.get(CART_STORAGE_KEY))[0];
+  const updated = updateServicePeriod(item.id, 6);
+  const link = new URL(updated.sourceHref, "https://example.com");
+  assert.equal(link.searchParams.get("plan-service"), "brand-development");
+  assert.equal(link.searchParams.get("duration"), "6");
+  assert.equal(link.hash, "#/family/design");
+  assert.deepEqual(updated.selections, item.selections);
+  assert.equal(updated.estimate, 1800);
 });

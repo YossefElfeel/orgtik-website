@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CommerceLayout } from "./CommerceLayout";
 import { CartSummary, EmptyCart } from "./CartSummary";
-import { getServiceFeatures } from "./service-catalog";
+import { getServiceDepartment, getServiceFeatures } from "./service-catalog";
+import { ServiceDuration } from "./ServiceDuration";
 import {
   SERVICE_DURATIONS,
   getServiceDuration,
@@ -15,6 +16,8 @@ import {
   formatCHF,
   removeCartItem,
   undoCartRemoval,
+  updateServicePeriod,
+  undoServicePeriod,
   useCart,
 } from "./cart-store";
 import "./cart.css";
@@ -24,7 +27,6 @@ function CartItem({ item }) {
     item.plan && item.name.endsWith(` · ${item.plan}`)
       ? item.name.slice(0, -(item.plan.length + 3))
       : item.name;
-  const scope = item.kind === "software" ? "product" : "service";
   const hasServicePeriod =
     item.kind === "service" &&
     SERVICE_DURATIONS.includes(item.commitmentMonths) &&
@@ -33,6 +35,8 @@ function CartItem({ item }) {
   const actionName = hasServicePeriod
     ? `${item.name} · ${item.duration}`
     : item.name;
+  const isBuilderSelection =
+    item.kind === "service" && item.sourceHref.includes("#svc-builder");
   return (
     <li className="cart-row" id={`cart-item-${encodeURIComponent(item.id)}`}>
       <div className="cart-row__main">
@@ -43,15 +47,11 @@ function CartItem({ item }) {
         </span>
         <div className="cart-row__identity">
           <h3>{name}</h3>
-          <p className="cart-row__meta">
-            {item.plan && <strong>{item.plan}</strong>}
-            {!hasServicePeriod && <span>{item.duration}</span>}
-          </p>
-          {hasServicePeriod && (
-            <span className="cart-row__duration">
-              <i className="ph ph-calendar-blank" aria-hidden="true" />
-              <span>{item.duration}</span>
-            </span>
+          {(item.plan || (!hasServicePeriod && item.duration)) && (
+            <p className="cart-row__meta">
+              {item.plan && <strong>{item.plan}</strong>}
+              {!hasServicePeriod && <span>{item.duration}</span>}
+            </p>
           )}
         </div>
         <div className="cart-row__estimate">
@@ -70,6 +70,61 @@ function CartItem({ item }) {
           )}
         </div>
       </div>
+      {item.kind === "service" && (
+        <div className="cart-row__service-config">
+          <dl className="cart-row__engagement">
+            <dt>How we work</dt>
+            <dd>
+              <i
+                className={`ph ${item.billing === "monthly" ? "ph-arrows-clockwise" : "ph-briefcase"}`}
+                aria-hidden="true"
+              />
+              {item.billing === "monthly"
+                ? "Ongoing partnership"
+                : "One-off project"}
+            </dd>
+          </dl>
+          <ServiceDuration
+            months={hasServicePeriod ? item.commitmentMonths : null}
+            groupLabel={`Service duration for ${actionName}`}
+            headingLevel={4}
+            hint={
+              hasServicePeriod
+                ? "Changes save automatically."
+                : "Choose a duration for this selection."
+            }
+            onChange={(months) => {
+              const updated = updateServicePeriod(item.id, months);
+              if (updated)
+                requestAnimationFrame(() =>
+                  document
+                    .getElementById(
+                      `cart-item-${encodeURIComponent(updated.id)}`,
+                    )
+                    ?.querySelector(".service-duration input:checked")
+                    ?.focus({ preventScroll: true }),
+                );
+            }}
+          />
+          <div className="cart-row__services">
+            <h4>
+              Selected services <span>{item.selections.length}</span>
+            </h4>
+            <ul aria-label={`Selected services in ${item.name}`}>
+              {item.selections.map((selection) => {
+                const department = getServiceDepartment(selection.id);
+                return (
+                  <li key={selection.id}>
+                    <i className="ph ph-check" aria-hidden="true" />
+                    <span>{selection.name}</span>
+                    {department && <small>{department.short}</small>}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      )}
       {hasServicePeriod &&
         periodEstimate !== null &&
         item.commitmentMonths > 1 && (
@@ -92,16 +147,16 @@ function CartItem({ item }) {
                 ? "View service features"
                 : `${item.selections.length} product${item.selections.length !== 1 ? "s" : ""} included`}
             </b>
-            <span className="cart-row__preview">
-              {item.kind === "service" &&
-                `${item.selections.length} ${scope}${item.selections.length !== 1 ? "s" : ""} · `}
-              {item.selections
-                .slice(0, 3)
-                .map((selection) => selection.name)
-                .join(", ")}
-              {item.selections.length > 3 &&
-                ` + ${item.selections.length - 3} more`}
-            </span>
+            {item.kind === "software" && (
+              <span className="cart-row__preview">
+                {item.selections
+                  .slice(0, 3)
+                  .map((selection) => selection.name)
+                  .join(", ")}
+                {item.selections.length > 3 &&
+                  ` + ${item.selections.length - 3} more`}
+              </span>
+            )}
           </span>
           <i className="ph ph-caret-down" aria-hidden="true" />
         </summary>
@@ -168,8 +223,12 @@ function CartItem({ item }) {
           }}
           aria-label={`Edit ${actionName}`}
         >
-          <i className="ph ph-pencil-simple" aria-hidden="true" /> Edit
-          selection
+          <i className="ph ph-pencil-simple" aria-hidden="true" />
+          {isBuilderSelection
+            ? "Edit in builder"
+            : item.kind === "service"
+              ? "Edit plan"
+              : "Edit selection"}
         </a>
         <button
           type="button"
@@ -204,11 +263,14 @@ function CartActivity({ notice }) {
     return () => window.removeEventListener("keydown", keydown);
   }, [notice]);
   if (!notice) return null;
-  const canUndo = ["removed", "cleared"].includes(notice.type);
+  const canUndo = ["removed", "cleared", "period-updated"].includes(
+    notice.type,
+  );
+  const removed = ["removed", "cleared"].includes(notice.type);
   return (
     <div className="cart-activity" ref={activityRef}>
       <i
-        className={`ph ${canUndo ? "ph-trash" : "ph-check-circle"}`}
+        className={`ph ${removed ? "ph-trash" : "ph-check-circle"}`}
         aria-hidden="true"
       />
       <p role="status">{notice.text}</p>
@@ -217,14 +279,20 @@ function CartActivity({ notice }) {
           id="cart-undo-removal"
           type="button"
           onClick={() => {
-            undoCartRemoval();
+            if (notice.type === "period-updated") undoServicePeriod();
+            else undoCartRemoval();
             requestAnimationFrame(() => {
-              const target = notice.item
-                ? document
-                    .getElementById(
-                      `cart-item-${encodeURIComponent(notice.item.id)}`,
-                    )
-                    ?.querySelector("button")
+              const focusItem = notice.originalItem || notice.item;
+              const row = focusItem
+                ? document.getElementById(
+                    `cart-item-${encodeURIComponent(focusItem.id)}`,
+                  )
+                : null;
+              const target = focusItem
+                ? notice.type === "period-updated"
+                  ? row?.querySelector(".service-duration input:checked") ||
+                    row?.querySelector(".service-duration input")
+                  : row?.querySelector("button")
                 : document.getElementById("cart-title");
               target?.focus();
             });

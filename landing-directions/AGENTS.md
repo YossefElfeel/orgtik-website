@@ -1,3 +1,9 @@
+## Duration filter design — 2026-10-04
+
+Every active duration selector uses the shared `DurationPicker` and matches the department filter pills: separate fully rounded options, a thin lilac outline when unselected, and a dark plum selected state. All options in a row have equal height, including the one-month option without a savings label. Do not put the options inside a filled segmented bar. Keep duration/savings labels, native radio behavior, keyboard focus, and an even four-option row or two-by-two layout in narrow containers. Apply the same style to bundles, Services/Software builders, individual packages, the pricing directory, and cart editors.
+
+Inside Make it yours, each service/product has a native Set an individual duration checkbox that shows or hides its duration pills. Start collapsed when the item uses the shared duration; reveal existing overrides or missing terms on entry. Hiding options preserves the selected duration. Show the current item duration and explain that edits affect only that item, leave the bundle/plan shared duration unchanged, and preserve all other items' chosen terms. The top-level shared duration remains visible and continues to confirm replacing existing overrides.
+
 ## Complete test checkout — 2026-10-04
 
 Start checkout with no payment method selected. Hide payment details and method-specific guidance until the customer chooses Card, TWINT, or PayPal. Only render the chosen method's details/approval, and keep Pay disabled until they are complete.

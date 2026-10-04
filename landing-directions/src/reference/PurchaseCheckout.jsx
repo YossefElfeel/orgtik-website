@@ -1,4 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useSyncExternalStore,
+} from "react";
 import { CommerceLayout } from "./CommerceLayout";
 import {
   useCart,
@@ -22,6 +27,13 @@ import {
   loadPurchaseSession,
   clearPurchaseSession,
 } from "./purchase-adapter.js";
+import {
+  getPreviewCustomer,
+  subscribePreviewCustomer,
+  signInPreviewCustomer,
+  signOutPreviewCustomer,
+} from "./purchase-identity.js";
+import { PAYMENT_METHODS, getPaymentMethod } from "./purchase-payment.js";
 
 function Confirmation({ order, crm, onCRM, verified, onRestart }) {
   const [busy, setBusy] = useState(false);
@@ -50,15 +62,21 @@ function Confirmation({ order, crm, onCRM, verified, onRestart }) {
       <section className="purchase-checkout-panel">
         <span className="purchase-confirmed">
           <i className="ph ph-check-circle" aria-hidden="true" /> Payment
-          confirmed in preview
+          confirmed
         </span>
         <h2 ref={heading} tabIndex={-1}>
           Access your customer account.
         </h2>
         <p>
-          Demo order <strong>{order.reference}</strong> ·{" "}
-          {money(order.quote.total)} paid in the preview. No real charge was
-          made.
+          Order <strong>{order.reference}</strong> · {money(order.quote.total)}{" "}
+          paid.
+        </p>
+        <p className="purchase-receipt-method">
+          <i
+            className={`ph ph-${getPaymentMethod(order.paymentMethod).icon}`}
+            aria-hidden="true"
+          />
+          Payment method: {getPaymentMethod(order.paymentMethod).name}
         </p>
         <div className="purchase-alert" role="status">
           <strong>
@@ -74,21 +92,30 @@ function Confirmation({ order, crm, onCRM, verified, onRestart }) {
               : "Your purchase is saved. You will not be asked to pay again."}
           </p>
         </div>
-        {crm.status === "ready" ? (
-          <PurchaseAction onClick={() => setHandoff(true)}>
-            {crm.access === "verified-existing"
-              ? "Go to my account"
-              : "Set up my account"}
-          </PurchaseAction>
-        ) : (
-          <PurchaseAction onClick={retry} disabled={busy}>
-            {busy
-              ? "Preparing account…"
-              : crm.status === "failed"
-                ? "Retry account setup"
-                : "Check account setup"}
-          </PurchaseAction>
-        )}
+        <div className="purchase-confirmation-actions">
+          {crm.status === "ready" ? (
+            <PurchaseAction onClick={() => setHandoff(true)}>
+              {crm.access === "verified-existing"
+                ? "Go to my account"
+                : "Set up my account"}
+            </PurchaseAction>
+          ) : (
+            <PurchaseAction onClick={retry} disabled={busy}>
+              {busy
+                ? "Preparing account…"
+                : crm.status === "failed"
+                  ? "Retry account setup"
+                  : "Check account setup"}
+            </PurchaseAction>
+          )}
+          <button
+            type="button"
+            className="purchase-text-button"
+            onClick={onRestart}
+          >
+            Continue browsing
+          </button>
+        </div>
         <p className="purchase-caption">
           Software activates after payment. Service periods begin after
           onboarding confirms activation in the CRM.
@@ -115,13 +142,13 @@ function Confirmation({ order, crm, onCRM, verified, onRestart }) {
                     </small>
                     <small>
                       {line.activation === "active-preview"
-                        ? "Active in preview"
+                        ? "Active"
                         : "Awaiting onboarding — period not started"}
                     </small>
                     {line.autoRenew && (
                       <small>
                         Renews for {termLabel(line.months)} at{" "}
-                        {money(line.total)} in the preview
+                        {money(line.total)}
                       </small>
                     )}
                   </td>
@@ -137,45 +164,35 @@ function Confirmation({ order, crm, onCRM, verified, onRestart }) {
           </tbody>
           <tfoot>
             <tr>
-              <th>Total paid in preview</th>
+              <th>Total paid</th>
               <th>{money(order.quote.total)}</th>
             </tr>
           </tfoot>
         </table>
         <p>
-          Invoices and payment history will be available in the CRM. No real
-          invoice was generated.
+          View invoices and payment history in your OrgTik customer account.
         </p>
-        <button
-          type="button"
-          className="purchase-text-button"
-          onClick={onRestart}
-        >
-          Continue browsing
-        </button>
       </section>
       <PurchaseDialog
         open={handoff}
         title="Your CRM account"
         onClose={() => setHandoff(false)}
       >
-        <span className="purchase-eyebrow">Handoff preview</span>
         <p>
           {verified || emailVerified
-            ? "Demo identity verified. In production, the CRM opens your customer account with your purchases, payments, and invoices."
-            : "The CRM verifies your email before granting access. A new customer sets up their account; an existing customer securely accesses their current account."}
+            ? "Your email is verified. Continue to your customer account to view purchases, payments, and invoices."
+            : "Verify your email to securely access your customer account."}
         </p>
-        <p>No email was sent and no real account was created.</p>
         {!verified && !emailVerified ? (
           <PurchaseAction onClick={() => setEmailVerified(true)}>
-            Simulate email verification
+            Verify email
           </PurchaseAction>
         ) : portal ? (
           <PurchaseAction href={portal}>Continue to CRM</PurchaseAction>
         ) : (
           <div className="purchase-alert">
-            Account access verified in the preview. The CRM portal destination
-            will be configured before the live integration.
+            Your purchase is saved. Customer portal access will be available
+            once the account connection is configured.
           </div>
         )}
       </PurchaseDialog>
@@ -184,40 +201,47 @@ function Confirmation({ order, crm, onCRM, verified, onRestart }) {
 }
 export default function PurchaseCheckout() {
   const { items } = useCart();
+  const identity = useSyncExternalStore(
+    subscribePreviewCustomer,
+    getPreviewCustomer,
+    getPreviewCustomer,
+  );
   const [saved] = useState(() => (items.length ? null : loadPurchaseSession()));
   const [order, setOrder] = useState(saved?.order || null);
   const [crm, setCRM] = useState(
     saved?.crm || { status: "pending", access: "verification-required" },
   );
-  const [channel, setChannel] = useState("");
-  const [customer, setCustomer] = useState({
-    name: "",
-    email: "",
-    company: "",
-  });
-  const [verified, setVerified] = useState(false);
+  const [signInOpen, setSignInOpen] = useState(false);
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  const [signInError, setSignInError] = useState("");
+  const [customer, setCustomer] = useState(() =>
+    identity ? { ...identity } : { name: "", email: "", company: "" },
+  );
+  const verified = !saved && !!identity && customer.email === identity.email;
+  const guestDraft = useRef({ name: "", email: "", company: "" });
+  const previousIdentity = useRef(identity);
+  useEffect(() => {
+    if (previousIdentity.current === identity) return;
+    previousIdentity.current = identity;
+    setCustomer(identity ? { ...identity } : { ...guestDraft.current });
+    setErrors({});
+  }, [identity]);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const selectedMethod = getPaymentMethod(paymentMethod);
   const [outcome, setOutcome] = useState("success");
   const [crmScenario, setCRMScenario] = useState("ready");
   const [sessionSaved, setSessionSaved] = useState(true);
+  const showTestControls =
+    import.meta.env.DEV &&
+    new URLSearchParams(window.location.search).get("qa") === "1";
   const busy = useRef(false);
   const controller = useRef(null);
   const attempt = useRef(null);
   const form = useRef(null);
-  const panel = useRef(null);
-  const previousChannel = useRef({ channel, verified });
-  useEffect(() => {
-    if (
-      previousChannel.current.channel !== channel ||
-      previousChannel.current.verified !== verified
-    )
-      (
-        form.current?.elements.name || panel.current?.querySelector("button")
-      )?.focus();
-    previousChannel.current = { channel, verified };
-  }, [channel, verified]);
   useEffect(() => () => controller.current?.abort(), []);
   const updateCRM = (value) => {
     setCRM(value);
@@ -240,12 +264,13 @@ export default function PurchaseCheckout() {
     busy.current = true;
     setProcessing(true);
     controller.current = new AbortController();
-    attempt.current ||= `DEMO-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+    attempt.current ||= `ORG-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     try {
       const purchase = await simulatePayment({
         groups: items,
         customer,
         reference: attempt.current,
+        paymentMethod,
         outcome,
         signal: controller.current.signal,
       });
@@ -289,7 +314,6 @@ export default function PurchaseCheckout() {
         readOnly={verified && id === "email"}
         onChange={(e) => {
           setCustomer({ ...customer, [id]: e.target.value });
-          if (id === "email") setVerified(false);
         }}
         required={required}
         aria-invalid={!!errors[id]}
@@ -313,13 +337,13 @@ export default function PurchaseCheckout() {
           <p>
             {order
               ? "Your payment is complete. Continue to your account for purchases, payments, and invoices."
-              : "Review your order and complete your demo payment."}
+              : "Review your order and complete your payment."}
           </p>
         </div>
         {!sessionSaved && (
           <p className="purchase-alert">
-            This browser cannot retain the preview receipt. Keep this tab open
-            to review your confirmation.
+            This browser cannot retain your receipt. Keep this tab open to
+            review your confirmation.
           </p>
         )}
         {order ? (
@@ -349,138 +373,154 @@ export default function PurchaseCheckout() {
               <OrderContents groups={items} />
               <p>
                 Full selected periods paid upfront. You save{" "}
-                {money(quoteCart(items).saving)}. Tax calculation is not
-                configured in this prototype.
+                {money(quoteCart(items).saving)}. Tax is not calculated.
               </p>
               <a href="/cart">Edit your selection</a>
             </details>
-            <section ref={panel} className="purchase-checkout-panel">
-              {!channel ? (
-                <>
-                  <h2>Continue to payment</h2>
-                  <p>
-                    Your purchase includes an OrgTik customer account where you
-                    can view purchases, payments, and invoices.
-                  </p>
-                  <div className="purchase-dialog__actions">
-                    <PurchaseAction onClick={() => setChannel("guest")}>
-                      Continue as guest
-                    </PurchaseAction>
-                    <PurchaseAction
-                      secondary
-                      onClick={() => setChannel("signin")}
-                    >
-                      Sign in
-                    </PurchaseAction>
+            <section className="purchase-checkout-panel">
+              <form
+                ref={form}
+                onSubmit={submit}
+                noValidate
+                aria-busy={processing}
+              >
+                <div className="purchase-checkout-identity">
+                  <div>
+                    <strong>
+                      {verified
+                        ? `Signed in as ${identity.name || identity.email}`
+                        : "Guest checkout"}
+                    </strong>
+                    {verified && <span>{identity.email}</span>}
                   </div>
-                </>
-              ) : channel === "signin" && !verified ? (
-                <>
-                  <h2>Sign in to your account</h2>
-                  <p>
-                    This is a local sign-in preview. Use the demo account to
-                    return to checkout; no password or real credentials are
-                    needed.
-                  </p>
-                  <PurchaseAction
+                  <button
+                    type="button"
+                    disabled={processing}
                     onClick={() => {
-                      setVerified(true);
-                      setCustomer({
-                        name: "Demo Customer",
-                        email: "customer@example.test",
-                        company: "",
-                      });
+                      if (verified) {
+                        signOutPreviewCustomer();
+                        setCustomer({ ...guestDraft.current });
+                        setErrors({});
+                      } else {
+                        setSignInEmail(customer.email);
+                        setSignInOpen(true);
+                      }
                     }}
                   >
-                    Use demo account
-                  </PurchaseAction>
-                  <button
-                    className="purchase-text-button"
-                    type="button"
-                    onClick={() => setChannel("guest")}
-                  >
-                    Continue as guest instead
+                    {verified ? "Sign out" : "Sign in"}
                   </button>
-                </>
-              ) : (
-                <form
-                  ref={form}
-                  onSubmit={submit}
-                  noValidate
-                  aria-busy={processing}
+                </div>
+                <h2>Billing details</h2>
+                <p>
+                  {verified
+                    ? "Your purchase will be linked to your OrgTik customer account."
+                    : "Your purchase includes an OrgTik customer account where you can view purchases, payments, and invoices. Account access is set up after payment."}
+                </p>
+                <fieldset
+                  disabled={processing}
+                  className="purchase-billing-fields"
                 >
-                  <div className="purchase-toolbar">
-                    <h2>{verified ? "Welcome back." : "Billing details"}</h2>
-                    <button
-                      type="button"
-                      disabled={processing}
-                      onClick={() => {
-                        setChannel("");
-                        setVerified(false);
-                      }}
-                    >
-                      Change checkout choice
-                    </button>
+                  <div className="purchase-fields">
+                    {field("name", "Full name")}
+                    {field("email", "Email address", "email")}
+                    <details className="purchase-company">
+                      <summary>Add company details (optional)</summary>
+                      {field("company", "Company", "text", false)}
+                    </details>
                   </div>
-                  <p>
-                    {verified
-                      ? "Demo account verified. Your purchase will be associated with your existing CRM account."
-                      : "Your purchase includes an OrgTik customer account where you can view purchases, payments, and invoices. Account access is set up after payment."}
+                </fieldset>
+                <fieldset
+                  className="purchase-payment-methods"
+                  disabled={processing}
+                  aria-describedby="purchase-payment-disclosure"
+                >
+                  <legend>Payment method</legend>
+                  <div className="purchase-payment-options">
+                    {PAYMENT_METHODS.map((method) => (
+                      <label
+                        className="purchase-payment-option"
+                        key={method.id}
+                        data-selected={paymentMethod === method.id}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value={method.id}
+                          checked={paymentMethod === method.id}
+                          onChange={() => {
+                            setPaymentMethod(method.id);
+                            setError("");
+                          }}
+                          aria-label={method.name}
+                          aria-describedby={`purchase-method-${method.id}-description`}
+                        />
+                        <i
+                          className={`ph ph-${method.icon}`}
+                          aria-hidden="true"
+                        />
+                        <span>
+                          <strong>{method.name}</strong>
+                          <small
+                            id={`purchase-method-${method.id}-description`}
+                          >
+                            {method.description}
+                          </small>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="purchase-payment-guidance" role="status">
+                    {selectedMethod.guidance}
                   </p>
-                  <fieldset
-                    disabled={processing}
-                    className="purchase-billing-fields"
-                  >
-                    <div className="purchase-fields">
-                      {field("name", "Full name")}
-                      {field("email", "Email address", "email")}
-                      <details className="purchase-company">
-                        <summary>Add company details (optional)</summary>
-                        {field("company", "Company", "text", false)}
-                      </details>
-                    </div>
-                  </fieldset>
-                  <div className="purchase-payment-method">
-                    <i className="ph ph-credit-card" aria-hidden="true" />
-                    <div>
-                      <strong>Demo payment method</strong>
-                      <p>No card details required. No real charge.</p>
-                    </div>
-                  </div>
-                  {error && (
-                    <p className="purchase-error" role="alert">
-                      {error}
-                    </p>
-                  )}
+                </fieldset>
+                <div className="purchase-payment-total">
+                  <span>Due today</span>
+                  <strong>{money(quoteCart(items).total)}</strong>
+                </div>
+                <p
+                  id="purchase-payment-disclosure"
+                  className="purchase-payment-disclosure"
+                >
+                  No charge is made in this environment.
+                </p>
+                {error && (
+                  <p className="purchase-error" role="alert">
+                    {error}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={processing || !quoteCart(items).valid}
+                  className="commerce-action purchase-action"
+                >
+                  <span>
+                    {processing
+                      ? `Processing ${selectedMethod.name} payment…`
+                      : `Pay ${money(quoteCart(items).total)}`}
+                  </span>
+                  <span className="commerce-action__arrow">
+                    <i className="ph ph-lock-simple" aria-hidden="true" />
+                  </span>
+                </button>
+                <span className="purchase-sr-only" role="status">
+                  {processing ? "Processing payment. Please wait." : ""}
+                </span>
+                {processing && (
                   <button
-                    type="submit"
-                    disabled={processing || !quoteCart(items).valid}
-                    className="commerce-action purchase-action"
+                    type="button"
+                    className="purchase-text-button"
+                    onClick={() => controller.current?.abort()}
                   >
-                    <span>
-                      {processing
-                        ? "Processing demo payment…"
-                        : `Pay ${money(quoteCart(items).total)}`}
-                    </span>
-                    <span className="commerce-action__arrow">
-                      <i className="ph ph-lock-simple" aria-hidden="true" />
-                    </span>
+                    Cancel payment
                   </button>
-                  {processing && (
-                    <button
-                      type="button"
-                      className="purchase-text-button"
-                      onClick={() => controller.current?.abort()}
-                    >
-                      Cancel payment
-                    </button>
-                  )}
-                  {!quoteCart(items).valid && (
-                    <p className="purchase-error">
-                      Your selection needs review.{" "}
-                      <a href="/cart">Return to cart</a>.
-                    </p>
-                  )}
+                )}
+                {!quoteCart(items).valid && (
+                  <p className="purchase-error">
+                    Your selection needs review.{" "}
+                    <a href="/cart">Return to cart</a>.
+                  </p>
+                )}
+                {showTestControls && (
                   <details className="purchase-demo-controls">
                     <summary>Preview payment and account states</summary>
                     <div className="purchase-fields">
@@ -510,9 +550,129 @@ export default function PurchaseCheckout() {
                       </label>
                     </div>
                   </details>
-                </form>
-              )}
+                )}
+              </form>
             </section>
+            <PurchaseDialog
+              open={signInOpen}
+              title="Sign in to OrgTik"
+              onClose={() => {
+                setSignInOpen(false);
+                setSignInPassword("");
+                setSignInError("");
+              }}
+            >
+              <p>
+                Sign in to link this purchase to your customer account. Your
+                cart and billing details stay with you.
+              </p>
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (
+                    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signInEmail.trim()) ||
+                    !signInPassword
+                  ) {
+                    setSignInError("Enter your email address and password.");
+                    const invalidField = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                      signInEmail.trim(),
+                    )
+                      ? "signin-email"
+                      : "signin-password";
+                    event.currentTarget.elements
+                      .namedItem(invalidField)
+                      ?.focus();
+                    return;
+                  }
+                  guestDraft.current = { ...customer };
+                  setCustomer({
+                    ...signInPreviewCustomer({
+                      name:
+                        customer.email === signInEmail.trim()
+                          ? customer.name
+                          : "",
+                      email: signInEmail,
+                      company: "",
+                    }),
+                  });
+                  setErrors({});
+                  setSignInOpen(false);
+                  setSignInPassword("");
+                  setSignInError("");
+                }}
+                noValidate
+              >
+                <div className="purchase-fields">
+                  <label>
+                    Email address
+                    <input
+                      name="signin-email"
+                      type="email"
+                      autoComplete="email"
+                      maxLength={254}
+                      aria-invalid={
+                        !!signInError &&
+                        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signInEmail.trim())
+                      }
+                      aria-describedby={
+                        signInError ? "checkout-signin-error" : undefined
+                      }
+                      value={signInEmail}
+                      onChange={(event) => setSignInEmail(event.target.value)}
+                      required
+                    />
+                  </label>
+                  <label>
+                    Password
+                    <input
+                      name="signin-password"
+                      type="password"
+                      autoComplete="current-password"
+                      maxLength={128}
+                      aria-invalid={!!signInError && !signInPassword}
+                      aria-describedby={
+                        signInError ? "checkout-signin-error" : undefined
+                      }
+                      value={signInPassword}
+                      onChange={(event) =>
+                        setSignInPassword(event.target.value)
+                      }
+                      required
+                    />
+                  </label>
+                </div>
+                {signInError && (
+                  <p
+                    id="checkout-signin-error"
+                    className="purchase-error"
+                    role="alert"
+                  >
+                    {signInError}
+                  </p>
+                )}
+                <div className="purchase-dialog__actions">
+                  <button
+                    type="submit"
+                    className="commerce-action purchase-action"
+                  >
+                    <span>Sign in</span>
+                    <span className="commerce-action__arrow">
+                      <i className="ph ph-arrow-up-right" aria-hidden="true" />
+                    </span>
+                  </button>
+                  <PurchaseAction
+                    secondary
+                    onClick={() => {
+                      setSignInOpen(false);
+                      setSignInPassword("");
+                      setSignInError("");
+                    }}
+                  >
+                    Keep checking out as guest
+                  </PurchaseAction>
+                </div>
+              </form>
+            </PurchaseDialog>
             <QuoteSummary groups={items} title="Your order">
               <OrderContents groups={items} />
               <a href="/cart">Edit your selection</a>

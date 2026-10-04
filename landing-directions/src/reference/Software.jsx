@@ -10,6 +10,7 @@ import { Testimonials } from "./Testimonials";
 import { ContentHeading } from "./ContentHeading";
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { AccountControl } from "./AccountControl";
 import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref, readWorkspaceQuery } from "./navigation";
@@ -1379,18 +1380,7 @@ export default class Software extends ReferencePage {
                   >
                     <CartLink />
                     <LanguageMenu />
-                    <a
-                      href={toSiteHref("SignIn.dc.html")}
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: "500",
-                        color: "#DCD0E6",
-                        whiteSpace: "nowrap",
-                      }}
-                      className={"reference-state-34"}
-                    >
-                      {"Sign in"}
-                    </a>
+                    <AccountControl />
                     <a
                       href={toSiteHref("Contact.dc.html")}
                       style={{
@@ -1436,6 +1426,7 @@ export default class Software extends ReferencePage {
                 <>
                   <CartLink />
                   <LanguageMenu compact />
+                  <AccountControl compact />
                   <button
                     onClick={v.openMenu}
                     aria-label="Open menu"
@@ -1468,6 +1459,7 @@ export default class Software extends ReferencePage {
           {v.menuOpen && (
             <>
               <div
+                className="site-navigation-panel"
                 style={{
                   position: "fixed",
                   inset: "0",
@@ -1509,6 +1501,11 @@ export default class Software extends ReferencePage {
                     ></i>
                   </button>
                 </div>
+                <AccountControl
+                  menu
+                  onNavigate={v.closeMenu}
+                  onSignOut={v.closeMenu}
+                />
                 <nav
                   style={{
                     display: "flex",
@@ -3208,9 +3205,7 @@ export default class Software extends ReferencePage {
                             }}
                             className={"ph ph-info"}
                           ></i>
-                          {
-                            "Interface preview · product captures replace these images once approved."
-                          }
+                          {"Explore how work connects across OrgTik products."}
                         </span>
                       </div>
                     </div>
@@ -3358,7 +3353,7 @@ export default class Software extends ReferencePage {
                               color: "#CFC2DB",
                             }}
                           >
-                            {"Preview · " + v.pm.ucTitle}
+                            {v.pm.ucTitle}
                           </span>
                           <span
                             style={{
@@ -3591,7 +3586,7 @@ export default class Software extends ReferencePage {
                         }}
                       >
                         {
-                          "Complete a simulated payment, then continue to your OrgTik customer account for purchases, payments, and invoices."
+                          "Complete your payment, then continue to your OrgTik customer account for purchases, payments, and invoices."
                         }
                       </p>
                     </div>

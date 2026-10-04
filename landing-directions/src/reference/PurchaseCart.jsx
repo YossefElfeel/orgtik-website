@@ -132,8 +132,7 @@ function CartGroup({ group, onEditState }) {
             <div className="purchase-alert">
               <p>
                 Saved packages now include the full listed scope at the new
-                sample prices. Choose any missing durations and confirm your
-                selection.
+                prices. Choose any missing durations and confirm your selection.
               </p>
               <PurchaseAction
                 secondary
@@ -227,7 +226,7 @@ export default function PurchaseCart() {
         {!persistent && (
           <p className="purchase-alert">
             Your browser cannot save this cart. Keep this tab open while
-            completing the preview.
+            completing your purchase.
           </p>
         )}
         {messages.length > 0 && (
@@ -271,10 +270,17 @@ export default function PurchaseCart() {
                   onEditState={onEditState}
                 />
               ))}
-              <div className="purchase-toolbar">
-                <a href="/services#svc-builder">Add services</a>
-                <a href="/software#plan-builder">Add software</a>
-              </div>
+              <nav
+                className="purchase-cart-additions"
+                aria-label="Add to your cart"
+              >
+                <PurchaseAction secondary href="/services#svc-builder">
+                  Add services
+                </PurchaseAction>
+                <PurchaseAction secondary href="/software#plan-builder">
+                  Add software
+                </PurchaseAction>
+              </nav>
             </div>
             <QuoteSummary groups={items} title="Order summary">
               {checkoutAction()}

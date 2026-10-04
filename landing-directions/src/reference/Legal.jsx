@@ -1,5 +1,6 @@
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { AccountControl } from "./AccountControl";
 import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
@@ -7,61 +8,49 @@ import { toSiteHref } from "./navigation";
 export default class Legal extends ReferencePage {
   LG = {
     imprint: {
-      title: "Imprint",
-      summary: "Company and contact information for this frontend preview.",
+      title: "Company information",
+      summary: "Contact information for OrgTik.",
       sections: [
-        [
-          "Organisation",
-          "OrgTik. Final legal entity, registration details, and authorized representation require owner approval before publication.",
-        ],
+        ["Organisation", "OrgTik"],
         [
           "Contact",
-          "Muristrasse 3, 3123 Belp, Switzerland. Phone: +41 31 812 74 84. Email ownership must be verified before launch.",
-        ],
-        [
-          "Publication status",
-          "This page demonstrates the approved legal template. It is not final legal wording.",
+          "Muristrasse 3, 3123 Belp, Switzerland. Phone: +41 31 812 74 84.",
         ],
       ],
     },
     privacy: {
-      title: "Privacy policy",
-      summary: "A structured placeholder for owner-reviewed privacy wording.",
+      title: "Privacy information",
+      summary: "How information is handled in this environment.",
       sections: [
         [
-          "Data controller",
-          "The legal data-controller identity and contact details must be supplied and reviewed before publication.",
+          "Information you enter",
+          "Contact, account, and checkout details stay in this browser session. They are not sent to a server.",
         ],
         [
-          "Data in this preview",
-          "The frontend demonstrations do not submit contact, account, roadmap, or plan information to a server.",
+          "Cart storage",
+          "Cart configurations are saved in this browser so they remain available after a refresh. Customer details and passwords are not stored in browser storage.",
         ],
         [
-          "Cart and checkout",
-          "Cart selections are saved in this browser so they remain available after a refresh. Checkout contact details stay in memory during the preview and are not saved or sent to a server.",
-        ],
-        [
-          "Final policy",
-          "Purposes, legal bases, third parties, retention, rights, transfers, and cookie details require approved source wording.",
+          "Purchase receipts",
+          "The session stores an order reference and purchased items, without customer details or payment credentials.",
         ],
       ],
     },
     terms: {
-      title: "Terms and conditions",
-      summary:
-        "A readable template awaiting approved commercial and legal text.",
+      title: "Purchasing information",
+      summary: "How plans and purchases work.",
       sections: [
         [
-          "Scope",
-          "Final scope and contracting-party language must be supplied by the business and reviewed by legal counsel.",
+          "Selected periods",
+          "Each selected period is paid upfront. Automatic renewal is optional for each item.",
         ],
         [
-          "Services and commercial terms",
-          "Prices, payment, delivery, intellectual property, warranty, liability, cancellation, and venue remain pending.",
+          "Activation",
+          "Software activates after payment. Service periods start when onboarding confirms activation.",
         ],
         [
-          "Preview status",
-          "No offer, payment, subscription, or transaction is created through this frontend demonstration.",
+          "Current environment",
+          "Payment and account access are simulated here. No real payment, account, or contract is created.",
         ],
       ],
     },
@@ -980,18 +969,7 @@ export default class Legal extends ReferencePage {
                   >
                     <CartLink />
                     <LanguageMenu />
-                    <a
-                      href={toSiteHref("SignIn.dc.html")}
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: "500",
-                        color: "#DCD0E6",
-                        whiteSpace: "nowrap",
-                      }}
-                      className={"reference-state-146"}
-                    >
-                      {"Sign in"}
-                    </a>
+                    <AccountControl />
                     <a
                       href={toSiteHref("Contact.dc.html")}
                       style={{
@@ -1037,6 +1015,7 @@ export default class Legal extends ReferencePage {
                 <>
                   <CartLink />
                   <LanguageMenu compact />
+                  <AccountControl compact />
                   <button
                     onClick={v.openMenu}
                     aria-label="Open menu"
@@ -1069,6 +1048,7 @@ export default class Legal extends ReferencePage {
           {v.menuOpen && (
             <>
               <div
+                className="site-navigation-panel"
                 style={{
                   position: "fixed",
                   inset: "0",
@@ -1110,6 +1090,11 @@ export default class Legal extends ReferencePage {
                     ></i>
                   </button>
                 </div>
+                <AccountControl
+                  menu
+                  onNavigate={v.closeMenu}
+                  onSignOut={v.closeMenu}
+                />
                 <nav
                   style={{
                     display: "flex",
@@ -1194,8 +1179,8 @@ export default class Legal extends ReferencePage {
                   </h1>
                 </div>
                 <p className="contact-intro__subtitle">
-                  Find company details, privacy information and terms, or use
-                  the sitemap to explore every part of OrgTik.
+                  Find company details, privacy and purchasing information, or
+                  use the sitemap to explore every part of OrgTik.
                 </p>
               </header>
               <div
@@ -1373,9 +1358,7 @@ export default class Legal extends ReferencePage {
                           style={{ color: "#D4B7EC" }}
                           className={"ph ph-info"}
                         ></i>
-                        {
-                          "Template text pending owner and legal review before publication."
-                        }
+                        {"Contact OrgTik if you need more information."}
                       </div>
                     </>
                   )}

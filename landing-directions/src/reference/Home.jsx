@@ -1,6 +1,7 @@
 import { Testimonials } from "./Testimonials";
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { AccountControl } from "./AccountControl";
 import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
@@ -882,10 +883,7 @@ export default class Home extends ReferencePage {
       sideA: side(0),
       sideB: side(1),
       sideLeave: () => this.setState({ side: null }),
-      logos: Array.from({ length: 10 }, (_, i) => ({
-        id: "h-logo-" + String(i + 1).padStart(2, "0"),
-        src: "/assets/logo-ph-" + ((i % 6) + 1) + ".svg",
-      })),
+      logos: [],
       logoPause: () => {
         clearTimeout(this.logoT);
         if (this.logoAnim) this.logoAnim.pause();
@@ -1326,18 +1324,7 @@ export default class Home extends ReferencePage {
                   >
                     <CartLink />
                     <LanguageMenu />
-                    <a
-                      href={toSiteHref("SignIn.dc.html")}
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: "500",
-                        color: "#DCD0E6",
-                        whiteSpace: "nowrap",
-                      }}
-                      className={"reference-state-7"}
-                    >
-                      {"Sign in"}
-                    </a>
+                    <AccountControl />
                     <a
                       href={toSiteHref("Contact.dc.html")}
                       style={{
@@ -1383,6 +1370,7 @@ export default class Home extends ReferencePage {
                 <>
                   <CartLink />
                   <LanguageMenu compact />
+                  <AccountControl compact />
                   <button
                     onClick={v.openMenu}
                     aria-label="Open menu"
@@ -1415,6 +1403,7 @@ export default class Home extends ReferencePage {
           {v.menuOpen && (
             <>
               <div
+                className="site-navigation-panel"
                 style={{
                   position: "fixed",
                   inset: "0",
@@ -1456,6 +1445,11 @@ export default class Home extends ReferencePage {
                     ></i>
                   </button>
                 </div>
+                <AccountControl
+                  menu
+                  onNavigate={v.closeMenu}
+                  onSignOut={v.closeMenu}
+                />
                 <nav
                   style={{
                     display: "flex",
@@ -2856,147 +2850,7 @@ export default class Home extends ReferencePage {
                 </div>
               </div>
             </section>
-            <section style={{ padding: "0 0 var(--section-space)" }}>
-              <div
-                style={{
-                  maxWidth: "1440px",
-                  margin: "0 auto",
-                  padding: "0 clamp(20px,4.4vw,64px)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "24px",
-                  marginBottom: "28px",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    letterSpacing: ".2em",
-                    textTransform: "uppercase",
-                    color: "#B5A6C4",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {"Selected clients"}
-                </span>
-                <span
-                  style={{ flex: "1", height: "1px", background: "#ffffff1a" }}
-                ></span>
-              </div>
-              <div
-                onMouseEnter={v.logoPause}
-                onMouseLeave={v.logoPlay}
-                onDragEnter={v.logoPause}
-                onDrop={v.logoPlayLater}
-                style={{
-                  overflow: "hidden",
-                  WebkitMaskImage:
-                    "linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)",
-                  maskImage:
-                    "linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)",
-                }}
-              >
-                <div
-                  data-marquee={"60000"}
-                  data-logo-track={""}
-                  style={{ display: "flex", width: "max-content" }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "16px",
-                      paddingRight: "16px",
-                    }}
-                  >
-                    {(v.logos || []).map((lg, lgIndex) => (
-                      <React.Fragment key={lgIndex}>
-                        <span
-                          title={"Drop a client logo here"}
-                          style={{
-                            position: "relative",
-                            flex: "0 0 auto",
-                            width: "210px",
-                            height: "92px",
-                            borderRadius: "18px",
-                            border: "1px solid #ffffff17",
-                            background: "#ffffff06",
-                            opacity: ".8",
-                            transition:
-                              "opacity .4s, border-color .4s, background .4s",
-                          }}
-                          className={"reference-state-13"}
-                        >
-                          <span
-                            style={{
-                              position: "absolute",
-                              inset: "18px 24px",
-                              color: "#DCD0E6",
-                            }}
-                          >
-                            <image-slot
-                              data-logo={""}
-                              id={lg.id}
-                              shape={"rect"}
-                              fit={"contain"}
-                              data-src={lg.src}
-                              placeholder={"Client logo"}
-                              style={{
-                                position: "absolute",
-                                inset: "0",
-                                width: "100%",
-                                height: "100%",
-                              }}
-                            ></image-slot>
-                          </span>
-                        </span>
-                      </React.Fragment>
-                    ))}
-                  </div>
-                  <div
-                    aria-hidden={"true"}
-                    style={{
-                      display: "flex",
-                      gap: "16px",
-                      paddingRight: "16px",
-                    }}
-                  >
-                    {(v.logos || []).map((lg, lgIndex) => (
-                      <React.Fragment key={lgIndex}>
-                        <span
-                          style={{
-                            position: "relative",
-                            flex: "0 0 auto",
-                            width: "210px",
-                            height: "92px",
-                            borderRadius: "18px",
-                            border: "1px solid #ffffff17",
-                            background: "#ffffff06",
-                            opacity: ".8",
-                            transition:
-                              "opacity .4s, border-color .4s, background .4s",
-                          }}
-                          className={"reference-state-14"}
-                        >
-                          <img
-                            data-logo-mirror={lg.id}
-                            alt={""}
-                            style={{
-                              position: "absolute",
-                              inset: "18px 24px",
-                              width: "calc(100% - 48px)",
-                              height: "calc(100% - 36px)",
-                              objectFit: "contain",
-                              filter: "brightness(0) invert(1)",
-                            }}
-                          />
-                        </span>
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
+
             <section
               id={"work"}
               style={{ padding: "0 0 var(--section-space)" }}
@@ -3047,7 +2901,7 @@ export default class Home extends ReferencePage {
                           background: "#ffffff2e",
                         }}
                       ></span>
-                      {"Selected work"}
+                      {"Our identity"}
                     </div>
                     <h2
                       data-reveal={"mask"}
@@ -3062,7 +2916,7 @@ export default class Home extends ReferencePage {
                     >
                       <span style={{ display: "block" }}>
                         <span data-line={""} style={{ display: "block" }}>
-                          {"We don’t chase attention."}
+                          {"OrgTik, in the world."}
                         </span>
                       </span>
                       <span style={{ display: "block" }}>
@@ -3076,7 +2930,7 @@ export default class Home extends ReferencePage {
                             letterSpacing: "-.045em",
                           }}
                         >
-                          {"We attract it."}
+                          {"One connected identity."}
                         </span>
                       </span>
                     </h2>
@@ -3100,7 +2954,7 @@ export default class Home extends ReferencePage {
                       }}
                     >
                       {
-                        "From a clear idea to every touchpoint — identities, platforms and campaigns built to be noticed."
+                        "Explore our own brand identity across print, digital applications, and signage."
                       }
                     </p>
                     <a
@@ -3315,7 +3169,7 @@ export default class Home extends ReferencePage {
                   </a>
                   <a
                     href={toSiteHref(
-                      "Work.dc.html#/project/managed-digital-presence",
+                      "Work.dc.html#/project/orgtik-identity-system",
                     )}
                     data-reveal={"clip"}
                     data-cursor={"View project"}
@@ -3341,7 +3195,7 @@ export default class Home extends ReferencePage {
                       id={"h-work-02"}
                       shape={"rect"}
                       src={"/assets/brand-tablet.webp"}
-                      placeholder={"Case study image — web platform"}
+                      alt={"OrgTik brand on a tablet"}
                       style={{
                         position: "absolute",
                         inset: "0",
@@ -3384,7 +3238,7 @@ export default class Home extends ReferencePage {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {"Web & app"}
+                        {"Digital applications"}
                       </span>
                       <span
                         style={{
@@ -3438,7 +3292,7 @@ export default class Home extends ReferencePage {
                           }}
                           data-hw={""}
                         >
-                          {"Case study title"}
+                          {"The brand, on screen."}
                         </h3>
                         <p
                           style={{
@@ -3449,7 +3303,7 @@ export default class Home extends ReferencePage {
                             color: "#DCD0E6",
                           }}
                         >
-                          {"Client name — Web & app development"}
+                          {"OrgTik — our brand on screen"}
                         </p>
                       </div>
                       <span
@@ -3477,7 +3331,7 @@ export default class Home extends ReferencePage {
                   </a>
                   <a
                     href={toSiteHref(
-                      "Work.dc.html#/project/connected-platform-concept",
+                      "Work.dc.html#/project/orgtik-identity-system",
                     )}
                     data-reveal={"clip"}
                     data-cursor={"View project"}
@@ -3503,7 +3357,7 @@ export default class Home extends ReferencePage {
                       id={"h-work-03"}
                       shape={"rect"}
                       src={"/assets/brand-phone.webp"}
-                      placeholder={"Case study image — software rollout"}
+                      alt={"OrgTik brand on a phone"}
                       style={{
                         position: "absolute",
                         inset: "0",
@@ -3546,7 +3400,7 @@ export default class Home extends ReferencePage {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {"Software"}
+                        {"Mobile identity"}
                       </span>
                       <span
                         style={{
@@ -3588,7 +3442,7 @@ export default class Home extends ReferencePage {
                             color: "#D4B7EC",
                           }}
                         >
-                          {"Software"}
+                          {"OrgTik"}
                         </div>
                         <h3
                           style={{
@@ -3600,7 +3454,7 @@ export default class Home extends ReferencePage {
                           }}
                           data-hw={""}
                         >
-                          {"Case study title"}
+                          {"A familiar identity, anywhere."}
                         </h3>
                         <p
                           style={{
@@ -3611,7 +3465,7 @@ export default class Home extends ReferencePage {
                             color: "#DCD0E6",
                           }}
                         >
-                          {"Client name — Business software"}
+                          {"OrgTik — our identity on mobile"}
                         </p>
                       </div>
                       <span
@@ -3639,7 +3493,7 @@ export default class Home extends ReferencePage {
                   </a>
                   <a
                     href={toSiteHref(
-                      "Work.dc.html#/project/campaign-growth-system",
+                      "Work.dc.html#/project/orgtik-identity-system",
                     )}
                     data-reveal={"clip"}
                     data-cursor={"View project"}
@@ -3665,7 +3519,7 @@ export default class Home extends ReferencePage {
                       id={"h-work-04"}
                       shape={"rect"}
                       src={"/assets/brand-glass.webp"}
-                      placeholder={"Case study image — campaign"}
+                      alt={"OrgTik brand on glass signage"}
                       style={{
                         position: "absolute",
                         inset: "0",
@@ -3708,7 +3562,7 @@ export default class Home extends ReferencePage {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {"Marketing & growth"}
+                        {"Signage"}
                       </span>
                       <span
                         style={{
@@ -3762,7 +3616,7 @@ export default class Home extends ReferencePage {
                           }}
                           data-hw={""}
                         >
-                          {"Case study title"}
+                          {"A mark made to be seen."}
                         </h3>
                         <p
                           style={{
@@ -3773,7 +3627,7 @@ export default class Home extends ReferencePage {
                             color: "#DCD0E6",
                           }}
                         >
-                          {"Client name — Marketing & growth"}
+                          {"OrgTik — our identity in physical spaces"}
                         </p>
                       </div>
                       <span

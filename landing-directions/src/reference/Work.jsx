@@ -3,6 +3,7 @@ import { Testimonials } from "./Testimonials";
 import { CaseStudy } from "./CaseStudy";
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { AccountControl } from "./AccountControl";
 import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
@@ -1184,18 +1185,7 @@ export default class Work extends ReferencePage {
                   >
                     <CartLink />
                     <LanguageMenu />
-                    <a
-                      href={toSiteHref("SignIn.dc.html")}
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: "500",
-                        color: "#DCD0E6",
-                        whiteSpace: "nowrap",
-                      }}
-                      className={"reference-state-281"}
-                    >
-                      {"Sign in"}
-                    </a>
+                    <AccountControl />
                     <a
                       href={toSiteHref("Contact.dc.html")}
                       style={{
@@ -1241,6 +1231,7 @@ export default class Work extends ReferencePage {
                 <>
                   <CartLink />
                   <LanguageMenu compact />
+                  <AccountControl compact />
                   <button
                     onClick={v.openMenu}
                     aria-label="Open menu"
@@ -1273,6 +1264,7 @@ export default class Work extends ReferencePage {
           {v.menuOpen && (
             <>
               <div
+                className="site-navigation-panel"
                 style={{
                   position: "fixed",
                   inset: "0",
@@ -1314,6 +1306,11 @@ export default class Work extends ReferencePage {
                     ></i>
                   </button>
                 </div>
+                <AccountControl
+                  menu
+                  onNavigate={v.closeMenu}
+                  onSignOut={v.closeMenu}
+                />
                 <nav
                   style={{
                     display: "flex",
@@ -1466,7 +1463,7 @@ export default class Work extends ReferencePage {
                         >
                           <span style={{ display: "block" }}>
                             <span data-line={""} style={{ display: "block" }}>
-                              {"Every project,"}
+                              {"Our work,"}
                             </span>
                           </span>
                           <span style={{ display: "block" }}>
@@ -1479,7 +1476,7 @@ export default class Work extends ReferencePage {
                                 letterSpacing: "-.045em",
                               }}
                             >
-                              {"clearly labelled."}
+                              {"up close."}
                             </span>
                           </span>
                         </h1>
@@ -1495,7 +1492,7 @@ export default class Work extends ReferencePage {
                         }}
                       >
                         {
-                          "From OrgTik-owned work to concept previews. Each story shows its status up front, so nothing is presented as more than it is."
+                          "Explore OrgTik work across brand, design, and digital experiences."
                         }
                       </p>
                     </div>
@@ -2213,7 +2210,7 @@ export default class Work extends ReferencePage {
                               fontVariantNumeric: "tabular-nums",
                             }}
                           >
-                            {"(05)"}
+                            {"(02)"}
                           </span>
                           <span
                             style={{
@@ -2269,7 +2266,7 @@ export default class Work extends ReferencePage {
                         }}
                       >
                         {
-                          "These frames show OrgTik brand applications until approved project captures are supplied. Drop your own images onto any frame."
+                          "OrgTik brand applications across print, digital screens, and signage."
                         }
                       </p>
                     </div>
@@ -2313,7 +2310,10 @@ export default class Work extends ReferencePage {
                     </div>
                   </div>
                 </section>
-                <section style={{ padding: "var(--section-space) 0" }}>
+                <section
+                  hidden={!v.related?.length}
+                  style={{ padding: "var(--section-space) 0" }}
+                >
                   <div
                     style={{
                       maxWidth: "1440px",
@@ -2351,7 +2351,7 @@ export default class Work extends ReferencePage {
                               fontVariantNumeric: "tabular-nums",
                             }}
                           >
-                            {"(06)"}
+                            {"(03)"}
                           </span>
                           <span
                             style={{
@@ -2406,9 +2406,7 @@ export default class Work extends ReferencePage {
                           color: "#CFC2DB",
                         }}
                       >
-                        {
-                          "Two more stories from the studio, each with its status clearly shown."
-                        }
+                        {"Explore more work from OrgTik."}
                       </p>
                     </div>
                     <div

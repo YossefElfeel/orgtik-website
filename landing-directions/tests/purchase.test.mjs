@@ -24,6 +24,12 @@ import {
   loadPurchaseSession,
   ORDER_SESSION_KEY,
 } from "../src/reference/purchase-adapter.js";
+import {
+  getPreviewCustomer,
+  subscribePreviewCustomer,
+  signInPreviewCustomer,
+  signOutPreviewCustomer,
+} from "../src/reference/purchase-identity.js";
 const local = new Map(),
   session = new Map(),
   events = new Map();
@@ -55,6 +61,34 @@ const customer = {
   email: "test@example.test",
   company: "Demo",
 };
+
+test("entered identity is shared during navigation, defaults to guest, and never persists on reload", async () => {
+  assert.equal(getPreviewCustomer(), null);
+  const persisted = [local.size, session.size];
+  let updates = 0;
+  const unsubscribe = subscribePreviewCustomer(() => updates++);
+  assert.throws(() => signInPreviewCustomer({ email: "invalid" }));
+  assert.equal(getPreviewCustomer(), null);
+  const signedIn = signInPreviewCustomer({
+    ...customer,
+    password: "discard-me",
+  });
+  assert.equal(getPreviewCustomer(), signedIn);
+  assert.equal(signedIn.email, customer.email);
+  assert.equal(signedIn.name, customer.name);
+  assert.equal("password" in signedIn, false);
+  assert.ok(Object.isFrozen(signedIn));
+  const reloaded =
+    await import("../src/reference/purchase-identity.js?reload-test");
+  assert.equal(reloaded.getPreviewCustomer(), null);
+  signOutPreviewCustomer();
+  assert.equal(getPreviewCustomer(), null);
+  assert.equal(updates, 2);
+  unsubscribe();
+  signOutPreviewCustomer();
+  assert.equal(updates, 2);
+  assert.deepEqual([local.size, session.size], persisted);
+});
 
 test("catalog has exactly the approved purchasable items, prices, and capabilities", () => {
   assert.equal(CATALOG.length, 16);
@@ -286,6 +320,26 @@ test("remove last item and clear support Undo", () => {
   store.undoCartUpdate();
   assert.deepEqual(store.getCartSnapshot().items, [a]);
 });
+test("removing a matching plan preserves other groups and Undo restores its exact terms and renewal", () => {
+  const added = group([graphic, brand], 3);
+  added.lines[0] = { ...added.lines[0], months: 12, autoRenew: true };
+  const other = group([seo], 6);
+  reset([added, other]);
+  const incoming = createGroup({ ...added, id: "different-entry-id" });
+  const match = store.containsConfiguration(incoming);
+  assert.equal(match.id, added.id);
+  store.removeCartItem(match.id);
+  assert.deepEqual(store.getCartSnapshot().items, [other]);
+  assert.deepEqual(JSON.parse(local.get(store.CART_STORAGE_KEY)).groups, [
+    other,
+  ]);
+  store.undoCartUpdate();
+  assert.deepEqual(store.getCartSnapshot().items, [added, other]);
+  assert.deepEqual(JSON.parse(local.get(store.CART_STORAGE_KEY)).groups, [
+    added,
+    other,
+  ]);
+});
 test("successful purchase removes only purchased groups and cannot be undone into another charge", () => {
   const a = group(),
     b = group([brand]);
@@ -354,6 +408,68 @@ test("successful payment is idempotent, immutable, and records different activat
   assert.equal(a.groups[0].lines[0].activation, "awaiting-onboarding");
   assert.equal(a.groups[1].lines[0].activation, "active-preview");
   assert.equal("customer" in a, false);
+});
+test("all payment methods survive receipt refresh and CRM handoff without payment credentials", async () => {
+  const { createCRMHandoffRequest } =
+    await import("../src/reference/purchase-adapter.js");
+  for (const paymentMethod of ["card", "twint", "paypal"]) {
+    const order = await simulatePayment({
+      groups: [group()],
+      customer,
+      reference: `method-${paymentMethod}`,
+      paymentMethod,
+      paymentDetails: "credential-never-persisted",
+    });
+    assert.equal(order.paymentMethod, paymentMethod);
+    assert.ok(Object.isFrozen(order));
+    assert.equal(createCRMHandoffRequest(order).paymentMethod, paymentMethod);
+    savePurchaseSession(order, { status: "ready" });
+    assert.equal(loadPurchaseSession().order.paymentMethod, paymentMethod);
+    const receipt = session.get(ORDER_SESSION_KEY);
+    assert.equal(receipt.includes("credential-never-persisted"), false);
+    assert.equal(receipt.includes(customer.email), false);
+  }
+});
+test("a declined payment can switch method on retry and never changes after success", async () => {
+  const request = {
+    groups: [group()],
+    customer,
+    reference: "method-retry",
+  };
+  await assert.rejects(
+    simulatePayment({
+      ...request,
+      paymentMethod: "twint",
+      outcome: "declined",
+    }),
+    /declined/,
+  );
+  const order = await simulatePayment({ ...request, paymentMethod: "paypal" });
+  const repeated = await simulatePayment({ ...request, paymentMethod: "card" });
+  assert.equal(repeated, order);
+  assert.equal(repeated.paymentMethod, "paypal");
+});
+test("unsupported methods cannot create a purchase; older card receipts remain readable", async () => {
+  const { createPurchaseSnapshot } =
+    await import("../src/reference/purchase-adapter.js");
+  await assert.rejects(
+    simulatePayment({
+      groups: [group()],
+      customer,
+      reference: "unknown-method",
+      paymentMethod: "unsupported",
+    }),
+    /available payment method/,
+  );
+  const legacy = { ...createPurchaseSnapshot([group()], "legacy-method") };
+  delete legacy.paymentMethod;
+  session.set(ORDER_SESSION_KEY, JSON.stringify({ order: legacy }));
+  assert.equal(loadPurchaseSession().order.paymentMethod, "card");
+  session.set(
+    ORDER_SESSION_KEY,
+    JSON.stringify({ order: { ...legacy, paymentMethod: "unsupported" } }),
+  );
+  assert.equal(loadPurchaseSession(), null);
 });
 test("CRM failure and pending states recover idempotently without another payment", async () => {
   const order = await simulatePayment({

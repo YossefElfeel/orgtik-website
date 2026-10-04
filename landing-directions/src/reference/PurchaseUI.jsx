@@ -27,9 +27,8 @@ import {
 export function PreviewNote() {
   return (
     <p className="purchase-note">
-      <i className="ph ph-info" aria-hidden="true" /> Prototype pricing in CHF.
-      Payment is simulated; no charge is made. Tax calculation is not
-      configured.
+      <i className="ph ph-info" aria-hidden="true" /> Prices in CHF. Full
+      selected periods are paid upfront.
     </p>
   );
 }
@@ -123,6 +122,10 @@ export function QuoteSummary({
         <div>
           <dt>Your savings</dt>
           <dd>−{money(quote.saving)}</dd>
+        </div>
+        <div>
+          <dt>Tax</dt>
+          <dd>Not calculated</dd>
         </div>
       </dl>
       <p className="purchase-summary__equivalent">
@@ -463,7 +466,7 @@ export function BundleCard({ bundle, onCustomize }) {
         onChange={setMonths}
       />
       <div className="purchase-bundle__actions">
-        <AddPackageButton item={group} removable={false} />
+        <AddPackageButton item={group} />
         {onCustomize ? (
           <button
             type="button"
@@ -644,7 +647,6 @@ export function PurchasingOverview({ kind, initialIds, initialDuration }) {
               </p>
               <AddPackageButton
                 item={group}
-                removable={false}
                 disabled={!quoteGroup(group).valid}
               />
               <details className="purchase-summary-selection" open>

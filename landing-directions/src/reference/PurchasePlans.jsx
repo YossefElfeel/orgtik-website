@@ -143,7 +143,7 @@ export default function PurchasePlans() {
                   </small>
                 </div>
                 <div>
-                  <AddPackageButton item={group} removable={false} />
+                  <AddPackageButton item={group} />
                   <a
                     href={configurationHref(group)}
                     aria-label={`Customize ${item.name}`}

@@ -38,6 +38,7 @@ export function PurchaseAction({
     <a
       {...props}
       href={href}
+      onClick={onClick}
       className={`commerce-action purchase-action ${secondary ? "purchase-action--secondary" : ""}`}
     >
       {contents}
@@ -54,7 +55,14 @@ export function PurchaseAction({
     </button>
   );
 }
-export function PurchaseDialog({ open, title, onClose, children }) {
+export function PurchaseDialog({
+  open,
+  title,
+  onClose,
+  children,
+  className = "",
+  descriptionId,
+}) {
   const ref = useRef(null);
   const titleId = useId();
   const closeRef = useRef(onClose);
@@ -75,8 +83,32 @@ export function PurchaseDialog({ open, title, onClose, children }) {
   return (
     <dialog
       ref={ref}
-      className="purchase-dialog"
+      className={`purchase-dialog ${className}`}
       aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+      onKeyDown={(event) => {
+        if (event.key !== "Tab") return;
+        const controls = [
+          ...ref.current.querySelectorAll(
+            "a[href], button, input, select, textarea, [tabindex]",
+          ),
+        ].filter(
+          (element) =>
+            element.tabIndex >= 0 &&
+            !element.matches(":disabled") &&
+            !element.closest("[hidden], [inert]") &&
+            element.getClientRects().length,
+        );
+        const first = controls[0];
+        const last = controls.at(-1);
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }}
       onCancel={(e) => {
         e.preventDefault();
         closeRef.current();
@@ -137,30 +169,51 @@ export function AddPackageButton({
   ...props
 }) {
   const { items } = useCart();
+  const primary = useRef(null);
   const existing =
     item && items.find((g) => groupFingerprint(g) === groupFingerprint(item));
-  return (
+  const focusPrimary = () =>
+    requestAnimationFrame(() =>
+      primary.current?.focus({ preventScroll: true }),
+    );
+  const action = (
     <PurchaseAction
       {...props}
-      disabled={disabled || !item?.lines.length}
+      ref={primary}
+      href={existing ? "/cart" : undefined}
+      disabled={!existing && (disabled || !item?.lines.length)}
       onClick={() => {
-        if (existing && removable) removeCartItem(existing.id);
-        else if (existing) window.__orgNav?.("/cart");
-        else addCartItem(item);
+        if (!existing && addCartItem(item)) focusPrimary();
         onAction?.();
       }}
       aria-label={
-        existing && !removable
+        existing
           ? `View ${groupName(item)} in cart`
-          : `${existing && removable ? "Remove" : "Add"} ${item ? groupName(item) : "selection"} ${existing && removable ? "from" : "to"} cart`
+          : `Add ${item ? groupName(item) : "selection"} to cart`
       }
     >
-      {existing
-        ? removable
-          ? "Remove from cart"
-          : "View in cart"
-        : "Add to cart"}
+      {existing ? "View in cart" : "Add to cart"}
     </PurchaseAction>
+  );
+  return existing && removable ? (
+    <div className="purchase-cart-actions">
+      {action}
+      <button
+        type="button"
+        className="purchase-cart-remove"
+        aria-label={`Remove ${groupName(item)} from cart`}
+        onClick={() => {
+          removeCartItem(existing.id);
+          onAction?.();
+          focusPrimary();
+        }}
+      >
+        <i className="ph ph-trash" aria-hidden="true" />
+        Remove
+      </button>
+    </div>
+  ) : (
+    action
   );
 }
 export function CartLink() {
@@ -189,55 +242,190 @@ export function CartNotice() {
     <>
       {notice && (
         <aside className="purchase-toast" aria-label="Cart update">
-          <p role="status">{notice.text}</p>
-          <div className="purchase-toolbar">
+          <span className="purchase-toast__icon" aria-hidden="true">
+            <i className="ph ph-check" />
+          </span>
+          <div
+            className="purchase-toast__message"
+            role="status"
+            aria-atomic="true"
+          >
+            <strong>Cart updated</strong>
+            <p>{notice.text}</p>
+          </div>
+          <div className="purchase-toast__actions">
             {notice.undo && (
-              <button onClick={undoCartUpdate} type="button">
+              <button
+                className="purchase-toast__undo"
+                onClick={undoCartUpdate}
+                type="button"
+              >
+                <i
+                  className="ph ph-arrow-counter-clockwise"
+                  aria-hidden="true"
+                />
                 Undo
               </button>
             )}
-            <a href="/cart">View cart</a>
-            <button
-              type="button"
-              onClick={dismissCartNotice}
-              aria-label="Dismiss cart update"
-            >
-              Dismiss
-            </button>
+            <a className="purchase-toast__cart" href="/cart">
+              View cart
+              <i className="ph ph-arrow-right" aria-hidden="true" />
+            </a>
           </div>
+          <button
+            className="purchase-toast__close"
+            type="button"
+            onClick={dismissCartNotice}
+            aria-label="Dismiss cart update"
+          >
+            <i className="ph ph-x" aria-hidden="true" />
+          </button>
         </aside>
       )}
-      <PurchaseDialog
-        open={!!conflict}
-        title="Already in your cart"
-        onClose={() => resolveOverlap("cancel")}
-      >
-        <p>
-          Choose which configuration to keep. Other items will be added and each
-          plan’s savings will be recalculated.
-        </p>
-        <ul className="purchase-feature-list">
-          {conflict?.overlaps.map((l) => (
-            <li key={l.catalogId}>
-              {findItem(l.catalogId, conflict.group.kind)?.name} · existing{" "}
-              {termLabel(l.months)} → incoming{" "}
-              {termLabel(
-                conflict.group.lines.find((n) => n.catalogId === l.catalogId)
-                  ?.months,
-              )}
-            </li>
-          ))}
-        </ul>
-        <div className="purchase-dialog__actions">
-          <PurchaseAction onClick={() => resolveOverlap("keep")}>
-            Keep existing items
-          </PurchaseAction>
-          <PurchaseAction secondary onClick={() => resolveOverlap("replace")}>
-            Use incoming items
-          </PurchaseAction>
-        </div>
-      </PurchaseDialog>
+      <CartOverlapDialog conflict={conflict} />
     </>
+  );
+}
+function OverlapItems({ lines, kind }) {
+  return (
+    <ul className="purchase-overlap__items">
+      {lines.map((line) => (
+        <li key={line.catalogId}>
+          <strong>{findItem(line.catalogId, kind)?.name}</strong>
+          <span>
+            {termLabel(line.months)} ·{" "}
+            {line.autoRenew ? "Automatic renewal" : "Manual renewal"}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+function CartOverlapDialog({ conflict }) {
+  const { items } = useCart();
+  const descriptionId = useId();
+  const sharedIds = new Set(conflict?.overlaps.map((line) => line.catalogId));
+  const currentPlans = items.filter((group) =>
+    conflict?.overlaps.some((line) => line.groupId === group.id),
+  );
+  const sharedLines =
+    conflict?.group.lines.filter((line) => sharedIds.has(line.catalogId)) || [];
+  const otherLines =
+    conflict?.group.lines.filter((line) => !sharedIds.has(line.catalogId)) ||
+    [];
+  const sameTerms =
+    !!conflict &&
+    conflict.overlaps.every((line) => {
+      const next = sharedLines.find(
+        (next) => next.catalogId === line.catalogId,
+      );
+      return next?.months === line.months && next?.autoRenew === line.autoRenew;
+    });
+  return (
+    <PurchaseDialog
+      open={!!conflict}
+      title="Choose a version"
+      descriptionId={descriptionId}
+      className="purchase-dialog--overlap"
+      onClose={() => resolveOverlap("cancel")}
+    >
+      {conflict && (
+        <>
+          <p id={descriptionId} className="purchase-overlap__intro">
+            {sharedIds.size} {sharedIds.size === 1 ? "item is" : "items are"}{" "}
+            already in your cart. Choose the plan that keeps them.
+          </p>
+          <div className="purchase-overlap__comparison">
+            <section
+              className="purchase-overlap__version purchase-overlap__version--current"
+              aria-label="Already in your cart"
+            >
+              <h3>
+                <i className="ph ph-shopping-cart" aria-hidden="true" />
+                Already in your cart
+              </h3>
+              <div className="purchase-overlap__plans">
+                {currentPlans.map((group) => (
+                  <div key={group.id}>
+                    <h4>{groupName(group)}</h4>
+                    <OverlapItems
+                      kind={group.kind}
+                      lines={group.lines.filter((line) =>
+                        sharedIds.has(line.catalogId),
+                      )}
+                    />
+                  </div>
+                ))}
+              </div>
+              <p className="purchase-overlap__consequence">
+                Keep these items in their current{" "}
+                {currentPlans.length === 1 ? "plan" : "plans"}.
+              </p>
+              <PurchaseAction onClick={() => resolveOverlap("keep")}>
+                Keep cart version
+              </PurchaseAction>
+            </section>
+            <section
+              className="purchase-overlap__version purchase-overlap__version--new"
+              aria-label="You’re adding"
+            >
+              <h3>
+                <i className="ph ph-plus" aria-hidden="true" />
+                You’re adding
+              </h3>
+              <div className="purchase-overlap__plans">
+                <div>
+                  <h4>{groupName(conflict.group)}</h4>
+                  <OverlapItems
+                    kind={conflict.group.kind}
+                    lines={sharedLines}
+                  />
+                </div>
+              </div>
+              <p className="purchase-overlap__consequence">
+                Move these items into this plan.
+              </p>
+              <PurchaseAction
+                secondary
+                onClick={() => resolveOverlap("replace")}
+              >
+                Use new version
+              </PurchaseAction>
+            </section>
+          </div>
+          {sameTerms && (
+            <p className="purchase-overlap__same">
+              The shared items have the same duration and renewal settings.
+            </p>
+          )}
+          {!!otherLines.length && (
+            <div className="purchase-overlap__included">
+              <strong>Included with either choice</strong>
+              <span>
+                {otherLines
+                  .map(
+                    (line) =>
+                      findItem(line.catalogId, conflict.group.kind)?.name,
+                  )
+                  .join(", ")}
+              </span>
+            </div>
+          )}
+          <div className="purchase-overlap__footer">
+            <p>
+              Each item is kept once. Bundle savings update after your choice.
+            </p>
+            <button
+              type="button"
+              className="purchase-text-button"
+              onClick={() => resolveOverlap("cancel")}
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      )}
+    </PurchaseDialog>
   );
 }
 export function CartEditBar() {

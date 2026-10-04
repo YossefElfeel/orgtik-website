@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useId } from "react";
 import {
   CATALOG,
   BUNDLES,
@@ -144,12 +144,58 @@ export function QuoteSummary({
     </aside>
   );
 }
+function IndividualDuration({ group, line, item, onChange }) {
+  const id = useId();
+  const [expanded, setExpanded] = useState(
+    () => !line.months || line.months !== group.defaultMonths,
+  );
+  return (
+    <div className="purchase-individual-duration">
+      <label className="purchase-check purchase-individual-duration__toggle">
+        <input
+          type="checkbox"
+          checked={expanded}
+          aria-label={`Set an individual duration for ${item.name}`}
+          aria-controls={`${id}-options`}
+          aria-describedby={`${id}-note`}
+          onChange={(event) => setExpanded(event.target.checked)}
+        />
+        <span>
+          Set an individual duration
+          <small>
+            {line.months
+              ? `Current duration: ${termLabel(line.months)}`
+              : "Choose a duration to continue."}
+          </small>
+        </span>
+      </label>
+      <p className="purchase-caption" id={`${id}-note`}>
+        Changes apply only to this{" "}
+        {group.kind === "service" ? "service" : "product"}. The{" "}
+        {group.bundleId ? "bundle" : "plan"}’s shared duration remains{" "}
+        {termLabel(group.defaultMonths)}; other items keep their selected
+        durations.
+      </p>
+      <div id={`${id}-options`} hidden={!expanded}>
+        {expanded && (
+          <DurationPicker
+            label={`Duration for ${item.name}`}
+            displayLabel="Duration"
+            months={line.months}
+            onChange={(months) => onChange(line.catalogId, { months })}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
 export function PackageLines({
   group,
   onChange,
   onRemove,
   renewal = true,
   compact = false,
+  optionalDuration = false,
 }) {
   const quoted = quoteGroup(group);
   return (
@@ -198,7 +244,15 @@ export function PackageLines({
                 Management only; media spend is separate.
               </p>
             )}
-            {onChange ? (
+            {onChange && optionalDuration ? (
+              <IndividualDuration
+                key={group.id}
+                group={group}
+                line={line}
+                item={item}
+                onChange={onChange}
+              />
+            ) : onChange ? (
               <DurationPicker
                 label={`Duration for ${item.name}`}
                 displayLabel="Duration"
@@ -396,6 +450,7 @@ export function ConfigurationEditor({ group, onChange, showLines = true }) {
             <PackageLines
               group={group}
               compact
+              optionalDuration
               onChange={(id, patch) =>
                 onChange({
                   ...group,

@@ -379,28 +379,35 @@ export function ConfigurationEditor({ group, onChange, showLines = true }) {
         }
       />
       {showLines && group.lines.length > 0 && (
-        <>
-          <div className="purchase-editor__step">
+        <details className="purchase-customization" key={group.id}>
+          <summary className="purchase-editor__step">
             <span className="purchase-step">03</span>
-            <div>
+            <div className="purchase-customization__copy">
               <h3>Make it yours</h3>
               <p>Choose individual periods and renewal preferences.</p>
             </div>
+            <span className="purchase-customization__toggle" aria-hidden="true">
+              <span className="purchase-customization__show">Show options</span>
+              <span className="purchase-customization__hide">Hide options</span>
+              <i className="ph ph-caret-down" />
+            </span>
+          </summary>
+          <div className="purchase-customization__content">
+            <PackageLines
+              group={group}
+              compact
+              onChange={(id, patch) =>
+                onChange({
+                  ...group,
+                  lines: group.lines.map((l) =>
+                    l.catalogId === id ? { ...l, ...patch } : l,
+                  ),
+                })
+              }
+              onRemove={toggle}
+            />
           </div>
-          <PackageLines
-            group={group}
-            compact
-            onChange={(id, patch) =>
-              onChange({
-                ...group,
-                lines: group.lines.map((l) =>
-                  l.catalogId === id ? { ...l, ...patch } : l,
-                ),
-              })
-            }
-            onRemove={toggle}
-          />
-        </>
+        </details>
       )}
       <PurchaseDialog
         open={pendingMonths !== null}

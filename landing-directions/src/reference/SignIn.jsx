@@ -1,8 +1,14 @@
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { AccountControl } from "./AccountControl";
 import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
+import {
+  getPreviewCustomer,
+  subscribePreviewCustomer,
+  signInPreviewCustomer,
+} from "./purchase-identity.js";
 
 let accountTabToFocus = null;
 
@@ -24,7 +30,7 @@ export default class SignIn extends ReferencePage {
   state = {
     route: this.parseRoute(location.hash) || { view: "index" },
     mode: window.location.pathname === "/sign-up" ? "signup" : "signin",
-    done: false,
+    done: window.location.pathname !== "/sign-up" && !!getPreviewCustomer(),
     error: "",
     hoverCard: null,
     narrow: window.innerWidth < 900,
@@ -53,6 +59,9 @@ export default class SignIn extends ReferencePage {
   }
   componentDidMount() {
     super.componentDidMount();
+    this.unsubscribeIdentity = subscribePreviewCustomer(() =>
+      this.setState({ done: !!getPreviewCustomer(), error: "" }),
+    );
     const root = this.rootRef.current;
     if (!root) return;
     this.reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -119,6 +128,7 @@ export default class SignIn extends ReferencePage {
   }
   componentWillUnmount() {
     super.componentWillUnmount();
+    this.unsubscribeIdentity?.();
     window.removeEventListener("scroll", this.onScroll);
     window.removeEventListener("resize", this.measure);
     window.removeEventListener("hashchange", this.onHash);
@@ -571,19 +581,19 @@ export default class SignIn extends ReferencePage {
       sub: rec
         ? "Enter your work email and we’ll send a reset link."
         : signup
-          ? "Set up your OrgTik workspace account preview. No account is created yet."
+          ? "Create your OrgTik customer account."
           : "Use the email linked to your OrgTik workspace.",
-      cta: rec ? "Send reset link" : signup ? "Preview sign up" : "Sign in",
+      cta: rec ? "Send reset link" : signup ? "Create account" : "Sign in",
       doneTitle: rec
         ? "Check your inbox."
         : signup
-          ? "Sign-up preview complete."
-          : "Preview complete.",
+          ? "Account details received."
+          : "Signed in.",
       doneBody: rec
-        ? "In the live product a reset link would arrive shortly. This preview sends nothing."
+        ? "Follow the recovery instructions for your OrgTik account. Email delivery is not connected in this environment."
         : signup
-          ? "Your details passed the preview checks. No account was created and no information was stored."
-          : "In the live product you would now enter your workspace. This preview does not authenticate.",
+          ? "Your account details are ready. Continue to choose the services and software your business needs."
+          : "Continue shopping. Your purchase will be linked to your customer account.",
       back: () => this.setState({ done: false }),
       submit: (e) => {
         e.preventDefault();
@@ -618,6 +628,8 @@ export default class SignIn extends ReferencePage {
           this.setState({ error: "The passwords do not match." });
           return;
         }
+        if (!rec) signInPreviewCustomer({ name, email: em, company: "" });
+        e.currentTarget.reset();
         this.setState({ done: true, error: "" });
       },
     };
@@ -932,18 +944,7 @@ export default class SignIn extends ReferencePage {
                   >
                     <CartLink />
                     <LanguageMenu />
-                    <a
-                      href={toSiteHref("SignIn.dc.html")}
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: "500",
-                        color: "#DCD0E6",
-                        whiteSpace: "nowrap",
-                      }}
-                      className={"reference-state-200"}
-                    >
-                      {"Sign in"}
-                    </a>
+                    <AccountControl />
                     <a
                       href={toSiteHref("Contact.dc.html")}
                       style={{
@@ -989,6 +990,7 @@ export default class SignIn extends ReferencePage {
                 <>
                   <CartLink />
                   <LanguageMenu compact />
+                  <AccountControl compact />
                   <button
                     onClick={v.openMenu}
                     aria-label="Open menu"
@@ -1021,6 +1023,7 @@ export default class SignIn extends ReferencePage {
           {v.menuOpen && (
             <>
               <div
+                className="site-navigation-panel"
                 style={{
                   position: "fixed",
                   inset: "0",
@@ -1062,6 +1065,11 @@ export default class SignIn extends ReferencePage {
                     ></i>
                   </button>
                 </div>
+                <AccountControl
+                  menu
+                  onNavigate={v.closeMenu}
+                  onSignOut={v.closeMenu}
+                />
                 <nav
                   style={{
                     display: "flex",
@@ -1423,9 +1431,7 @@ export default class SignIn extends ReferencePage {
                               style={{ color: "#6C3CAA", flexShrink: "0" }}
                               className={"ph ph-info"}
                             ></i>
-                            {
-                              "Account preview · nothing is authenticated, created, sent, or stored."
-                            }
+                            {"Account access is simulated in this environment."}
                           </p>
                         </form>
                       </>

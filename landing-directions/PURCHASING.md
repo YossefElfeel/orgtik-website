@@ -1,6 +1,6 @@
-# Purchasing prototype
+# Purchasing flow
 
-The journey is `/plans` or a service/software page → builder → `/cart` → `/checkout` → CRM handoff preview. Services and software have separate builders and share one cart. Hosting is an external purchase at https://orgtik.ch.
+The journey is `/plans` or a service/software page → builder → `/cart` → `/checkout` → CRM account handoff. Services and software have separate builders and share one cart. Hosting is an external purchase at https://orgtik.ch. The storefront uses production-style wording, with payment, authentication, and CRM integration simulated locally. No real charges, accounts, or messages are created.
 
 ## Architecture
 
@@ -9,6 +9,7 @@ The journey is `/plans` or a service/software page → builder → `/cart` → `
 - `purchase-store.js`: cart v2, migration, explicit overlap choices, content replacement, persistence, and Undo.
 - `PurchasePlans.jsx`, `PurchaseCart.jsx`, `PurchaseCheckout.jsx`: discovery, review, payment, and confirmation. Existing Services/Software page shells retain their content and visual system.
 - `purchase-adapter.js`: deterministic mock payment and CRM integration boundary. No network, email, actual accounts, invoices, or card fields.
+- `purchase-payment.js`: shared simulated Card, TWINT, and PayPal choices. The selected method is validated by the adapter, recorded in the immutable receipt, and included in the CRM handoff. No card or wallet credentials are collected.
 
 Prices are editable sample CHF monthly amounts. Duration savings are 0%, 5%, 10%, 15% for 1/3/6/12 months. Group savings are 0%, 5%, 10%, 15% for 1/2/3–4/5+ distinct items. Each line uses the larger rate; ties are duration savings. Round its full-period amount once, sum line totals, and derive monthly equivalents from those payable totals. Taxes are unconfigured. Advertising management excludes media spend.
 
@@ -33,7 +34,8 @@ Builder links preserve `services` or `modules`, shared `duration`, line-level `t
       subtotal, total, saving, discount, reason, activation }
   ] }],
   amounts: { subtotal, saving, total, monthlyEquivalent, valid },
-  currency: "CHF"
+  currency: "CHF",
+  paymentMethod: "card" | "twint" | "paypal"
 }
 ```
 
@@ -41,15 +43,31 @@ Builder links preserve `services` or `modules`, shared `duration`, line-level `t
 
 Production must confirm payment through the payment backend, calculate authoritative prices, create/associate the verified CRM customer, associate order/payment/invoice records, and initiate account access. The mock's browser flags are demonstration data, never production payment or authentication evidence.
 
-Set `VITE_CRM_PORTAL_URL` to the supplied HTTPS portal destination and restart Vite when ready. With no destination, account actions open an explicit handoff preview. The guest preview requires simulated email ownership verification before account access and never looks up or discloses whether an email has an existing account. Demo sign-in represents a verified returning customer. No identity persists on refresh.
+Set `VITE_CRM_PORTAL_URL` to the supplied HTTPS portal destination and restart Vite when ready. With no destination, account actions explain that the account connection is not configured. Guest access requires simulated email ownership verification before account access and never looks up or discloses whether an email has an existing account. Local sign-in represents a verified returning customer. No identity persists on refresh.
+
+Checkout opens directly to guest billing and payment, with an optional Sign in dialog. It uses entered email/customer details, never a fixed demo customer. The shared in-memory identity prefills billing and displays signed-in status on return visits; standalone sign-in uses the same identity. Closing sign-in preserves guest inputs, and signing out restores the guest draft. No credentials, identity, or customer details are stored in browser storage. These client-side flags do not provide production authentication.
+
+`AccountControl.jsx` subscribes to this identity on every marketing and commerce header. Guest headers show Sign in; signed-in headers show initials and a compact name, with My account and Sign out. The navbar cart icon provides cart access; the account panel and mobile account section do not duplicate it. The account panel stays inside the viewport, supports keyboard focus and Escape, and closes on outside interaction. Mobile navigation includes the same identity/actions. My account opens the configured HTTPS CRM destination, or explains that the account connection is not configured. Signing out never removes cart items and immediately resets the standalone sign-in page and checkout identity.
+
+Guest and signed-in checkout share visible Card (Visa or Mastercard), TWINT, and PayPal radio choices, method-specific simulation guidance, a due-today total, and a concise no-charge disclosure. The user confirmed Visa, Mastercard, TWINT, and PayPal; the two card brands share one payment flow. Changing identity or retrying failed/cancelled payment preserves the choice. Successful payment records the method on confirmation and in the identity-free session receipt; older receipts restore as Card. Production payment methods must be supplied and processed by the payment backend.
+
+Payment and CRM outcome controls are available only during development at `/checkout?qa=1`. They are hidden on normal checkout and removed from the production build. Tax remains not calculated. Unapproved testimonials, mock client logos, project narratives/results, and roadmap activity are not published.
 
 Software activation is `active-preview`; services are `awaiting-onboarding`, with the period not started. Real onboarding, password setup, invoices, payment history, and dashboards remain in the CRM project.
+
+Confirmation places account access and purchase details beside each other in two top-aligned columns above 900px, and stacks account access first on smaller screens. Continue browsing stays directly below the account setup/access action, followed by the activation note. The purchase details panel contains the receipt and invoice guidance.
 
 ## Validation
 
 The latest UI review is documented in [qa/journey-review/README.md](qa/journey-review/README.md), including before/after captures. The [initial purchasing acceptance pass](qa/purchasing/README.md) covers the wider legacy-link and migration scenarios.
 
 The cart's content editor previews its draft price and requires Save or Cancel before checkout. Duration and renewal changes outside that editor still save immediately with Undo. Mobile purchase actions remain reachable while scrolling; checkout displays its expandable order review before billing.
+
+Bundle cards, individual packages, and inline builder summaries change Add to cart into a View in cart link plus a separate Remove button when that exact configuration is in the cart. Bundle cards retain Customize. Remove targets the matching stored group ID, preserves other groups, and offers Undo; focus returns to Add to cart. Undo restores periods and renewal settings. Duration changes are matched independently, so a different configuration still uses the overlap-resolution flow. The compact sticky mobile builder bar keeps the primary Add/View action, while its inline summary provides removal.
+
+The overlap dialog identifies the originating cart plans and the new selection in separate Already in your cart / You’re adding panels. Shared item names, individual durations, and renewal preferences stay visible. Keep cart version retains their current grouping; Use new version moves the shared items into the incoming plan. Other incoming items are listed as Included with either choice. Identical terms are explained explicitly. Cancel/Escape leaves the cart unchanged, both boundary Tab directions stay inside the dialog, and focus returns on close. See `qa/overlap-comparison/README.md` for browser evidence.
+
+Cart includes Back above its title. The router records the source page in the cart history entry; Back returns through browser history, retaining builder queries and product anchors after a cart refresh. A cart opened directly uses a same-site referrer when available, otherwise `/plans`. The current cart icon does not create duplicate entries. Navigation preserves the cart. See `qa/cart-back-navigation/README.md`.
 
 Run `npm run test:cart`, `npm run format:check`, and `npm run build`. Unit tests cover all catalog subsets/duration combinations, discount thresholds/ties/rounding, mixed groups, overlap resolution, edits/Undo/persistence, legacy migration and invalid terms, payment retry/idempotency, CRM recovery, activation, and identity-free receipt restoration.
 
@@ -58,6 +76,6 @@ Browser scenarios:
 1. Customize a bundle, override one duration, cancel/accept shared replacement, filter without losing selections, and add to cart.
 2. Edit contents, cancel, save, reload; change duration and renewal, then Undo. Add an overlapping bundle and exercise both explicit choices.
 3. Add software to the same cart. Inspect directory, department, and individual package prices; follow legacy entry links. Verify Hosting has only its external action.
-4. Continue as guest, check name/email validation, choose declined/cancelled demo outcomes, and retry with the same cart.
-5. Pay successfully with CRM failed or pending; refresh confirmation and retry account setup without paying. Verify guest email handoff and returning demo customer access.
+4. Open checkout directly as guest; check name/email validation, cancel optional sign-in without losing inputs, and simulate a signed-in customer using entered details. In development, visit `/checkout?qa=1` to choose declined/cancelled outcomes and retry with the same cart.
+5. Pay successfully with CRM failed or pending using the development QA controls; refresh confirmation and retry account setup without paying. Verify guest email handoff and returning customer access.
 6. Inspect 320, 390, 768, and 1440px layouts, keyboard controls, dialog Escape/focus return, live total announcements, and browser errors.

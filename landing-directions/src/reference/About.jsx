@@ -1,6 +1,7 @@
 import { Testimonials } from "./Testimonials";
 import React from "react";
 import { LanguageMenu } from "./LanguageMenu";
+import { AccountControl } from "./AccountControl";
 import { CartLink } from "./CartControls";
 import { ReferencePage } from "./ReferencePage";
 import { toSiteHref } from "./navigation";
@@ -1426,18 +1427,7 @@ export default class About extends ReferencePage {
                   >
                     <CartLink />
                     <LanguageMenu />
-                    <a
-                      href={toSiteHref("SignIn.dc.html")}
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: "500",
-                        color: "#DCD0E6",
-                        whiteSpace: "nowrap",
-                      }}
-                      className={"reference-state-224"}
-                    >
-                      {"Sign in"}
-                    </a>
+                    <AccountControl />
                     <a
                       href={toSiteHref("Contact.dc.html")}
                       style={{
@@ -1483,6 +1473,7 @@ export default class About extends ReferencePage {
                 <>
                   <CartLink />
                   <LanguageMenu compact />
+                  <AccountControl compact />
                   <button
                     onClick={v.openMenu}
                     aria-label="Open menu"
@@ -1515,6 +1506,7 @@ export default class About extends ReferencePage {
           {v.menuOpen && (
             <>
               <div
+                className="site-navigation-panel"
                 style={{
                   position: "fixed",
                   inset: "0",
@@ -1556,6 +1548,11 @@ export default class About extends ReferencePage {
                     ></i>
                   </button>
                 </div>
+                <AccountControl
+                  menu
+                  onNavigate={v.closeMenu}
+                  onSignOut={v.closeMenu}
+                />
                 <nav
                   style={{
                     display: "flex",

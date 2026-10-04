@@ -28,6 +28,33 @@ import {
   MobilePurchaseBar,
 } from "./PurchaseUI";
 import { PurchaseAction, PurchaseDialog } from "./PurchaseControls";
+import { cartBackTarget } from "./navigation.js";
+
+function CartBackLink() {
+  const target = cartBackTarget();
+  return (
+    <a
+      className="purchase-cart-back"
+      href={target.href}
+      onClick={(event) => {
+        if (
+          !target.useHistory ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        )
+          return;
+        event.preventDefault();
+        window.history.back();
+      }}
+    >
+      <i className="ph ph-arrow-left" aria-hidden="true" />
+      Back
+    </a>
+  );
+}
 
 function CartGroup({ group, onEditState }) {
   const [draft, setDraft] = useState(null);
@@ -132,8 +159,7 @@ function CartGroup({ group, onEditState }) {
             <div className="purchase-alert">
               <p>
                 Saved packages now include the full listed scope at the new
-                sample prices. Choose any missing durations and confirm your
-                selection.
+                prices. Choose any missing durations and confirm your selection.
               </p>
               <PurchaseAction
                 secondary
@@ -219,6 +245,7 @@ export default function PurchaseCart() {
       <div
         className={`purchase-surface ${items.length ? "purchase-with-mobile-bar" : ""}`}
       >
+        <CartBackLink />
         <div className="commerce-intro">
           <span className="purchase-eyebrow">Review your selection</span>
           <h1>Your cart.</h1>
@@ -227,7 +254,7 @@ export default function PurchaseCart() {
         {!persistent && (
           <p className="purchase-alert">
             Your browser cannot save this cart. Keep this tab open while
-            completing the preview.
+            completing your purchase.
           </p>
         )}
         {messages.length > 0 && (
@@ -271,10 +298,17 @@ export default function PurchaseCart() {
                   onEditState={onEditState}
                 />
               ))}
-              <div className="purchase-toolbar">
-                <a href="/services#svc-builder">Add services</a>
-                <a href="/software#plan-builder">Add software</a>
-              </div>
+              <nav
+                className="purchase-cart-additions"
+                aria-label="Add to your cart"
+              >
+                <PurchaseAction secondary href="/services#svc-builder">
+                  Add services
+                </PurchaseAction>
+                <PurchaseAction secondary href="/software#plan-builder">
+                  Add software
+                </PurchaseAction>
+              </nav>
             </div>
             <QuoteSummary groups={items} title="Order summary">
               {checkoutAction()}

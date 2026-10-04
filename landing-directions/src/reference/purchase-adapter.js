@@ -5,6 +5,7 @@ import {
   quoteCart,
   CRM_PORTAL_URL,
 } from "./purchase-catalog.js";
+import { getPaymentMethod } from "./purchase-payment.js";
 export const ORDER_SESSION_KEY = "orgtik.purchase-preview.v1";
 const payments = new Map();
 const setups = new Map();
@@ -23,7 +24,12 @@ export function validateCustomer(customer) {
     errors.email = "Enter a valid email address.";
   return errors;
 }
-export function createPurchaseSnapshot(groups, reference) {
+export function createPurchaseSnapshot(
+  groups,
+  reference,
+  paymentMethod = "card",
+) {
+  const method = getPaymentMethod(paymentMethod);
   const quote = quoteCart(groups);
   if (!quote.valid)
     throw new Error("Review the cart and choose all durations before paying.");
@@ -31,6 +37,7 @@ export function createPurchaseSnapshot(groups, reference) {
     version: 1,
     reference,
     paymentStatus: "succeeded",
+    paymentMethod: method.id,
     createdAt: new Date().toISOString(),
     currency: "CHF",
     groups: groups.map((g) => ({
@@ -67,10 +74,12 @@ export async function simulatePayment({
   groups,
   customer,
   reference,
+  paymentMethod = "card",
   outcome = "success",
   signal,
 }) {
   if (payments.has(reference)) return payments.get(reference);
+  const method = getPaymentMethod(paymentMethod);
   if (Object.keys(validateCustomer(customer)).length)
     throw new Error("Complete your billing details.");
   const stableGroups = groups.map(createGroup);
@@ -80,10 +89,10 @@ export async function simulatePayment({
     await delay(signal);
     if (outcome === "declined")
       throw new Error(
-        "The demo payment was declined. Your cart is saved; try again.",
+        "Your payment was declined. Your cart is saved; try again.",
       );
     if (outcome === "cancelled") throw new Error("cancelled");
-    return createPurchaseSnapshot(stableGroups, reference);
+    return createPurchaseSnapshot(stableGroups, reference, method.id);
   })();
   payments.set(reference, request);
   try {
@@ -116,6 +125,7 @@ export function createCRMHandoffRequest(
     purchases: order.groups,
     amounts: order.quote,
     currency: order.currency,
+    paymentMethod: getPaymentMethod(order.paymentMethod).id,
   };
 }
 export async function provisionCRM(
@@ -172,7 +182,10 @@ export function loadPurchaseSession() {
     )
       return null;
     return {
-      order: freeze(value.order),
+      order: freeze({
+        ...value.order,
+        paymentMethod: getPaymentMethod(value.order.paymentMethod).id,
+      }),
       crm: {
         status: ["ready", "pending", "failed"].includes(value.crm?.status)
           ? value.crm.status

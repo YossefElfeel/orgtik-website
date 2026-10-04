@@ -458,7 +458,7 @@ export function migrateLegacy(items) {
   }
   if (groups.length)
     messages.add(
-      "Packages and sample prices have changed. Review each saved group and confirm its scope before checkout.",
+      "Packages and prices have changed. Review each saved group and confirm its scope before checkout.",
     );
   return { groups, messages: [...messages] };
 }

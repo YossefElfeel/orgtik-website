@@ -30,7 +30,6 @@ import {
 import {
   getPreviewCustomer,
   subscribePreviewCustomer,
-  signInPreviewCustomer,
   signOutPreviewCustomer,
 } from "./purchase-identity.js";
 import {
@@ -220,10 +219,6 @@ export default function PurchaseCheckout() {
   const [crm, setCRM] = useState(
     saved?.crm || { status: "pending", access: "verification-required" },
   );
-  const [signInOpen, setSignInOpen] = useState(false);
-  const [signInEmail, setSignInEmail] = useState("");
-  const [signInPassword, setSignInPassword] = useState("");
-  const [signInError, setSignInError] = useState("");
   const [customer, setCustomer] = useState(() =>
     identity ? { ...identity } : { name: "", email: "", company: "" },
   );
@@ -432,22 +427,19 @@ export default function PurchaseCheckout() {
                     </strong>
                     {verified && <span>{identity.email}</span>}
                   </div>
-                  <button
-                    type="button"
-                    disabled={processing}
-                    onClick={() => {
-                      if (verified) {
+                  {verified && (
+                    <button
+                      type="button"
+                      disabled={processing}
+                      onClick={() => {
                         signOutPreviewCustomer();
                         setCustomer({ ...guestDraft.current });
                         setErrors({});
-                      } else {
-                        setSignInEmail(customer.email);
-                        setSignInOpen(true);
-                      }
-                    }}
-                  >
-                    {verified ? "Sign out" : "Sign in"}
-                  </button>
+                      }}
+                    >
+                      Sign out
+                    </button>
+                  )}
                 </div>
                 <h2>Billing details</h2>
                 <p>
@@ -611,126 +603,6 @@ export default function PurchaseCheckout() {
                 )}
               </form>
             </section>
-            <PurchaseDialog
-              open={signInOpen}
-              title="Sign in to OrgTik"
-              onClose={() => {
-                setSignInOpen(false);
-                setSignInPassword("");
-                setSignInError("");
-              }}
-            >
-              <p>
-                Sign in to link this purchase to your customer account. Your
-                cart and billing details stay with you.
-              </p>
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  if (
-                    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signInEmail.trim()) ||
-                    !signInPassword
-                  ) {
-                    setSignInError("Enter your email address and password.");
-                    const invalidField = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-                      signInEmail.trim(),
-                    )
-                      ? "signin-email"
-                      : "signin-password";
-                    event.currentTarget.elements
-                      .namedItem(invalidField)
-                      ?.focus();
-                    return;
-                  }
-                  guestDraft.current = { ...customer };
-                  setCustomer({
-                    ...signInPreviewCustomer({
-                      name:
-                        customer.email === signInEmail.trim()
-                          ? customer.name
-                          : "",
-                      email: signInEmail,
-                      company: "",
-                    }),
-                  });
-                  setErrors({});
-                  setSignInOpen(false);
-                  setSignInPassword("");
-                  setSignInError("");
-                }}
-                noValidate
-              >
-                <div className="purchase-fields">
-                  <label>
-                    Email address
-                    <input
-                      name="signin-email"
-                      type="email"
-                      autoComplete="email"
-                      maxLength={254}
-                      aria-invalid={
-                        !!signInError &&
-                        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signInEmail.trim())
-                      }
-                      aria-describedby={
-                        signInError ? "checkout-signin-error" : undefined
-                      }
-                      value={signInEmail}
-                      onChange={(event) => setSignInEmail(event.target.value)}
-                      required
-                    />
-                  </label>
-                  <label>
-                    Password
-                    <input
-                      name="signin-password"
-                      type="password"
-                      autoComplete="current-password"
-                      maxLength={128}
-                      aria-invalid={!!signInError && !signInPassword}
-                      aria-describedby={
-                        signInError ? "checkout-signin-error" : undefined
-                      }
-                      value={signInPassword}
-                      onChange={(event) =>
-                        setSignInPassword(event.target.value)
-                      }
-                      required
-                    />
-                  </label>
-                </div>
-                {signInError && (
-                  <p
-                    id="checkout-signin-error"
-                    className="purchase-error"
-                    role="alert"
-                  >
-                    {signInError}
-                  </p>
-                )}
-                <div className="purchase-dialog__actions">
-                  <button
-                    type="submit"
-                    className="commerce-action purchase-action"
-                  >
-                    <span>Sign in</span>
-                    <span className="commerce-action__arrow">
-                      <i className="ph ph-arrow-up-right" aria-hidden="true" />
-                    </span>
-                  </button>
-                  <PurchaseAction
-                    secondary
-                    onClick={() => {
-                      setSignInOpen(false);
-                      setSignInPassword("");
-                      setSignInError("");
-                    }}
-                  >
-                    Keep checking out as guest
-                  </PurchaseAction>
-                </div>
-              </form>
-            </PurchaseDialog>
             <QuoteSummary groups={items} title="Your order">
               <OrderContents groups={items} />
               <a href="/cart">Edit your selection</a>

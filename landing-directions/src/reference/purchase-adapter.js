@@ -75,11 +75,14 @@ export async function simulatePayment({
   customer,
   reference,
   paymentMethod = "card",
+  authorization,
   outcome = "success",
   signal,
 }) {
   if (payments.has(reference)) return payments.get(reference);
   const method = getPaymentMethod(paymentMethod);
+  if (authorization?.method !== method.id || authorization.approved !== true)
+    throw new Error("Complete your payment details or approval first.");
   if (Object.keys(validateCustomer(customer)).length)
     throw new Error("Complete your billing details.");
   const stableGroups = groups.map(createGroup);

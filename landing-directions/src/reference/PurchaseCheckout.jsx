@@ -33,7 +33,13 @@ import {
   signInPreviewCustomer,
   signOutPreviewCustomer,
 } from "./purchase-identity.js";
-import { PAYMENT_METHODS, getPaymentMethod } from "./purchase-payment.js";
+import {
+  PAYMENT_METHODS,
+  getPaymentMethod,
+  validateTestPaymentDetails,
+  createTestPaymentAuthorization,
+} from "./purchase-payment.js";
+import { PaymentDetails } from "./PaymentDetails";
 
 function Confirmation({ order, crm, onCRM, verified, onRestart }) {
   const [busy, setBusy] = useState(false);
@@ -62,8 +68,11 @@ function Confirmation({ order, crm, onCRM, verified, onRestart }) {
       <section className="purchase-checkout-panel">
         <span className="purchase-confirmed">
           <i className="ph ph-check-circle" aria-hidden="true" /> Payment
-          confirmed
+          successful
         </span>
+        <p className="purchase-caption">
+          Test payment complete. No money was charged.
+        </p>
         <h2 ref={heading} tabIndex={-1}>
           Access your customer account.
         </h2>
@@ -230,8 +239,13 @@ export default function PurchaseCheckout() {
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [processing, setProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("card");
-  const selectedMethod = getPaymentMethod(paymentMethod);
+  const [paymentMethod, setPaymentMethod] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState({});
+  const selectedMethod = paymentMethod ? getPaymentMethod(paymentMethod) : null;
+  const paymentReady =
+    !!selectedMethod &&
+    !Object.keys(validateTestPaymentDetails(paymentMethod, paymentDetails))
+      .length;
   const [outcome, setOutcome] = useState("success");
   const [crmScenario, setCRMScenario] = useState("ready");
   const [sessionSaved, setSessionSaved] = useState(true);
@@ -241,8 +255,19 @@ export default function PurchaseCheckout() {
   const busy = useRef(false);
   const controller = useRef(null);
   const attempt = useRef(null);
+  const approvalCart = useRef(items);
   const form = useRef(null);
   useEffect(() => () => controller.current?.abort(), []);
+  useEffect(() => {
+    if (approvalCart.current === items) return;
+    approvalCart.current = items;
+    if (!order) {
+      controller.current?.abort();
+      attempt.current = null;
+      setPaymentDetails({});
+      setErrors({});
+    }
+  }, [items, order]);
   const updateCRM = (value) => {
     setCRM(value);
     if (order) setSessionSaved(savePurchaseSession(order, value));
@@ -250,11 +275,19 @@ export default function PurchaseCheckout() {
   const submit = async (event) => {
     event.preventDefault();
     if (busy.current) return;
-    const problems = validateCustomer(customer);
+    const problems = {
+      ...validateCustomer(customer),
+      ...(selectedMethod
+        ? validateTestPaymentDetails(paymentMethod, paymentDetails)
+        : { paymentMethod: "Choose a payment method." }),
+    };
     setErrors(problems);
     setError("");
     if (Object.keys(problems).length) {
-      form.current?.elements[Object.keys(problems)[0]]?.focus();
+      const firstError = Object.keys(problems)[0];
+      if (firstError === "paymentMethod")
+        form.current?.querySelector('[name="paymentMethod"]')?.focus();
+      else form.current?.elements[firstError]?.focus();
       return;
     }
     if (!quoteCart(items).valid) {
@@ -271,6 +304,10 @@ export default function PurchaseCheckout() {
         customer,
         reference: attempt.current,
         paymentMethod,
+        authorization: createTestPaymentAuthorization(
+          paymentMethod,
+          paymentDetails,
+        ),
         outcome,
         signal: controller.current.signal,
       });
@@ -278,6 +315,7 @@ export default function PurchaseCheckout() {
         status: "pending",
         access: verified ? "verified-existing" : "verification-required",
       };
+      setPaymentDetails({});
       setOrder(purchase);
       setCRM(pending);
       setSessionSaved(savePurchaseSession(purchase, pending));
@@ -291,6 +329,7 @@ export default function PurchaseCheckout() {
       setCRM(setup);
       setSessionSaved(savePurchaseSession(purchase, setup));
     } catch (problem) {
+      if (paymentMethod !== "card") setPaymentDetails({});
       setError(
         problem.message === "cancelled"
           ? "Payment cancelled. Your cart has been kept."
@@ -448,7 +487,10 @@ export default function PurchaseCheckout() {
                           value={method.id}
                           checked={paymentMethod === method.id}
                           onChange={() => {
+                            if (method.id === paymentMethod) return;
                             setPaymentMethod(method.id);
+                            setPaymentDetails({});
+                            setErrors({});
                             setError("");
                           }}
                           aria-label={method.name}
@@ -469,10 +511,24 @@ export default function PurchaseCheckout() {
                       </label>
                     ))}
                   </div>
-                  <p className="purchase-payment-guidance" role="status">
-                    {selectedMethod.guidance}
-                  </p>
+                  {selectedMethod && (
+                    <p className="purchase-payment-guidance" role="status">
+                      {selectedMethod.guidance}
+                    </p>
+                  )}
                 </fieldset>
+                {selectedMethod && (
+                  <PaymentDetails
+                    key={paymentMethod}
+                    methodId={paymentMethod}
+                    details={paymentDetails}
+                    onChange={setPaymentDetails}
+                    errors={errors}
+                    onErrors={setErrors}
+                    processing={processing}
+                    amount={money(quoteCart(items).total)}
+                  />
+                )}
                 <div className="purchase-payment-total">
                   <span>Due today</span>
                   <strong>{money(quoteCart(items).total)}</strong>
@@ -490,11 +546,13 @@ export default function PurchaseCheckout() {
                 )}
                 <button
                   type="submit"
-                  disabled={processing || !quoteCart(items).valid}
+                  disabled={
+                    processing || !quoteCart(items).valid || !paymentReady
+                  }
                   className="commerce-action purchase-action"
                 >
                   <span>
-                    {processing
+                    {processing && selectedMethod
                       ? `Processing ${selectedMethod.name} payment…`
                       : `Pay ${money(quoteCart(items).total)}`}
                   </span>

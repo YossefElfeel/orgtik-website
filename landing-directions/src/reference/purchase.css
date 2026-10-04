@@ -1447,6 +1447,56 @@
   font-size: 13px;
   min-height: 42px;
 }
+.purchase-payment-details {
+  min-width: 0;
+  border: 1px solid #ded1e7;
+  border-radius: 18px;
+  padding: 20px;
+  margin: 0 0 24px;
+}
+.purchase-payment-details legend {
+  padding: 0 8px;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.purchase-checkout-panel .purchase-test-payment-note {
+  font-size: 13px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.purchase-card-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-block: 20px 12px;
+}
+.purchase-card-fields > label:first-child {
+  grid-column: 1 / -1;
+}
+.purchase-card-fields input[aria-invalid="true"] {
+  border-color: #992842;
+}
+.purchase-card-fields input:focus-visible {
+  outline: 2px solid #6c3caa;
+  outline-offset: 3px;
+}
+.purchase-payment-details > .purchase-action {
+  width: 100%;
+}
+.purchase-checkout-panel .purchase-payment-readiness {
+  font-size: 13px;
+  margin: 16px 0 0;
+}
+.purchase-checkout-panel .purchase-payment-readiness--ready {
+  color: #416541;
+}
+@media (max-width: 360px) {
+  .purchase-payment-details {
+    padding: 16px;
+  }
+  .purchase-card-fields {
+    grid-template-columns: 1fr;
+  }
+}
 .purchase-payment-total {
   display: flex;
   justify-content: space-between;

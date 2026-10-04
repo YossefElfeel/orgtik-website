@@ -67,6 +67,8 @@ Bundle cards, individual packages, and inline builder summaries change Add to ca
 
 The overlap dialog identifies the originating cart plans and the new selection in separate Already in your cart / You’re adding panels. Shared item names, individual durations, and renewal preferences stay visible. Keep cart version retains their current grouping; Use new version moves the shared items into the incoming plan. Other incoming items are listed as Included with either choice. Identical terms are explained explicitly. Cancel/Escape leaves the cart unchanged, both boundary Tab directions stay inside the dialog, and focus returns on close. See `qa/overlap-comparison/README.md` for browser evidence.
 
+Cart includes Back above its title. The router records the source page in the cart history entry; Back returns through browser history, retaining builder queries and product anchors after a cart refresh. A cart opened directly uses a same-site referrer when available, otherwise `/plans`. The current cart icon does not create duplicate entries. Navigation preserves the cart. See `qa/cart-back-navigation/README.md`.
+
 Run `npm run test:cart`, `npm run format:check`, and `npm run build`. Unit tests cover all catalog subsets/duration combinations, discount thresholds/ties/rounding, mixed groups, overlap resolution, edits/Undo/persistence, legacy migration and invalid terms, payment retry/idempotency, CRM recovery, activation, and identity-free receipt restoration.
 
 Browser scenarios:

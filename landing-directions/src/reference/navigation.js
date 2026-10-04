@@ -56,7 +56,33 @@ export function normalizeLocation() {
     path = "/legal";
   }
   if (path !== pathname || fragment !== hash)
-    window.history.replaceState({}, "", path + search + fragment);
+    window.history.replaceState(
+      window.history.state,
+      "",
+      path + search + fragment,
+    );
+}
+
+export function cartBackTarget() {
+  const internalPage = (href) => {
+    if (typeof href !== "string" || !href) return null;
+    try {
+      const url = new URL(href, window.location.origin);
+      if (
+        url.origin !== window.location.origin ||
+        url.pathname.replace(/\/+$/, "") === "/cart"
+      )
+        return null;
+      return url.pathname + url.search + url.hash;
+    } catch {
+      return null;
+    }
+  };
+  const previousPage = internalPage(window.history.state?.cartReturnTo);
+  return {
+    href: previousPage || internalPage(document.referrer) || "/plans",
+    useHistory: !!previousPage && window.history.length > 1,
+  };
 }
 
 export function readWorkspaceQuery(search = window.location.search) {

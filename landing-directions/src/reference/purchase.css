@@ -105,6 +105,30 @@
 .purchase-cart-toolbar > button {
   flex-shrink: 0;
 }
+.purchase-cart-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 16px;
+  margin-bottom: 18px;
+  border: 1px solid #d7c3e6;
+  border-radius: 999px;
+  background: #fff;
+  color: #56317b;
+  font:
+    600 12px/1.4 Montserrat,
+    Arial,
+    sans-serif;
+  text-decoration: none;
+}
+.purchase-cart-back i {
+  font-size: 18px;
+}
+.purchase-cart-back:hover {
+  background: #eee3f7;
+  border-color: #9d77c0;
+}
 .purchase-section {
   padding: clamp(40px, 6vw, 80px) 0;
   scroll-margin-top: 115px;

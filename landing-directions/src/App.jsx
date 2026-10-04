@@ -35,7 +35,17 @@ export function App() {
       }
       const previous = window.location.href;
       const changedPage = url.pathname !== window.location.pathname;
-      window.history.pushState({}, "", url.pathname + url.search + url.hash);
+      if (url.pathname === "/cart" && !changedPage) return;
+      const state =
+        url.pathname === "/cart"
+          ? {
+              cartReturnTo:
+                window.location.pathname +
+                window.location.search +
+                window.location.hash,
+            }
+          : {};
+      window.history.pushState(state, "", url.pathname + url.search + url.hash);
       update();
       if (changedPage) window.scrollTo({ top: 0, behavior: "instant" });
       else

@@ -28,6 +28,33 @@ import {
   MobilePurchaseBar,
 } from "./PurchaseUI";
 import { PurchaseAction, PurchaseDialog } from "./PurchaseControls";
+import { cartBackTarget } from "./navigation.js";
+
+function CartBackLink() {
+  const target = cartBackTarget();
+  return (
+    <a
+      className="purchase-cart-back"
+      href={target.href}
+      onClick={(event) => {
+        if (
+          !target.useHistory ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        )
+          return;
+        event.preventDefault();
+        window.history.back();
+      }}
+    >
+      <i className="ph ph-arrow-left" aria-hidden="true" />
+      Back
+    </a>
+  );
+}
 
 function CartGroup({ group, onEditState }) {
   const [draft, setDraft] = useState(null);
@@ -218,6 +245,7 @@ export default function PurchaseCart() {
       <div
         className={`purchase-surface ${items.length ? "purchase-with-mobile-bar" : ""}`}
       >
+        <CartBackLink />
         <div className="commerce-intro">
           <span className="purchase-eyebrow">Review your selection</span>
           <h1>Your cart.</h1>

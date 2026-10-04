@@ -1873,9 +1873,8 @@
   padding: 0;
 }
 .purchase-summary-selection .purchase-order-contents {
-  max-height: 240px;
-  overflow-y: auto;
-  padding-right: 8px;
+  max-height: none;
+  overflow: visible;
 }
 .purchase-summary-selection .purchase-order-group > strong {
   font-size: 12px;
@@ -1908,11 +1907,8 @@
 .purchase-mobile-order {
   display: none;
 }
-@media (min-width: 801px) {
-  .purchase-summary:has(.purchase-summary-selection) {
-    max-height: calc(100svh - 130px);
-    overflow-y: auto;
-  }
+.purchase-summary:has(.purchase-summary-selection) {
+  position: static;
 }
 @media (max-width: 800px) {
   .purchase-surface > .commerce-intro {

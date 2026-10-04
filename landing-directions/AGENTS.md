@@ -1,3 +1,7 @@
+## Selection card scrolling — 2026-10-04
+
+Services and Software selection summary cards and their selected-package lists grow naturally with their contents and scroll with the page. Do not constrain them to viewport heights or add internal scrolling. Keep these expanded summaries in normal document flow so all content remains reachable on short screens.
+
 ## Hero scope update — 2026-09-28
 
 Keep full-screen hero sections only on the Home, Services overview, and Software overview pages. All other pages, including sign-in and product/service/content detail views, begin with their content or a compact page title. Software footer links must have explicit labels and destinations.

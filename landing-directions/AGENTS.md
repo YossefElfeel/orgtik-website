@@ -1,3 +1,9 @@
+## Complete test checkout — 2026-10-04
+
+Start checkout with no payment method selected. Hide payment details and method-specific guidance until the customer chooses Card, TWINT, or PayPal. Only render the chosen method's details/approval, and keep Pay disabled until they are complete.
+
+Keep checkout in this order: billing name/email, payment method, method-specific payment details or approval, Pay, successful payment, then account access ready. This is explicitly a local test checkout. Card inputs accept only the supplied synthetic Visa/Mastercard examples, expiry 12/30 and security code 123; real credentials are rejected and payment details are never persisted or passed to the adapter. TWINT and PayPal use explicit local approval dialogs without credentials, real QR codes, or provider calls. Pay requires completed details/approval. Switching methods or changing the cart resets details and authorization; failed/cancelled wallet attempts require fresh approval. Clear payment inputs after success. Preserve the existing guest/sign-in choices, cart on failure, independent CRM retries, and honest unconfigured portal state. Account readiness remains a simulation; it never authenticates a real customer.
+
 ## Selection card scrolling — 2026-10-04
 
 Services and Software selection summary cards and their selected-package lists grow naturally with their contents and scroll with the page. Do not constrain them to viewport heights or add internal scrolling. Keep these expanded summaries in normal document flow so all content remains reachable on short screens.

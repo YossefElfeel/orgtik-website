@@ -17,7 +17,7 @@ import {
   migrateLegacy,
 } from "../src/reference/purchase-catalog.js";
 import {
-  simulatePayment,
+  simulatePayment as simulatePaymentRequest,
   provisionCRM,
   validateCustomer,
   savePurchaseSession,
@@ -30,6 +30,18 @@ import {
   signInPreviewCustomer,
   signOutPreviewCustomer,
 } from "../src/reference/purchase-identity.js";
+import {
+  normalizeTestPaymentInput,
+  validateTestPaymentDetails,
+  createTestPaymentAuthorization,
+} from "../src/reference/purchase-payment.js";
+
+// Existing adapter scenarios begin after the payment-details step is completed.
+const simulatePayment = (request) =>
+  simulatePaymentRequest({
+    authorization: { method: request.paymentMethod || "card", approved: true },
+    ...request,
+  });
 const local = new Map(),
   session = new Map(),
   events = new Map();
@@ -366,6 +378,140 @@ test("checkout requires name and valid email, not a project enquiry", () => {
   assert.deepEqual(validateCustomer(customer), {});
   assert.ok(validateCustomer({ name: "", email: "no" }).name);
   assert.ok(validateCustomer({ name: "A", email: "no" }).email);
+});
+
+test("test card entry accepts only synthetic values and requires all payment details", () => {
+  const visa = {
+    cardNumber: "4242 4242 4242 4242",
+    expiry: "12/30",
+    securityCode: "123",
+  };
+  const mastercard = { ...visa, cardNumber: "5555 5555 5555 4444" };
+  assert.deepEqual(validateTestPaymentDetails("card", visa), {});
+  assert.deepEqual(validateTestPaymentDetails("card", mastercard), {});
+  assert.equal(Object.keys(validateTestPaymentDetails("card", {})).length, 3);
+  assert.ok(
+    validateTestPaymentDetails("card", { ...visa, securityCode: "" })
+      .securityCode,
+  );
+  assert.ok(
+    validateTestPaymentDetails("card", { ...visa, expiry: "01/29" }).expiry,
+  );
+  assert.ok(
+    validateTestPaymentDetails("card", {
+      ...visa,
+      cardNumber: "4111111111111111",
+    }).cardNumber,
+  );
+  assert.equal(
+    normalizeTestPaymentInput("cardNumber", "4242424242424242"),
+    visa.cardNumber,
+  );
+  assert.equal(
+    normalizeTestPaymentInput("cardNumber", "5555555555554444"),
+    mastercard.cardNumber,
+  );
+  assert.equal(
+    normalizeTestPaymentInput("cardNumber", "4111111111111111"),
+    null,
+  );
+  assert.equal(normalizeTestPaymentInput("cardNumber", "4242a"), null);
+  assert.equal(normalizeTestPaymentInput("expiry", "1230"), "12/30");
+  assert.equal(normalizeTestPaymentInput("expiry", "11/30"), null);
+  assert.equal(normalizeTestPaymentInput("securityCode", "999"), null);
+  assert.throws(
+    () => createTestPaymentAuthorization("card", {}),
+    /payment details/,
+  );
+  assert.deepEqual(createTestPaymentAuthorization("card", visa), {
+    method: "card",
+    approved: true,
+  });
+});
+
+test("wallets require method-specific approval before payment and never retain authorization", async () => {
+  for (const method of ["twint", "paypal"]) {
+    assert.ok(validateTestPaymentDetails(method, {}).walletApproval);
+    assert.ok(
+      validateTestPaymentDetails(method, { walletApproved: false })
+        .walletApproval,
+    );
+    assert.deepEqual(
+      validateTestPaymentDetails(method, { walletApproved: true }),
+      {},
+    );
+    const authorization = createTestPaymentAuthorization(method, {
+      walletApproved: true,
+    });
+    await assert.rejects(
+      simulatePaymentRequest({
+        groups: [group()],
+        customer,
+        reference: `missing-${method}`,
+        paymentMethod: method,
+      }),
+      /payment details or approval/,
+    );
+    await assert.rejects(
+      simulatePaymentRequest({
+        groups: [group()],
+        customer,
+        reference: `mismatch-${method}`,
+        paymentMethod: "card",
+        authorization,
+      }),
+      /payment details or approval/,
+    );
+    const order = await simulatePaymentRequest({
+      groups: [group()],
+      customer,
+      reference: `approved-${method}`,
+      paymentMethod: method,
+      authorization,
+    });
+    assert.equal(order.paymentStatus, "succeeded");
+    assert.equal(order.paymentMethod, method);
+    assert.equal("authorization" in order, false);
+    const crm = await provisionCRM(order);
+    assert.equal(crm.status, "ready");
+    savePurchaseSession(order, crm);
+    assert.equal(
+      session.get(ORDER_SESSION_KEY).includes("authorization"),
+      false,
+    );
+  }
+});
+
+test("card authorization never passes card details into receipts or CRM and refresh needs new entry", async () => {
+  const details = {
+    cardNumber: "4242 4242 4242 4242",
+    expiry: "12/30",
+    securityCode: "123",
+  };
+  const authorization = createTestPaymentAuthorization("card", details);
+  const order = await simulatePaymentRequest({
+    groups: [group()],
+    customer,
+    reference: "card-details-complete",
+    paymentMethod: "card",
+    authorization,
+  });
+  const crm = await provisionCRM(order);
+  savePurchaseSession(order, crm);
+  const receipt = session.get(ORDER_SESSION_KEY);
+  assert.equal(receipt.includes(details.cardNumber), false);
+  assert.equal(receipt.includes("cardNumber"), false);
+  assert.equal(receipt.includes("securityCode"), false);
+  assert.ok(validateTestPaymentDetails("card", {}).cardNumber);
+  await assert.rejects(
+    simulatePaymentRequest({
+      groups: [group()],
+      customer,
+      reference: "card-details-empty",
+      paymentMethod: "card",
+    }),
+    /payment details or approval/,
+  );
 });
 test("declined and cancelled payment never produce an order or account", async () => {
   await assert.rejects(

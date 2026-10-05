@@ -2,7 +2,7 @@
 
 Every active duration selector uses the shared `DurationPicker` and matches the department filter pills: separate fully rounded options, a thin lilac outline when unselected, and a dark plum selected state. All options in a row have equal height, including the one-month option without a savings label. Do not put the options inside a filled segmented bar. Keep duration/savings labels, native radio behavior, keyboard focus, and an even four-option row or two-by-two layout in narrow containers. Apply the same style to bundles, Services/Software builders, individual packages, the pricing directory, and cart editors.
 
-Builders and the cart content editor have only two steps: choose items, then set durations. Step 2 has a native Use shared duration switch beside its heading, on by default. When on, show the shared duration pills and a collapsed Individual services/products disclosure in the same step. Inside that disclosure, each item retains its optional Set an individual duration checkbox and scope note. When the switch is off, hide the shared filter and show all selected-item cards with their duration pills directly, without individual-duration checkboxes or a separate Make it yours heading. Switching modes preserves terms and renewals; changing the shared term still confirms replacing overrides. This layout supersedes the third-step disclosure on 2026-10-05.
+Builders and the cart content editor have only two steps: choose items, then set durations. Step 1 puts Clear all beside the Choose your services/products heading. In builders it resets the current configuration; in cart editing it clears only the draft, with Save/Cancel still required. Step 2 has a native Use shared duration switch aligned to the right edge of the heading container, on by default. When on, show only the shared duration pills: no individual cards or disclosure. When off, hide the shared filter and show all selected-item cards with their duration pills directly, without individual-duration checkboxes or a separate Make it yours heading. Switching modes preserves terms and renewals; changing the shared term still confirms replacing overrides. This layout supersedes the third-step and individual disclosure on 2026-10-05.
 
 ## Complete test checkout — 2026-10-04
 
@@ -12,7 +12,7 @@ Keep checkout in this order: billing name/email, payment method, card details wh
 
 ## Selection card scrolling — 2026-10-04
 
-Services and Software selection summary cards and their selected-package lists grow naturally with their contents and scroll with the page. Do not constrain them to viewport heights or add internal scrolling. Keep these expanded summaries in normal document flow so all content remains reachable on short screens.
+Services and Software selection summary cards and their selected-package lists grow naturally with their contents. Do not constrain them to viewport heights or add internal scrolling. On desktop, the summary sticks within its builder while scrolling; measure its height so short cards sit below the header and taller cards can reveal their bottom before sticking. On stacked mobile layouts, retain normal page flow and the existing compact purchase bar. All content must remain reachable on short screens. Desktop sticky behavior was requested on 2026-10-05.
 
 ## Hero scope update — 2026-09-28
 
@@ -34,7 +34,7 @@ The overlap dialog compares Already in your cart with You’re adding, names the
 
 Cart shows a compact Back link above its title in both populated and empty states. Record the incoming same-site page in the cart history entry, preserving query parameters and fragments. Back uses browser history for that recorded entry, including after refresh; direct entries use a same-site referrer or fall back to `/plans`. Reopening the current cart must not add duplicate history entries. Never change purchases when navigating back.
 
-Individual services/products use a native disclosure within Step 2 when shared duration is on. New configurations start in shared mode with this disclosure collapsed. Keyboard or pointer activation reveals optional individual durations and renewal preferences. Turning shared duration off reveals the cards and their duration controls automatically. Collapsing options or switching modes preserves the configuration.
+New configurations start in shared mode with all individual cards hidden. Turning shared duration off reveals the cards and their duration controls automatically. There is no individual-services/products disclosure. Switching modes preserves the configuration.
 
 ## Current reference — 2026-09-28
 

@@ -103,8 +103,21 @@ export function QuoteSummary({
   children,
 }) {
   const quote = quoteCart(groups);
+  const summary = useRef(null);
+  useEffect(() => {
+    const element = summary.current;
+    const measure = () =>
+      element.style.setProperty(
+        "--purchase-summary-height",
+        `${element.offsetHeight}px`,
+      );
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   return (
-    <aside className="purchase-summary" id={id}>
+    <aside className="purchase-summary" id={id} ref={summary}>
       <span className="purchase-eyebrow">{title}</span>
       <div className="purchase-summary__amount">
         <small>Due today</small>
@@ -144,58 +157,12 @@ export function QuoteSummary({
     </aside>
   );
 }
-function IndividualDuration({ group, line, item, onChange }) {
-  const id = useId();
-  const [expanded, setExpanded] = useState(
-    () => !line.months || line.months !== group.defaultMonths,
-  );
-  return (
-    <div className="purchase-individual-duration">
-      <label className="purchase-check purchase-individual-duration__toggle">
-        <input
-          type="checkbox"
-          checked={expanded}
-          aria-label={`Set an individual duration for ${item.name}`}
-          aria-controls={`${id}-options`}
-          aria-describedby={`${id}-note`}
-          onChange={(event) => setExpanded(event.target.checked)}
-        />
-        <span>
-          Set an individual duration
-          <small>
-            {line.months
-              ? `Current duration: ${termLabel(line.months)}`
-              : "Choose a duration to continue."}
-          </small>
-        </span>
-      </label>
-      <p className="purchase-caption" id={`${id}-note`}>
-        Changes apply only to this{" "}
-        {group.kind === "service" ? "service" : "product"}. The{" "}
-        {group.bundleId ? "bundle" : "plan"}’s shared duration remains{" "}
-        {termLabel(group.defaultMonths)}; other items keep their selected
-        durations.
-      </p>
-      <div id={`${id}-options`} hidden={!expanded}>
-        {expanded && (
-          <DurationPicker
-            label={`Duration for ${item.name}`}
-            displayLabel="Duration"
-            months={line.months}
-            onChange={(months) => onChange(line.catalogId, { months })}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
 export function PackageLines({
   group,
   onChange,
   onRemove,
   renewal = true,
   compact = false,
-  optionalDuration = false,
 }) {
   const quoted = quoteGroup(group);
   return (
@@ -244,15 +211,7 @@ export function PackageLines({
                 Management only; media spend is separate.
               </p>
             )}
-            {onChange && optionalDuration ? (
-              <IndividualDuration
-                key={group.id}
-                group={group}
-                line={line}
-                item={item}
-                onChange={onChange}
-              />
-            ) : onChange ? (
+            {onChange ? (
               <DurationPicker
                 label={`Duration for ${item.name}`}
                 displayLabel="Duration"
@@ -316,7 +275,12 @@ export function PackageLines({
     </div>
   );
 }
-export function ConfigurationEditor({ group, onChange, showLines = true }) {
+export function ConfigurationEditor({
+  group,
+  onChange,
+  showLines = true,
+  onClear,
+}) {
   const [department, setDepartment] = useState("all");
   const [pendingMonths, setPendingMonths] = useState(null);
   const [sharedDuration, setSharedDuration] = useState(true);
@@ -358,7 +322,6 @@ export function ConfigurationEditor({ group, onChange, showLines = true }) {
     <PackageLines
       group={group}
       compact
-      optionalDuration={sharedDuration}
       onChange={(id, patch) =>
         onChange({
           ...group,
@@ -374,10 +337,21 @@ export function ConfigurationEditor({ group, onChange, showLines = true }) {
     <div className="purchase-editor">
       <div className="purchase-editor__step">
         <span className="purchase-step">01</span>
-        <div>
-          <h3>
-            Choose your {group.kind === "software" ? "products" : "services"}
-          </h3>
+        <div className="purchase-editor__selection-copy">
+          <div className="purchase-editor__selection-title">
+            <h3>
+              Choose your {group.kind === "software" ? "products" : "services"}
+            </h3>
+            <button
+              type="button"
+              className="purchase-editor__clear"
+              onClick={() =>
+                onClear ? onClear() : onChange({ ...group, lines: [] })
+              }
+            >
+              Clear all
+            </button>
+          </div>
           <p>One package each. The same features at every duration.</p>
         </div>
       </div>
@@ -454,7 +428,7 @@ export function ConfigurationEditor({ group, onChange, showLines = true }) {
           </div>
           <p id={`${durationId}-note`}>
             {sharedDuration
-              ? "Apply one period to all items, or open their individual options below."
+              ? "Apply one period to all items. Turn off shared duration to set each item individually."
               : "Shared duration is off. Choose a duration for each item below; other items keep their selected durations."}
           </p>
         </div>
@@ -473,34 +447,9 @@ export function ConfigurationEditor({ group, onChange, showLines = true }) {
           />
         )}
         {showLines &&
+          !sharedDuration &&
           group.lines.length > 0 &&
-          (sharedDuration ? (
-            <details className="purchase-customization" key={group.id}>
-              <summary>
-                <strong className="purchase-customization__copy">
-                  Individual{" "}
-                  {group.kind === "software" ? "products" : "services"}
-                </strong>
-                <span
-                  className="purchase-customization__toggle"
-                  aria-hidden="true"
-                >
-                  <span className="purchase-customization__show">
-                    Show options
-                  </span>
-                  <span className="purchase-customization__hide">
-                    Hide options
-                  </span>
-                  <i className="ph ph-caret-down" />
-                </span>
-              </summary>
-              <div className="purchase-customization__content">
-                {individualLines}
-              </div>
-            </details>
-          ) : (
-            individualLines
-          ))}
+          individualLines}
       </div>
       <PurchaseDialog
         open={pendingMonths !== null}
@@ -727,18 +676,16 @@ export function PurchasingOverview({ kind, initialIds, initialDuration }) {
             Choose your items, set their durations, and review your plan.
           </PurchaseHeading>
           <div className="purchase-toolbar">
-            <button
-              type="button"
-              onClick={() => update(groupFromIds(kind, []))}
-            >
-              Start from scratch
-            </button>
             <span>
               {group.lines.length ? groupName(group) : "Choose your first item"}
             </span>
           </div>
           <div className="purchase-layout">
-            <ConfigurationEditor group={group} onChange={update} />
+            <ConfigurationEditor
+              group={group}
+              onChange={update}
+              onClear={() => update(groupFromIds(kind, []))}
+            />
             <QuoteSummary groups={[group]}>
               <p>
                 {group.lines.length}{" "}

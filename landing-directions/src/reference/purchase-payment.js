@@ -12,14 +12,14 @@ export const PAYMENT_METHODS = Object.freeze([
     name: "TWINT",
     description: "Mobile payment",
     icon: "device-mobile",
-    guidance: "Approve the TWINT payment below, then pay the amount shown.",
+    guidance: "Use the Pay button below to complete your test TWINT payment.",
   }),
   Object.freeze({
     id: "paypal",
     name: "PayPal",
     description: "PayPal account",
     icon: "wallet",
-    guidance: "Approve the PayPal payment below, then pay the amount shown.",
+    guidance: "Use the Pay button below to complete your test PayPal payment.",
   }),
 ]);
 
@@ -69,8 +69,6 @@ export function validateTestPaymentDetails(methodId, details = {}) {
       errors.expiry = `Use the test expiry ${TEST_CARD_EXPIRY}.`;
     if (details.securityCode !== TEST_CARD_SECURITY_CODE)
       errors.securityCode = `Use the test security code ${TEST_CARD_SECURITY_CODE}.`;
-  } else if (details.walletApproved !== true) {
-    errors.walletApproval = `Approve the ${method.name} test payment first.`;
   }
   return errors;
 }
@@ -79,6 +77,6 @@ export function createTestPaymentAuthorization(methodId, details) {
   const method = getPaymentMethod(methodId);
   if (Object.keys(validateTestPaymentDetails(method.id, details)).length)
     throw new Error("Complete your payment details or approval first.");
-  // Only this method-specific flag crosses the simulation boundary.
+  // The Pay request confirms this local simulation. No wallet approval or credentials are collected.
   return Object.freeze({ method: method.id, approved: true });
 }

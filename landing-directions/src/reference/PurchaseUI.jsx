@@ -319,9 +319,12 @@ export function PackageLines({
 export function ConfigurationEditor({ group, onChange, showLines = true }) {
   const [department, setDepartment] = useState("all");
   const [pendingMonths, setPendingMonths] = useState(null);
+  const [sharedDuration, setSharedDuration] = useState(true);
+  const durationId = useId();
   useEffect(() => {
     setDepartment("all");
     setPendingMonths(null);
+    setSharedDuration(true);
   }, [group.id]);
   const options = CATALOG.filter((i) => i.kind === group.kind);
   const departments = [
@@ -351,6 +354,22 @@ export function ConfigurationEditor({ group, onChange, showLines = true }) {
             { catalogId: id, months: group.defaultMonths, autoRenew: false },
           ],
     });
+  const individualLines = (
+    <PackageLines
+      group={group}
+      compact
+      optionalDuration={sharedDuration}
+      onChange={(id, patch) =>
+        onChange({
+          ...group,
+          lines: group.lines.map((line) =>
+            line.catalogId === id ? { ...line, ...patch } : line,
+          ),
+        })
+      }
+      onRemove={toggle}
+    />
+  );
   return (
     <div className="purchase-editor">
       <div className="purchase-editor__step">
@@ -417,53 +436,72 @@ export function ConfigurationEditor({ group, onChange, showLines = true }) {
       </div>
       <div className="purchase-editor__step">
         <span className="purchase-step">02</span>
-        <div>
-          <h3>Set your shared duration</h3>
-          <p>Apply one period to all items, then adjust them individually.</p>
+        <div className="purchase-editor__duration-copy">
+          <div className="purchase-editor__duration-title">
+            <h3>Set your shared duration</h3>
+            <label className="purchase-duration-switch">
+              <input
+                type="checkbox"
+                role="switch"
+                aria-label="Use shared duration"
+                aria-controls={`${durationId}-controls`}
+                aria-describedby={`${durationId}-note`}
+                checked={sharedDuration}
+                onChange={(event) => setSharedDuration(event.target.checked)}
+              />
+              <span aria-hidden="true" />
+            </label>
+          </div>
+          <p id={`${durationId}-note`}>
+            {sharedDuration
+              ? "Apply one period to all items, or open their individual options below."
+              : "Shared duration is off. Choose a duration for each item below; other items keep their selected durations."}
+          </p>
         </div>
       </div>
-      <DurationPicker
-        label="Shared duration"
-        months={group.defaultMonths}
-        showSavings
-        onChange={(months) =>
-          group.lines.some((l) => l.months !== group.defaultMonths)
-            ? setPendingMonths(months)
-            : applyDuration(months)
-        }
-      />
-      {showLines && group.lines.length > 0 && (
-        <details className="purchase-customization" key={group.id}>
-          <summary className="purchase-editor__step">
-            <span className="purchase-step">03</span>
-            <div className="purchase-customization__copy">
-              <h3>Make it yours</h3>
-              <p>Choose individual periods and renewal preferences.</p>
-            </div>
-            <span className="purchase-customization__toggle" aria-hidden="true">
-              <span className="purchase-customization__show">Show options</span>
-              <span className="purchase-customization__hide">Hide options</span>
-              <i className="ph ph-caret-down" />
-            </span>
-          </summary>
-          <div className="purchase-customization__content">
-            <PackageLines
-              group={group}
-              compact
-              optionalDuration
-              onChange={(id, patch) =>
-                onChange({
-                  ...group,
-                  lines: group.lines.map((l) =>
-                    l.catalogId === id ? { ...l, ...patch } : l,
-                  ),
-                })
-              }
-              onRemove={toggle}
-            />
-          </div>
-        </details>
-      )}
+      <div id={`${durationId}-controls`}>
+        {sharedDuration && (
+          <DurationPicker
+            label="Shared duration"
+            months={group.defaultMonths}
+            showSavings
+            onChange={(months) =>
+              group.lines.some((line) => line.months !== group.defaultMonths)
+                ? setPendingMonths(months)
+                : applyDuration(months)
+            }
+          />
+        )}
+        {showLines &&
+          group.lines.length > 0 &&
+          (sharedDuration ? (
+            <details className="purchase-customization" key={group.id}>
+              <summary>
+                <strong className="purchase-customization__copy">
+                  Individual{" "}
+                  {group.kind === "software" ? "products" : "services"}
+                </strong>
+                <span
+                  className="purchase-customization__toggle"
+                  aria-hidden="true"
+                >
+                  <span className="purchase-customization__show">
+                    Show options
+                  </span>
+                  <span className="purchase-customization__hide">
+                    Hide options
+                  </span>
+                  <i className="ph ph-caret-down" />
+                </span>
+              </summary>
+              <div className="purchase-customization__content">
+                {individualLines}
+              </div>
+            </details>
+          ) : (
+            individualLines
+          ))}
+      </div>
       <PurchaseDialog
         open={pendingMonths !== null}
         title="Replace individual durations?"

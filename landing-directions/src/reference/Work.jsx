@@ -1463,7 +1463,7 @@ export default class Work extends ReferencePage {
                         >
                           <span style={{ display: "block" }}>
                             <span data-line={""} style={{ display: "block" }}>
-                              {"Our work,"}
+                              {"Every project,"}
                             </span>
                           </span>
                           <span style={{ display: "block" }}>
@@ -1476,7 +1476,7 @@ export default class Work extends ReferencePage {
                                 letterSpacing: "-.045em",
                               }}
                             >
-                              {"up close."}
+                              {"clearly labelled."}
                             </span>
                           </span>
                         </h1>
@@ -1492,7 +1492,7 @@ export default class Work extends ReferencePage {
                         }}
                       >
                         {
-                          "Explore OrgTik work across brand, design, and digital experiences."
+                          "From OrgTik-owned work to concept previews. Each story shows its status up front, so nothing is presented as more than it is."
                         }
                       </p>
                     </div>
@@ -2210,7 +2210,7 @@ export default class Work extends ReferencePage {
                               fontVariantNumeric: "tabular-nums",
                             }}
                           >
-                            {"(02)"}
+                            {"(05)"}
                           </span>
                           <span
                             style={{
@@ -2266,7 +2266,7 @@ export default class Work extends ReferencePage {
                         }}
                       >
                         {
-                          "OrgTik brand applications across print, digital screens, and signage."
+                          "These frames show OrgTik brand applications until approved project captures are supplied. Drop your own images onto any frame."
                         }
                       </p>
                     </div>
@@ -2351,7 +2351,7 @@ export default class Work extends ReferencePage {
                               fontVariantNumeric: "tabular-nums",
                             }}
                           >
-                            {"(03)"}
+                            {"(06)"}
                           </span>
                           <span
                             style={{
@@ -2406,7 +2406,9 @@ export default class Work extends ReferencePage {
                           color: "#CFC2DB",
                         }}
                       >
-                        {"Explore more work from OrgTik."}
+                        {
+                          "Two more stories from the studio, each with its status clearly shown."
+                        }
                       </p>
                     </div>
                     <div

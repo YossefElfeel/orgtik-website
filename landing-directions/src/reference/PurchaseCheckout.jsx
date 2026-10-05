@@ -509,16 +509,13 @@ export default function PurchaseCheckout() {
                     </p>
                   )}
                 </fieldset>
-                {selectedMethod && (
+                {paymentMethod === "card" && (
                   <PaymentDetails
-                    key={paymentMethod}
-                    methodId={paymentMethod}
                     details={paymentDetails}
                     onChange={setPaymentDetails}
                     errors={errors}
                     onErrors={setErrors}
                     processing={processing}
-                    amount={money(quoteCart(items).total)}
                   />
                 )}
                 <div className="purchase-payment-total">

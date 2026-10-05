@@ -429,19 +429,13 @@ test("test card entry accepts only synthetic values and requires all payment det
   });
 });
 
-test("wallets require method-specific approval before payment and never retain authorization", async () => {
+test("wallets need no extra details and retain method-specific test payment intent", async () => {
   for (const method of ["twint", "paypal"]) {
-    assert.ok(validateTestPaymentDetails(method, {}).walletApproval);
-    assert.ok(
-      validateTestPaymentDetails(method, { walletApproved: false })
-        .walletApproval,
-    );
-    assert.deepEqual(
-      validateTestPaymentDetails(method, { walletApproved: true }),
-      {},
-    );
-    const authorization = createTestPaymentAuthorization(method, {
-      walletApproved: true,
+    assert.deepEqual(validateTestPaymentDetails(method), {});
+    const authorization = createTestPaymentAuthorization(method);
+    assert.deepEqual(authorization, {
+      method,
+      approved: true,
     });
     await assert.rejects(
       simulatePaymentRequest({

@@ -7,9 +7,7 @@ import "./case-study.css";
 export function CaseStudy({ project }) {
   const headerRef = useRef(null);
   useChartReveal(headerRef);
-  const study = CASE_STUDIES[project.slug]?.approved
-    ? CASE_STUDIES[project.slug]
-    : null;
+  const study = CASE_STUDIES[project.slug];
   const dept = study?.department || project.service;
   const format = CASE_STUDY_FORMATS[dept];
   const view = DEPARTMENTS[dept];
@@ -68,6 +66,7 @@ export function CaseStudy({ project }) {
                 block={study.results}
               />
               <view.Results study={study} />
+              <SampleNote />
             </div>
           </section>
         </>
@@ -131,6 +130,16 @@ function SectionHead({ n, label, format, id, block }) {
   );
 }
 
+function SampleNote() {
+  return (
+    <p className="cs-sample">
+      <i className="ph ph-info" aria-hidden="true" />
+      Figures in this section are samples until approved project results are
+      supplied.
+    </p>
+  );
+}
+
 function Tags({ items }) {
   return (
     <ul className="cs-tags">
@@ -186,6 +195,7 @@ function Brief({ project, study, dept }) {
                 <span className="cs-highlight__tag">Headline result</span>
                 <strong>{study.highlight.value}</strong>
                 <span>{study.highlight.label}</span>
+                <small>Sample figure</small>
               </div>
             )}
             <dl className="cs-facts">
@@ -408,7 +418,7 @@ function DevResults({ study }) {
     <>
       <figure className="cs-gauges">
         <figcaption>
-          <code>Technical audit</code>
+          <code>Prototype audit</code>
         </figcaption>
         <ul>
           {r.gauges.map((g) => (

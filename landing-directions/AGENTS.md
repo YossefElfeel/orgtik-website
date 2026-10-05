@@ -1,3 +1,7 @@
+## Work and case-study restoration — 2026-10-05
+
+The user requested restoring Work and its case studies from the older repository. Restore the five projects and complete department-specific stories from `edc4a8a`, including their existing concept/mock status labels and sample-result disclosures. This explicit restoration supersedes the later empty-case-study and single-project restriction for Work. Preserve current account controls, navigation, responsiveness, and the purchasing flow.
+
 ## Roadmap restoration — 2026-10-05
 
 The user requested restoring the earlier Roadmap in both the website and Figma. Keep the timeline, 2025–2027 milestones, period/theme/search filters, community ideas and session-only voting, item dialog, and local suggestion form from the last complete Roadmap at `edc4a8a`. This explicit restoration supersedes the empty public-update placeholder for this page. Preserve its existing preview disclosures, current `AccountControl` navigation, and local-only interactions; suggestions and votes are never sent or persisted.

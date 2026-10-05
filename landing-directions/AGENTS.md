@@ -1,3 +1,7 @@
+## Roadmap restoration — 2026-10-05
+
+The user requested restoring the earlier Roadmap in both the website and Figma. Keep the timeline, 2025–2027 milestones, period/theme/search filters, community ideas and session-only voting, item dialog, and local suggestion form from the last complete Roadmap at `edc4a8a`. This explicit restoration supersedes the empty public-update placeholder for this page. Preserve its existing preview disclosures, current `AccountControl` navigation, and local-only interactions; suggestions and votes are never sent or persisted.
+
 ## Duration filter design — 2026-10-04
 
 Every active duration selector uses the shared `DurationPicker` and matches the department filter pills: separate fully rounded options, a thin lilac outline when unselected, and a dark plum selected state. All options in a row have equal height, including the one-month option without a savings label. Do not put the options inside a filled segmented bar. Keep duration/savings labels, native radio behavior, keyboard focus, and an even four-option row or two-by-two layout in narrow containers. Apply the same style to bundles, Services/Software builders, individual packages, the pricing directory, and cart editors.

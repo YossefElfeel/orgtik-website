@@ -1,5 +1,6 @@
 import React from "react";
 import { SiteHeader } from "./SiteHeader";
+import { SiteFooter } from "./SiteFooter";
 
 export function CommerceLayout({
   checkout = false,
@@ -29,26 +30,7 @@ export function CommerceLayout({
         )}
         {children}
       </main>
-      <footer className="commerce-footer">
-        <a href="/" className="commerce-footer__logo">
-          <img
-            src="/assets/logo/orgtik-mark-white.svg"
-            alt=""
-            className="commerce-brand__mark"
-          />
-          <img
-            src="/assets/logo/orgtik-wordmark-white.svg"
-            alt="OrgTik home"
-            className="commerce-brand__wordmark"
-          />
-        </a>
-        <p>Strategy. Design. Technology.</p>
-        <div>
-          <a href="/plans">Bundles &amp; pricing</a>
-          <a href="/contact">Talk to us</a>
-          <a href="/legal#/privacy">Privacy policy</a>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -1,3 +1,7 @@
+## Commerce footer — 2026-10-06
+
+Cart, checkout, purchase confirmation, account handoff, and every other commerce screen use the original full site footer on desktop and mobile. Reuse `SiteFooter.jsx`, with the official logo, Back to top, Make the next move matter, Explore and Start here navigation, social placeholders, Swiss flag, and copyright. Do not restore the compact commerce footer. Figma screens use linked Site footer instances; clear Ready for dev on changed screens.
+
 ## Work and case-study restoration — 2026-10-05
 
 The user requested restoring Work and its case studies from the older repository. Restore the five projects and complete department-specific stories from `edc4a8a`, including their existing concept/mock status labels and sample-result disclosures. This explicit restoration supersedes the later empty-case-study and single-project restriction for Work. Preserve current account controls, navigation, responsiveness, and the purchasing flow.

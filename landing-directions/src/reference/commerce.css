@@ -1069,38 +1069,6 @@
   font-size: 13px;
   line-height: 1.5;
 }
-.commerce-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
-  padding: 40px max(clamp(20px, 4.4vw, 64px), calc((100% - 1184px) / 2));
-  background: #120a1b;
-  color: #cfc2db;
-  font-size: 13px;
-}
-.commerce-footer__logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-.commerce-footer__logo .commerce-brand__mark {
-  width: 26px;
-  height: 26px;
-  object-fit: contain;
-}
-.commerce-footer__logo .commerce-brand__wordmark {
-  width: 94px;
-  height: auto;
-}
-.commerce-footer > div {
-  display: flex;
-  gap: 24px;
-}
-.commerce-footer a {
-  color: #eee3f7;
-}
 @media (max-width: 1179px) {
   .commerce-header {
     gap: 10px;
